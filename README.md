@@ -30,7 +30,7 @@
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/buslk-android.git
+git clone https://github.com/shashika-mora/buslk-android
 
 ```
 
@@ -49,6 +49,6 @@ This application heavily leverages core OOP concepts:
 
 ## 🤝 Contributing
 
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://www.google.com/search?q=https://github.com/yourusername/buslk-android/issues).
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/shashika-mora/buslk-android/issues).
 
 ---
