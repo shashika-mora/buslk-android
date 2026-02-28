@@ -1,63 +1,278 @@
 package com.buslk.ui.screens
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.buslk.auth.GoogleAuthClient
+import com.buslk.ui.theme.BusLKTheme
 import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
-    onSignInSuccess: () -> Unit
+    onSignInSuccess: () -> Unit,
+    onBackClick: () -> Unit
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val googleAuthClient = remember { GoogleAuthClient(context) }
+    
+    var selectedTabIndex by remember { mutableStateOf(0) } // 0 for Login, 1 for Sign Up
     var isLoading by remember { mutableStateOf(false) }
 
     Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+            .padding(24.dp)
+            .statusBarsPadding()
     ) {
-        Text(text = "Welcome to BusLK", style = MaterialTheme.typography.headlineLarge)
-        Spacer(modifier = Modifier.height(32.dp))
+        // Back Button
+        IconButton(
+            onClick = onBackClick,
+            modifier = Modifier.align(Alignment.Start)
+        ) {
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = "Back",
+                tint = Color.Black
+            )
+        }
         
-        if (isLoading) {
-            CircularProgressIndicator()
-        } else {
-            Button(onClick = {
-                coroutineScope.launch {
-                    isLoading = true
-                    val result = googleAuthClient.signInWithGoogle()
-                    isLoading = false
-                    if (result?.user != null) {
-                        Toast.makeText(context, "Sign in successful!", Toast.LENGTH_SHORT).show()
-                        onSignInSuccess()
-                    } else {
-                        Toast.makeText(context, "Sign in failed", Toast.LENGTH_SHORT).show()
-                    }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Title
+        Text(
+            text = if (selectedTabIndex == 0) "Welcome Back!" else "Create Account",
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black
+        )
+        
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Tabs
+        AuthTabs(selectedTabIndex = selectedTabIndex, onTabSelected = { selectedTabIndex = it })
+        
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // Google SignIn Button
+        GoogleSignInButton(isLoading = isLoading) {
+            coroutineScope.launch {
+                isLoading = true
+                val result = googleAuthClient.signInWithGoogle()
+                isLoading = false
+                if (result?.user != null) {
+                    Toast.makeText(context, "Sign in successful!", Toast.LENGTH_SHORT).show()
+                    onSignInSuccess()
+                } else {
+                    Toast.makeText(context, "Sign in failed", Toast.LENGTH_SHORT).show()
                 }
-            }) {
-                Text("Continue with Google")
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(24.dp))
+        
+        // OR Divider
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            HorizontalDivider(modifier = Modifier.weight(1f), color = Color.LightGray)
+            Text(
+                text = "Or",
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = Color.Gray,
+                fontSize = 14.sp
+            )
+            HorizontalDivider(modifier = Modifier.weight(1f), color = Color.LightGray)
+        }
+        
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Form Fields
+        AuthForm(isLogin = selectedTabIndex == 0)
+        
+        Spacer(modifier = Modifier.weight(1f))
+        
+        // Main Action Button
+        Button(
+            onClick = { /* TODO: Implement Email/Password Logic */ },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E5DE6)),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Text(
+                text = if (selectedTabIndex == 0) "Login" else "Sign Up",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+        
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+@Composable
+fun AuthTabs(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .background(Color(0xFFF5F5F5), RoundedCornerShape(28.dp))
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        TabButton(
+            text = "Login",
+            isSelected = selectedTabIndex == 0,
+            modifier = Modifier.weight(1f),
+            onClick = { onTabSelected(0) }
+        )
+        TabButton(
+            text = "Sign Up",
+            isSelected = selectedTabIndex == 1,
+            modifier = Modifier.weight(1f),
+            onClick = { onTabSelected(1) }
+        )
+    }
+}
+
+@Composable
+fun TabButton(text: String, isSelected: Boolean, modifier: Modifier, onClick: () -> Unit) {
+    val backgroundColor = if (isSelected) Color(0xFF1E5DE6) else Color.Transparent
+    val textColor = if (isSelected) Color.White else Color.Gray
+
+    Box(
+        modifier = modifier
+            .fillMaxHeight()
+            .background(backgroundColor, RoundedCornerShape(24.dp))
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        Text(text = text, color = textColor, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+    }
+}
+
+@Composable
+fun GoogleSignInButton(isLoading: Boolean, onClick: () -> Unit) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.White),
+        enabled = !isLoading
+    ) {
+        if (isLoading) {
+            CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+        } else {
+            // Simple generic G to represent Google (Using colors could be added later or an image icon)
+            Text(text = "G", color = Color(0xFFEA4335), fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
+            Spacer(modifier = Modifier.width(12.dp))
+            Text("Continue with Google", color = Color.Black, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+        }
+    }
+}
+
+@Composable
+fun AuthForm(isLogin: Boolean) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
+
+    Column {
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email Address") },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color(0xFF1E5DE6),
+                focusedLabelColor = Color(0xFF1E5DE6)
+            )
+        )
+        
+        Spacer(modifier = Modifier.height(16.dp))
+        
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Password") },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            singleLine = true,
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            trailingIcon = {
+                val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(imageVector = image, contentDescription = if (passwordVisible) "Hide password" else "Show password")
+                }
+            },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color(0xFF1E5DE6),
+                focusedLabelColor = Color(0xFF1E5DE6)
+            )
+        )
+
+        if (!isLogin) {
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            OutlinedTextField(
+                value = confirmPassword,
+                onValueChange = { confirmPassword = it },
+                label = { Text("Confirm Password") },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                singleLine = true,
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFF1E5DE6),
+                    focusedLabelColor = Color(0xFF1E5DE6)
+                )
+            )
+        } else {
+            // Forgot Password Link
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                TextButton(onClick = { /* TODO: Implement Forgot Password */ }) {
+                    Text(
+                        text = "Forgot Password?",
+                        color = Color(0xFF1E5DE6),
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
         }
     }
@@ -66,7 +281,7 @@ fun LoginScreen(
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    MaterialTheme {
-        LoginScreen(onSignInSuccess = {})
+    BusLKTheme {
+        LoginScreen(onSignInSuccess = {}, onBackClick = {})
     }
 }
