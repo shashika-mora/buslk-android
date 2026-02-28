@@ -1,6 +1,8 @@
 package com.buslk
 
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -24,10 +26,17 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import com.buslk.ui.theme.BusLKTheme
+import com.google.firebase.FirebaseApp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Initialize Firebase
+        FirebaseApp.initializeApp(this)
+        Log.d("BusLK_Setup", "Firebase Initialized Successfully!")
+        Toast.makeText(this, "Firebase Initialized!", Toast.LENGTH_SHORT).show()
+        
         enableEdgeToEdge()
         setContent {
             BusLKTheme {
