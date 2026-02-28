@@ -70,6 +70,9 @@ fun BusLKApp() {
             LoginScreen(
                 onSignInSuccess = {
                     currentDestination = AppDestinations.HOME
+                },
+                onBackClick = {
+                    currentDestination = AppDestinations.OPENING
                 }
             )
         }
