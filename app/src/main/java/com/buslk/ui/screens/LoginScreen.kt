@@ -131,7 +131,9 @@ fun LoginScreen(
             password = password,
             onPasswordChange = { password = it },
             confirmPassword = confirmPassword,
-            onConfirmPasswordChange = { confirmPassword = it }
+            onConfirmPasswordChange = { confirmPassword = it },
+            isLoading = isLoading,
+            authViewModel = authViewModel
         )
         
         Spacer(modifier = Modifier.weight(1f))
@@ -152,14 +154,22 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E5DE6)),
+            enabled = !isLoading && email.isNotEmpty() && password.isNotEmpty(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF1E5DE6),
+                disabledContainerColor = Color.LightGray
+            ),
             shape = RoundedCornerShape(12.dp)
         ) {
-            Text(
-                text = if (selectedTabIndex == 0) "Login" else "Sign Up",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold
-            )
+            if (isLoading) {
+                CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White, strokeWidth = 2.dp)
+            } else {
+                Text(
+                    text = if (selectedTabIndex == 0) "Login" else "Sign Up",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
         }
         
         Spacer(modifier = Modifier.height(16.dp))
@@ -237,9 +247,18 @@ fun AuthForm(
     password: String,
     onPasswordChange: (String) -> Unit,
     confirmPassword: String,
-    onConfirmPasswordChange: (String) -> Unit
+    onConfirmPasswordChange: (String) -> Unit,
+    isLoading: Boolean,
+    authViewModel: com.buslk.ui.auth.AuthViewModel
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
+    val uiState by authViewModel.uiState.collectAsState()
+    
+    val isEmailError = uiState is com.buslk.ui.auth.AuthUiState.Error && 
+            (uiState as com.buslk.ui.auth.AuthUiState.Error).message.contains("Email", ignoreCase = true)
+    
+    val isPasswordError = uiState is com.buslk.ui.auth.AuthUiState.Error && 
+            (uiState as com.buslk.ui.auth.AuthUiState.Error).message.contains("Password", ignoreCase = true)
 
     Column {
         OutlinedTextField(
@@ -249,10 +268,16 @@ fun AuthForm(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            enabled = !isLoading,
+            isError = isEmailError,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                imeAction = androidx.compose.ui.text.input.ImeAction.Next
+            ),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color(0xFF1E5DE6),
-                focusedLabelColor = Color(0xFF1E5DE6)
+                focusedLabelColor = Color(0xFF1E5DE6),
+                errorBorderColor = Color.Red
             )
         )
         
@@ -265,8 +290,13 @@ fun AuthForm(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             singleLine = true,
+            enabled = !isLoading,
+            isError = isPasswordError,
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction = if (isLogin) androidx.compose.ui.text.input.ImeAction.Done else androidx.compose.ui.text.input.ImeAction.Next
+            ),
             trailingIcon = {
                 val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
@@ -275,7 +305,8 @@ fun AuthForm(
             },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color(0xFF1E5DE6),
-                focusedLabelColor = Color(0xFF1E5DE6)
+                focusedLabelColor = Color(0xFF1E5DE6),
+                errorBorderColor = Color.Red
             )
         )
 
@@ -289,8 +320,12 @@ fun AuthForm(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 singleLine = true,
+                enabled = !isLoading,
                 visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = androidx.compose.ui.text.input.ImeAction.Done
+                ),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color(0xFF1E5DE6),
                     focusedLabelColor = Color(0xFF1E5DE6)
@@ -302,7 +337,10 @@ fun AuthForm(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.CenterEnd
             ) {
-                TextButton(onClick = { /* TODO: Implement Forgot Password */ }) {
+                TextButton(
+                    onClick = { /* TODO: Implement Forgot Password */ },
+                    enabled = !isLoading
+                ) {
                     Text(
                         text = "Forgot Password?",
                         color = Color(0xFF1E5DE6),
