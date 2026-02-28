@@ -50,13 +50,20 @@ class MainActivity : ComponentActivity() {
 @PreviewScreenSizes
 @Composable
 fun BusLKApp() {
-    var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.LOGIN) }
+    val auth = com.google.firebase.auth.FirebaseAuth.getInstance()
+    var currentDestination by rememberSaveable { 
+        mutableStateOf(if (auth.currentUser != null) AppDestinations.HOME else AppDestinations.LOGIN) 
+    }
 
     if (currentDestination == AppDestinations.LOGIN) {
         // Hide navigation suite on login screen
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             // Pass innerPadding to LoginScreen if needed, or wrap it
-            LoginScreen()
+            LoginScreen(
+                onSignInSuccess = {
+                    currentDestination = AppDestinations.HOME
+                }
+            )
         }
     } else {
         NavigationSuiteScaffold(
