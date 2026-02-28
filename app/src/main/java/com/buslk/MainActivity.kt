@@ -8,6 +8,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Favorite
@@ -95,10 +98,21 @@ fun BusLKApp() {
             }
         ) {
             Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                Greeting(
-                    name = currentDestination.label,
-                    modifier = Modifier.padding(innerPadding)
-                )
+                if (currentDestination == AppDestinations.HOME || currentDestination == AppDestinations.PROFILE) {
+                    HomeScreen(
+                        user = auth.currentUser,
+                        onSignOut = {
+                            auth.signOut()
+                            currentDestination = AppDestinations.OPENING
+                        },
+                        modifier = Modifier.padding(innerPadding)
+                    )
+                } else {
+                    Greeting(
+                        name = currentDestination.label,
+                        modifier = Modifier.padding(innerPadding)
+                    )
+                }
             }
         }
     }
@@ -117,10 +131,38 @@ enum class AppDestinations(
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+    Box(modifier = modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
+        Text(
+            text = "Hello $name!",
+            style = androidx.compose.material3.MaterialTheme.typography.headlineMedium
+        )
+    }
+}
+
+@Composable
+fun HomeScreen(
+    user: com.google.firebase.auth.FirebaseUser?,
+    onSignOut: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    androidx.compose.foundation.layout.Column(
+        modifier = modifier.fillMaxSize().padding(16.dp),
+        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
+        verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+    ) {
+        if (user != null) {
+            Text(text = "Welcome, ${user.displayName ?: "User"}!", style = androidx.compose.material3.MaterialTheme.typography.headlineMedium)
+            androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(8.dp))
+            Text(text = "Email: ${user.email ?: "Unknown"}", style = androidx.compose.material3.MaterialTheme.typography.bodyLarge)
+            
+            androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(32.dp))
+            androidx.compose.material3.Button(onClick = onSignOut) {
+                Text("Sign Out")
+            }
+        } else {
+            Text(text = "Welcome to Home!", style = androidx.compose.material3.MaterialTheme.typography.headlineMedium)
+        }
+    }
 }
 
 @Preview(showBackground = true)
