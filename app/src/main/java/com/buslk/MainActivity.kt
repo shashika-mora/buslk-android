@@ -45,6 +45,8 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
+
 @PreviewScreenSizes
 @Composable
 fun BusLKApp() {
