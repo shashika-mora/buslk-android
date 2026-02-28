@@ -24,10 +24,13 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.buslk.auth.GoogleAuthClient
 import com.buslk.ui.theme.BusLKTheme
 import kotlinx.coroutines.launch
 
+// OOD Principle: Dependency Injection & State Hoisting.
+// Instead of creating the ViewModel inside the screen or managing its own complex
+// authentication logic, LoginScreen accepts the AuthViewModel as a parameter.
+// This decouples the UI from the business logic.
 @Composable
 fun LoginScreen(
     authViewModel: com.buslk.ui.auth.AuthViewModel,

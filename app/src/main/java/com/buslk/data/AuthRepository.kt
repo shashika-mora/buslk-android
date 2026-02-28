@@ -13,24 +13,40 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
 /**
- * Repository responsible for handling all Firebase Authentication operations.
- * Supports Email/Password login, signup, and Google Sign-In via Android Credential Manager.
+ * Interface representing the Authentication Use Cases.
+ * OOD Principle: Abstraction & Dependency Inversion Principle (SOLID).
+ * By depending on this interface rather than a concrete implementation,
+ * UI and ViewModels become loosely coupled and easily testable.
  */
-class AuthRepository {
+interface IAuthRepository {
+    fun getCurrentUser(): FirebaseUser?
+    fun signOut()
+    suspend fun signInWithEmailAndPassword(email: String, password: String): Result<FirebaseUser>
+    suspend fun signUpWithEmailAndPassword(email: String, password: String): Result<FirebaseUser>
+    suspend fun signInWithGoogle(context: Context): Result<FirebaseUser>
+}
+
+/**
+ * Concrete implementation of [IAuthRepository] handling Firebase Authentication.
+ * OOD Principle: Encapsulation. This class hides the complex details of
+ * CredentialManager and Firebase APIs from the rest of the application.
+ */
+class AuthRepository : IAuthRepository {
+    // OOD Principle: Encapsulation - auth instance is private.
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
     /** Returns the currently signed-in Firebase user, or null if not signed in. */
-    fun getCurrentUser(): FirebaseUser? = auth.currentUser
+    override fun getCurrentUser(): FirebaseUser? = auth.currentUser
 
     /** Signs the user out of Firebase. */
-    fun signOut() = auth.signOut()
+    override fun signOut() = auth.signOut()
 
     /**
      * Signs in a user with their email address and password.
      *
      * @return [Result.success] with the [FirebaseUser] on success, or [Result.failure] on error.
      */
-    suspend fun signInWithEmailAndPassword(email: String, password: String): Result<FirebaseUser> {
+    override suspend fun signInWithEmailAndPassword(email: String, password: String): Result<FirebaseUser> {
         return try {
             val authResult = auth.signInWithEmailAndPassword(email, password).await()
             val user = authResult.user ?: return Result.failure(Exception("Sign-in succeeded but user is null"))
@@ -47,21 +63,13 @@ class AuthRepository {
      *
      * @return [Result.success] with the [FirebaseUser] on success, or [Result.failure] on error.
      */
-    suspend fun signUpWithEmailAndPassword(email: String, password: String): Result<FirebaseUser> {
+    override suspend fun signUpWithEmailAndPassword(email: String, password: String): Result<FirebaseUser> {
         return try {
             val authResult = auth.createUserWithEmailAndPassword(email, password).await()
             val user = authResult.user ?: return Result.failure(Exception("Sign-up succeeded but user is null"))
             
-            // Create user document in Firestore
-            val db = FirebaseFirestore.getInstance()
-            val userDoc = UserDoc(
-                uid = user.uid,
-                displayName = "New User",
-                email = user.email ?: email,
-                points = 0,
-                level = "Beginner"
-            )
-            db.collection("users").document(user.uid).set(userDoc).await()
+            // Sync user document in Firestore (Registration case)
+            syncUserToFirestore(user, isInitialRegistration = true)
 
             Result.success(user)
         } catch (e: Exception) {
@@ -75,7 +83,7 @@ class AuthRepository {
      *
      * @return [Result.success] with the [FirebaseUser] on success, or [Result.failure] on error.
      */
-    suspend fun signInWithGoogle(context: Context): Result<FirebaseUser> {
+    override suspend fun signInWithGoogle(context: Context): Result<FirebaseUser> {
         return try {
             val credentialManager = CredentialManager.create(context)
 
@@ -103,20 +111,8 @@ class AuthRepository {
 
             val user = authResult.user ?: return Result.failure(Exception("Sign-in succeeded but user is null"))
             
-            // Generate user document in Firestore if it is a new user
-            val db = FirebaseFirestore.getInstance()
-            val userRef = db.collection("users").document(user.uid)
-            val userSnap = userRef.get().await()
-            if (!userSnap.exists()) {
-                val userDoc = UserDoc(
-                    uid = user.uid,
-                    displayName = user.displayName ?: "Google User",
-                    email = user.email ?: "",
-                    points = 0,
-                    level = "Beginner"
-                )
-                userRef.set(userDoc).await()
-            }
+            // Sync user document in Firestore (Google handles both login and registration)
+            syncUserToFirestore(user)
 
             Result.success(user)
         } catch (e: GetCredentialCancellationException) {
@@ -125,6 +121,50 @@ class AuthRepository {
             Result.failure(Exception("Sign-in failed: ${e.localizedMessage}"))
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    /**
+     * Synchronizes the FirebaseUser state with the Firestore /users collection.
+     * 
+     * OOD Principle: Encapsulation & Robustness.
+     * It ensures that new users get default fields (points, level, stats)
+     * while existing users only get their 'updatedAt' timestamp or profile info refreshed,
+     * protecting their accrued balance (points) and trip history.
+     */
+    private suspend fun syncUserToFirestore(user: FirebaseUser, isInitialRegistration: Boolean = false) {
+        val db = FirebaseFirestore.getInstance()
+        val userRef = db.collection("users").document(user.uid)
+        
+        try {
+            val userSnap = userRef.get().await()
+            val existingUser = userSnap.toObject(UserDoc::class.java)
+
+            if (existingUser == null || isInitialRegistration) {
+                // NEW USER case: Initialize with default schema from db.md
+                val newUserDoc = UserDoc(
+                    uid = user.uid,
+                    displayName = user.displayName ?: if (isInitialRegistration) "New User" else "Google User",
+                    email = user.email ?: "",
+                    photoUrl = user.photoUrl?.toString() ?: "",
+                    role = "Passenger" // Default role as per auth.md
+                )
+                userRef.set(newUserDoc).await()
+            } else {
+                // EXISTING USER case: Update volatile fields only, preserving history/points
+                val updates = mutableMapOf<String, Any>(
+                    "updatedAt" to com.google.firebase.firestore.FieldValue.serverTimestamp()
+                )
+                
+                // Refresh profile fields if they changed in Google/Auth
+                user.displayName?.let { updates["displayName"] = it }
+                user.photoUrl?.let { updates["photoUrl"] = it.toString() }
+                
+                userRef.update(updates).await()
+            }
+        } catch (e: Exception) {
+            // Log error or handle silently depending on criticality
+            println("Firestore sync failed: ${e.message}")
         }
     }
 }

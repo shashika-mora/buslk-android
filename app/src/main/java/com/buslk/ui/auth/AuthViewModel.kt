@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.buslk.data.AuthRepository
+import com.buslk.data.IAuthRepository
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,9 +23,13 @@ sealed class AuthUiState {
 /**
  * ViewModel governing the authentication flow.
  * Translates UI events (like button clicks) into repository calls and updates the [uiState].
+ * OOD Principle: Separation of Concerns (MVVM Pattern) & Observer Pattern.
+ * The ViewModel separates the UI logic from the Data/Business logic.
  */
 class AuthViewModel(
-    private val repository: AuthRepository = AuthRepository()
+    // OOD Principle: Dependency Injection. Depending on the interface IAuthRepository
+    // rather than the concrete AuthRepository allows for easier unit testing (mocking).
+    private val repository: IAuthRepository = AuthRepository()
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
@@ -100,7 +105,7 @@ class AuthViewModel(
 }
 
 class AuthViewModelFactory(
-    private val repository: AuthRepository = AuthRepository()
+    private val repository: IAuthRepository = AuthRepository()
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(AuthViewModel::class.java)) {

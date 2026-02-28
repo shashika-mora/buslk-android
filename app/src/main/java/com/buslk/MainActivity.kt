@@ -56,6 +56,11 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun BusLKApp() {
     val context = LocalContext.current
+    
+    // OOD Principle: Dependency Injection Setup
+    // We instantiate the AuthRepository here (the composition root) and inject it
+    // into the AuthViewModelFactory. This ensures that the ViewModel doesn't
+    // hardcode its dependencies, making it more modular and testable.
     val authRepository = androidx.compose.runtime.remember { com.buslk.data.AuthRepository() }
     val authViewModel: com.buslk.ui.auth.AuthViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
         factory = com.buslk.ui.auth.AuthViewModelFactory(authRepository)
