@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
@@ -53,9 +55,14 @@ class MainActivity : ComponentActivity() {
 @PreviewScreenSizes
 @Composable
 fun BusLKApp() {
-    val auth = com.google.firebase.auth.FirebaseAuth.getInstance()
+    val context = LocalContext.current
+    val authRepository = androidx.compose.runtime.remember { com.buslk.data.AuthRepository() }
+    val authViewModel: com.buslk.ui.auth.AuthViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+        factory = com.buslk.ui.auth.AuthViewModelFactory(authRepository)
+    )
+
     var currentDestination by rememberSaveable { 
-        mutableStateOf(if (auth.currentUser != null) AppDestinations.HOME else AppDestinations.OPENING) 
+        mutableStateOf(if (authRepository.getCurrentUser() != null) AppDestinations.HOME else AppDestinations.OPENING) 
     }
 
     if (currentDestination == AppDestinations.OPENING) {
@@ -71,6 +78,7 @@ fun BusLKApp() {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             // Pass innerPadding to LoginScreen if needed, or wrap it
             LoginScreen(
+                authViewModel = authViewModel,
                 onSignInSuccess = {
                     currentDestination = AppDestinations.HOME
                 },
@@ -100,9 +108,9 @@ fun BusLKApp() {
             Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                 if (currentDestination == AppDestinations.HOME || currentDestination == AppDestinations.PROFILE) {
                     HomeScreen(
-                        user = auth.currentUser,
+                        user = authRepository.getCurrentUser(),
                         onSignOut = {
-                            auth.signOut()
+                            authViewModel.signOut()
                             currentDestination = AppDestinations.OPENING
                         },
                         modifier = Modifier.padding(innerPadding)

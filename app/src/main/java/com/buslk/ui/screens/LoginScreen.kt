@@ -30,15 +30,31 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
+    authViewModel: com.buslk.ui.auth.AuthViewModel,
     onSignInSuccess: () -> Unit,
     onBackClick: () -> Unit
 ) {
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-    val googleAuthClient = remember { GoogleAuthClient(context) }
+    val authState by authViewModel.authState.collectAsState()
     
     var selectedTabIndex by remember { mutableStateOf(0) } // 0 for Login, 1 for Sign Up
-    var isLoading by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(authState) {
+        when (authState) {
+            is com.buslk.ui.auth.AuthUiState.Success -> {
+                Toast.makeText(context, "Sign in & Sync successful!", Toast.LENGTH_SHORT).show()
+                onSignInSuccess()
+            }
+            is com.buslk.ui.auth.AuthUiState.Error -> {
+                val msg = (authState as com.buslk.ui.auth.AuthUiState.Error).message
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                authViewModel.resetState()
+            }
+            else -> {}
+        }
+    }
+
+    val isLoading = authState is com.buslk.ui.auth.AuthUiState.Loading
 
     Column(
         modifier = Modifier
@@ -78,17 +94,7 @@ fun LoginScreen(
 
         // Google SignIn Button
         GoogleSignInButton(isLoading = isLoading) {
-            coroutineScope.launch {
-                isLoading = true
-                val result = googleAuthClient.signInWithGoogle()
-                isLoading = false
-                if (result?.user != null) {
-                    Toast.makeText(context, "Sign in successful!", Toast.LENGTH_SHORT).show()
-                    onSignInSuccess()
-                } else {
-                    Toast.makeText(context, "Sign in failed", Toast.LENGTH_SHORT).show()
-                }
-            }
+            authViewModel.signInWithGoogle(context)
         }
         
         Spacer(modifier = Modifier.height(24.dp))
@@ -110,14 +116,36 @@ fun LoginScreen(
         
         Spacer(modifier = Modifier.height(24.dp))
 
+        var email by remember { mutableStateOf("") }
+        var password by remember { mutableStateOf("") }
+        var confirmPassword by remember { mutableStateOf("") }
+
         // Form Fields
-        AuthForm(isLogin = selectedTabIndex == 0)
+        AuthForm(
+            isLogin = selectedTabIndex == 0,
+            email = email,
+            onEmailChange = { email = it },
+            password = password,
+            onPasswordChange = { password = it },
+            confirmPassword = confirmPassword,
+            onConfirmPasswordChange = { confirmPassword = it }
+        )
         
         Spacer(modifier = Modifier.weight(1f))
         
         // Main Action Button
         Button(
-            onClick = { /* TODO: Implement Email/Password Logic */ },
+            onClick = { 
+                if (selectedTabIndex == 0) {
+                    authViewModel.signInWithEmailAndPassword(email, password)
+                } else {
+                    if (password == confirmPassword) {
+                        authViewModel.signUpWithEmailAndPassword(email, password)
+                    } else {
+                        Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
@@ -199,16 +227,21 @@ fun GoogleSignInButton(isLoading: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
-fun AuthForm(isLogin: Boolean) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
+fun AuthForm(
+    isLogin: Boolean,
+    email: String,
+    onEmailChange: (String) -> Unit,
+    password: String,
+    onPasswordChange: (String) -> Unit,
+    confirmPassword: String,
+    onConfirmPasswordChange: (String) -> Unit
+) {
     var passwordVisible by remember { mutableStateOf(false) }
 
     Column {
         OutlinedTextField(
             value = email,
-            onValueChange = { email = it },
+            onValueChange = onEmailChange,
             label = { Text("Email Address") },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
@@ -224,7 +257,7 @@ fun AuthForm(isLogin: Boolean) {
         
         OutlinedTextField(
             value = password,
-            onValueChange = { password = it },
+            onValueChange = onPasswordChange,
             label = { Text("Password") },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
@@ -248,7 +281,7 @@ fun AuthForm(isLogin: Boolean) {
             
             OutlinedTextField(
                 value = confirmPassword,
-                onValueChange = { confirmPassword = it },
+                onValueChange = onConfirmPasswordChange,
                 label = { Text("Confirm Password") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -282,6 +315,8 @@ fun AuthForm(isLogin: Boolean) {
 @Composable
 fun LoginScreenPreview() {
     BusLKTheme {
-        LoginScreen(onSignInSuccess = {}, onBackClick = {})
+        // Preview might not work fully with ViewModel injection directly without mocking, 
+        // but normally we use a placeholder or fake viewmodel.
+        // LoginScreen(authViewModel = ..., onSignInSuccess = {}, onBackClick = {})
     }
 }
