@@ -73,3 +73,9 @@ obj/
 *.kotlin_module
 .kotlin_build/
 .kotlin/
+
+# Google Services
+
+
+*.txt
+*.log

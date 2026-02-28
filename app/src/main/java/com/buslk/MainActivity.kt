@@ -1,6 +1,8 @@
 package com.buslk
 
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -23,11 +25,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import com.buslk.ui.screens.LoginScreen
 import com.buslk.ui.theme.BusLKTheme
+import com.google.firebase.FirebaseApp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Initialize Firebase
+        FirebaseApp.initializeApp(this)
+        Log.d("BusLK_Setup", "Firebase Initialized Successfully!")
+        Toast.makeText(this, "Firebase Initialized!", Toast.LENGTH_SHORT).show()
+        
         enableEdgeToEdge()
         setContent {
             BusLKTheme {
@@ -40,30 +50,38 @@ class MainActivity : ComponentActivity() {
 @PreviewScreenSizes
 @Composable
 fun BusLKApp() {
-    var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
+    var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.LOGIN) }
 
-    NavigationSuiteScaffold(
-        navigationSuiteItems = {
-            AppDestinations.entries.forEach {
-                item(
-                    icon = {
-                        Icon(
-                            it.icon,
-                            contentDescription = it.label
-                        )
-                    },
-                    label = { Text(it.label) },
-                    selected = it == currentDestination,
-                    onClick = { currentDestination = it }
+    if (currentDestination == AppDestinations.LOGIN) {
+        // Hide navigation suite on login screen
+        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+            // Pass innerPadding to LoginScreen if needed, or wrap it
+            LoginScreen()
+        }
+    } else {
+        NavigationSuiteScaffold(
+            navigationSuiteItems = {
+                AppDestinations.entries.filter { it != AppDestinations.LOGIN }.forEach {
+                    item(
+                        icon = {
+                            Icon(
+                                it.icon,
+                                contentDescription = it.label
+                            )
+                        },
+                        label = { Text(it.label) },
+                        selected = it == currentDestination,
+                        onClick = { currentDestination = it }
+                    )
+                }
+            }
+        ) {
+            Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Greeting(
+                    name = currentDestination.label,
+                    modifier = Modifier.padding(innerPadding)
                 )
             }
-        }
-    ) {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            Greeting(
-                name = "Android",
-                modifier = Modifier.padding(innerPadding)
-            )
         }
     }
 }
@@ -72,6 +90,7 @@ enum class AppDestinations(
     val label: String,
     val icon: ImageVector,
 ) {
+    LOGIN("Login", Icons.Default.AccountBox),
     HOME("Home", Icons.Default.Home),
     FAVORITES("Favorites", Icons.Default.Favorite),
     PROFILE("Profile", Icons.Default.AccountBox),
