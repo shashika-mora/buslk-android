@@ -35,18 +35,18 @@ fun LoginScreen(
     onBackClick: () -> Unit
 ) {
     val context = LocalContext.current
-    val authState by authViewModel.authState.collectAsState()
+    val uiState by authViewModel.uiState.collectAsState()
     
     var selectedTabIndex by remember { mutableStateOf(0) } // 0 for Login, 1 for Sign Up
     
-    LaunchedEffect(authState) {
-        when (authState) {
+    LaunchedEffect(uiState) {
+        when (uiState) {
             is com.buslk.ui.auth.AuthUiState.Success -> {
                 Toast.makeText(context, "Sign in & Sync successful!", Toast.LENGTH_SHORT).show()
                 onSignInSuccess()
             }
             is com.buslk.ui.auth.AuthUiState.Error -> {
-                val msg = (authState as com.buslk.ui.auth.AuthUiState.Error).message
+                val msg = (uiState as com.buslk.ui.auth.AuthUiState.Error).message
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                 authViewModel.resetState()
             }
@@ -54,7 +54,7 @@ fun LoginScreen(
         }
     }
 
-    val isLoading = authState is com.buslk.ui.auth.AuthUiState.Loading
+    val isLoading = uiState is com.buslk.ui.auth.AuthUiState.Loading
 
     Column(
         modifier = Modifier
