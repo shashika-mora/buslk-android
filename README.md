@@ -13,39 +13,39 @@
 
 ## 🛠️ Tech Stack & Architecture
 
-* **Platform:** Android (Java / Android SDK)
-* **Backend / State Synchronization:** Firebase Realtime Database
-* **Geospatial Mapping:** OpenStreetMap (OSM) / OSMDroid
-* **Architecture:** Observer Pattern (for live location streams), strict Data Encapsulation, and Polymorphic routing.
+- **UI Framework:** Jetpack Compose (Modern, declarative UI).
+- **Architecture:** **MVVM (Model-View-ViewModel)** with **Repository Pattern**.
+  - **State Management:** Kotlin Coroutines & `StateFlow` for reactive UI updates.
+  - **Dependency Injection:** Custom ViewModel Factories for decoupled repository management.
+- **Backend / Authentication:** 
+  - **Firebase Auth:** Email/Password & Google Sign-In via **Android Credential Manager API**.
+  - **Firebase Firestore:** Real-time user profile synchronization.
+- **Geospatial Mapping:** OpenStreetMap (OSM) / `osmdroid`.
 
-## 🚀 Getting Started
+## 📈 Project Status & Accomplishments
 
-### Prerequisites
+### Phase 1: Foundation (Complete)
+- [x] Initial Project Scaffolding & Gradle 9.0 configuration.
+- [x] Firebase integration and build verification.
 
-* Android Studio (Koala or newer recommended)
-* Minimum SDK: API 24 (Android 7.0)
-* A valid `google-services.json` file from your Firebase console.
+### Phase 2: Authentication & Identity (Complete)
+- [x] Dual-method Auth: Custom Email/Password and Modern Google Sign-In.
+- [x] **Smart Identity Sync:** Registration logic that initializes `UserDoc` with default stats while preserving data for returning users.
+- [x] **Data Integrity:** Fully aligned `UserDoc` DTO with the `db.md` schema (Points, Levels, Preferences).
+- [x] **Defensive UX:** Strict input validation and robust error mapping for Firebase exceptions.
 
-### Installation
+### Phase 3: Core Features (In Progress)
+- [ ] Language Selection & Localization.
+- [ ] Map Integration & Live Bus Tracking.
+- [ ] QR Code Scanning & Automated Ticketing.
 
-1. Clone the repository:
-```bash
-git clone https://github.com/shashika-mora/buslk-android
+## 📐 OOP & OOD Principles in BusLK
 
-```
-
-
-2. Open the project in Android Studio.
-3. Place your Firebase `google-services.json` file into the `app/` directory.
-4. Sync Gradle and build the project.
-5. Run on an emulator or physical device.
-
-## 📐 System Design Overview
-
-This application heavily leverages core OOP concepts:
-
-* **Composition:** `Route` objects are structurally composed of multiple `Stop` objects.
-* **Inheritance & Polymorphism:** An abstract `User` base class is extended by specialized `Passenger`, `Driver`, and `Admin` subclasses, each inheriting core traits while implementing distinct behaviors (e.g., Drivers broadcasting GPS coordinates).
+This application is a case study in solid software engineering:
+- **Abstraction:** Using `IAuthRepository` interfaces to decouple UI from the data source.
+- **Encapsulation:** Hiding complex Credential Manager and Firebase logic within repositories.
+- **Polymorphism:** Utilizing a role-based user system (`Passenger`, `Driver`) with distinct behaviors.
+- **Defensive Programming:** Pre-request validation and robust error mapping in the ViewModel layer.
 
 ## 🤝 Contributing
 
