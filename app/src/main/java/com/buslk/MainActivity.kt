@@ -52,10 +52,18 @@ class MainActivity : ComponentActivity() {
 fun BusLKApp() {
     val auth = com.google.firebase.auth.FirebaseAuth.getInstance()
     var currentDestination by rememberSaveable { 
-        mutableStateOf(if (auth.currentUser != null) AppDestinations.HOME else AppDestinations.LOGIN) 
+        mutableStateOf(if (auth.currentUser != null) AppDestinations.HOME else AppDestinations.OPENING) 
     }
 
-    if (currentDestination == AppDestinations.LOGIN) {
+    if (currentDestination == AppDestinations.OPENING) {
+        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+            com.buslk.ui.screens.OpeningScreen(
+                onGetStartedClick = {
+                    currentDestination = AppDestinations.LOGIN
+                }
+            )
+        }
+    } else if (currentDestination == AppDestinations.LOGIN) {
         // Hide navigation suite on login screen
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             // Pass innerPadding to LoginScreen if needed, or wrap it
@@ -68,7 +76,7 @@ fun BusLKApp() {
     } else {
         NavigationSuiteScaffold(
             navigationSuiteItems = {
-                AppDestinations.entries.filter { it != AppDestinations.LOGIN }.forEach {
+                AppDestinations.entries.filter { it != AppDestinations.LOGIN && it != AppDestinations.OPENING }.forEach {
                     item(
                         icon = {
                             Icon(
@@ -97,6 +105,7 @@ enum class AppDestinations(
     val label: String,
     val icon: ImageVector,
 ) {
+    OPENING("Opening", Icons.Default.Home),
     LOGIN("Login", Icons.Default.AccountBox),
     HOME("Home", Icons.Default.Home),
     FAVORITES("Favorites", Icons.Default.Favorite),
