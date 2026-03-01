@@ -8,4 +8,23 @@
     
     <!-- Shared -->
     <string name="back">Back</string>
+    
+    <!-- Opening Screen -->
+    <string name="opening_subtitle">Your Smart Travel Companion</string>
+    <string name="btn_get_started">Get Started</string>
+    <string name="opening_footer">Track buses, report issues, and earn rewards</string>
+
+    <!-- Login Screen -->
+    <string name="welcome_back">Welcome Back!</string>
+    <string name="create_account">Create Account</string>
+    <string name="tab_login">Login</string>
+    <string name="tab_signup">Sign Up</string>
+    <string name="continue_with_google">Continue with Google</string>
+    <string name="lbl_or">Or</string>
+    <string name="lbl_email">Email Address</string>
+    <string name="lbl_password">Password</string>
+    <string name="lbl_confirm_password">Confirm Password</string>
+    <string name="btn_forgot_password">Forgot Password?</string>
+    <string name="msg_passwords_not_match">Passwords do not match</string>
+    <string name="msg_login_success">Sign in &amp; Sync successful!</string>
 </resources>

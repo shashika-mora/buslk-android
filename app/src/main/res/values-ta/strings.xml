@@ -9,4 +9,23 @@
     
     <!-- Shared -->
     <string name="back">பின்வாங்கு</string>
+
+    <!-- Opening Screen -->
+    <string name="opening_subtitle">உங்கள் திறமையான பயணத் துணை</string>
+    <string name="btn_get_started">தொடங்குங்கள்</string>
+    <string name="opening_footer">பேருந்துகளைக் கண்காணிக்கவும், சிக்கல்களைப் புகாரளிக்கவும், வெகுமதிகளைப் பெறவும்</string>
+
+    <!-- Login Screen -->
+    <string name="welcome_back">மீண்டும் வருக!</string>
+    <string name="create_account">கணக்கை உருவாக்குங்கள்</string>
+    <string name="tab_login">உள்நுழைய</string>
+    <string name="tab_signup">பதிவு செய்க</string>
+    <string name="continue_with_google">Google உடன் தொடரவும்</string>
+    <string name="lbl_or">அல்லது</string>
+    <string name="lbl_email">மின்னஞ்சல் முகவரி</string>
+    <string name="lbl_password">கடவுச்சொல்</string>
+    <string name="lbl_confirm_password">கடவுச்சொல்லை மீண்டும் உள்ளிடவும்</string>
+    <string name="btn_forgot_password">கடவுச்சொல் மறந்துவிட்டதா?</string>
+    <string name="msg_passwords_not_match">கடவுச்சொற்கள் பொருந்தவில்லை</string>
+    <string name="msg_login_success">வெற்றிகரமாக உள்நுழையப்பட்டது!</string>
 </resources>

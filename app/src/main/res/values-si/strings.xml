@@ -9,4 +9,23 @@
     
     <!-- Shared -->
     <string name="back">ආපසු</string>
+    
+    <!-- Opening Screen -->
+    <string name="opening_subtitle">ඔබේ ස්මාර්ට් ගමන් සගයා</string>
+    <string name="btn_get_started">ආරම්භ කරන්න</string>
+    <string name="opening_footer">බස් රථ ලුහුබැඳීම, ගැටළු වාර්තා කිරීම සහ ත්‍යාග ලබා ගැනීම</string>
+
+    <!-- Login Screen -->
+    <string name="welcome_back">ආයුබෝවන්!</string>
+    <string name="create_account">ගිණුමක් සාදන්න</string>
+    <string name="tab_login">පිවිසෙන්න</string>
+    <string name="tab_signup">ලියාපදිංචි වන්න</string>
+    <string name="continue_with_google">Google සමඟ ඉදිරියට යන්න</string>
+    <string name="lbl_or">හෝ</string>
+    <string name="lbl_email">විද්‍යුත් තැපෑල (Email)</string>
+    <string name="lbl_password">මුරපදය</string>
+    <string name="lbl_confirm_password">මුරපදය තහවුරු කරන්න</string>
+    <string name="btn_forgot_password">මුරපදය අමතකද?</string>
+    <string name="msg_passwords_not_match">මුරපද නොගැලපේ</string>
+    <string name="msg_login_success">සාර්ථකව පද්ධතියට සම්බන්ධ විය!</string>
 </resources>
