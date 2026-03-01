@@ -137,6 +137,7 @@ enum class AppDestinations(
 ) {
     OPENING("Opening", Icons.Default.Home),
     LOGIN("Login", Icons.Default.AccountBox),
+    LANGUAGE_SELECT("Language", Icons.Default.Home),
     HOME("Home", Icons.Default.Home),
     FAVORITES("Favorites", Icons.Default.Favorite),
     PROFILE("Profile", Icons.Default.AccountBox),
