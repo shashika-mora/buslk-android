@@ -88,7 +88,7 @@ fun BusLKApp() {
                     currentDestination = AppDestinations.HOME
                 },
                 onBackClick = {
-                    currentDestination = AppDestinations.OPENING
+                    currentDestination = AppDestinations.LANGUAGE_SELECT
                 }
             )
         }
