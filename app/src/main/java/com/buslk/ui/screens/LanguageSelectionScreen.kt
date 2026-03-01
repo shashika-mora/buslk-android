@@ -10,11 +10,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import com.buslk.ui.theme.BusLKTheme
+import com.buslk.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,7 +36,7 @@ fun LanguageSelectionScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(id = R.string.back),
                             tint = Color.White
                         )
                     }
@@ -54,7 +58,7 @@ fun LanguageSelectionScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
-                text = "Select Language",
+                text = stringResource(id = R.string.select_language),
                 color = Color.White,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold
@@ -63,7 +67,7 @@ fun LanguageSelectionScreen(
             Spacer(modifier = Modifier.height(8.dp))
             
             Text(
-                text = "භාෂාව තෝරන්න / மொழியைத் தேர்ந்தெடுக்கவும்",
+                text = stringResource(id = R.string.language_prompt),
                 color = Color.White.copy(alpha = 0.8f),
                 fontSize = 14.sp
             )
@@ -72,24 +76,33 @@ fun LanguageSelectionScreen(
 
             // English Button
             LanguageButton(
-                text = "English",
-                onClick = { onLanguageSelected("en") }
+                text = stringResource(id = R.string.lang_english),
+                onClick = { 
+                    AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("en"))
+                    onLanguageSelected("en") 
+                }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Sinhala Button
             LanguageButton(
-                text = "සිංහල",
-                onClick = { onLanguageSelected("si") }
+                text = stringResource(id = R.string.lang_sinhala),
+                onClick = { 
+                    AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("si"))
+                    onLanguageSelected("si") 
+                }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Tamil Button
             LanguageButton(
-                text = "தமிழ்",
-                onClick = { onLanguageSelected("ta") }
+                text = stringResource(id = R.string.lang_tamil),
+                onClick = { 
+                    AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("ta"))
+                    onLanguageSelected("ta") 
+                }
             )
             
             Spacer(modifier = Modifier.weight(1f))

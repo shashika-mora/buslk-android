@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">BusLK</string>
+    <string name="select_language">மொழியைத் தேர்ந்தெடுக்கவும்</string>
+    <string name="language_prompt">Select Language / භාෂාව තෝරන්න</string>
+    <string name="lang_english">English</string>
+    <string name="lang_sinhala">සිංහල</string>
+    <string name="lang_tamil">தமிழ்</string>
+    
+    <!-- Shared -->
+    <string name="back">பின்வாங்கு</string>
+</resources>

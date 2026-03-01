@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">BusLK</string>
+    <string name="select_language">Select Language</string>
+    <string name="language_prompt">භාෂාව තෝරන්න / மொழியைத் தேர்ந்தெடுக்கவும்</string>
+    <string name="lang_english">English</string>
+    <string name="lang_sinhala">සිංහල</string>
+    <string name="lang_tamil">தமிழ்</string>
+    
+    <!-- Shared -->
+    <string name="back">Back</string>
 </resources>
