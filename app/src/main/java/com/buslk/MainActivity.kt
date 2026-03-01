@@ -68,7 +68,7 @@ fun BusLKApp() {
     )
 
     var currentDestination by rememberSaveable { 
-        mutableStateOf(if (authRepository.getCurrentUser() != null) AppDestinations.HOME else AppDestinations.OPENING) 
+        mutableStateOf(AppDestinations.HOME) 
     }
 
     if (currentDestination == AppDestinations.OPENING) {
@@ -125,14 +125,7 @@ fun BusLKApp() {
         ) {
             Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                 if (currentDestination == AppDestinations.HOME || currentDestination == AppDestinations.PROFILE) {
-                    HomeScreen(
-                        user = authRepository.getCurrentUser(),
-                        onSignOut = {
-                            authViewModel.signOut()
-                            currentDestination = AppDestinations.OPENING
-                        },
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    com.buslk.ui.screens.HomeScreen()
                 } else {
                     Greeting(
                         name = currentDestination.label,
@@ -166,31 +159,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     }
 }
 
-@Composable
-fun HomeScreen(
-    user: com.google.firebase.auth.FirebaseUser?,
-    onSignOut: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    androidx.compose.foundation.layout.Column(
-        modifier = modifier.fillMaxSize().padding(16.dp),
-        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
-        verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
-    ) {
-        if (user != null) {
-            Text(text = "Welcome, ${user.displayName ?: "User"}!", style = androidx.compose.material3.MaterialTheme.typography.headlineMedium)
-            androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Email: ${user.email ?: "Unknown"}", style = androidx.compose.material3.MaterialTheme.typography.bodyLarge)
-            
-            androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(32.dp))
-            androidx.compose.material3.Button(onClick = onSignOut) {
-                Text("Sign Out")
-            }
-        } else {
-            Text(text = "Welcome to Home!", style = androidx.compose.material3.MaterialTheme.typography.headlineMedium)
-        }
-    }
-}
+
 
 @Preview(showBackground = true)
 @Composable
