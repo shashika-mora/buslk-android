@@ -15,6 +15,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.buslk.R
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -45,7 +47,7 @@ fun LoginScreen(
     LaunchedEffect(uiState) {
         when (uiState) {
             is com.buslk.ui.auth.AuthUiState.Success -> {
-                Toast.makeText(context, "Sign in & Sync successful!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.msg_login_success), Toast.LENGTH_SHORT).show()
                 onSignInSuccess()
             }
             is com.buslk.ui.auth.AuthUiState.Error -> {
@@ -82,7 +84,7 @@ fun LoginScreen(
 
         // Title
         Text(
-            text = if (selectedTabIndex == 0) "Welcome Back!" else "Create Account",
+            text = if (selectedTabIndex == 0) stringResource(id = R.string.welcome_back) else stringResource(id = R.string.create_account),
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black
@@ -109,7 +111,7 @@ fun LoginScreen(
         ) {
             HorizontalDivider(modifier = Modifier.weight(1f), color = Color.LightGray)
             Text(
-                text = "Or",
+                text = stringResource(id = R.string.lbl_or),
                 modifier = Modifier.padding(horizontal = 16.dp),
                 color = Color.Gray,
                 fontSize = 14.sp
@@ -147,7 +149,7 @@ fun LoginScreen(
                     if (password == confirmPassword) {
                         authViewModel.signUpWithEmailAndPassword(email, password)
                     } else {
-                        Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.msg_passwords_not_match), Toast.LENGTH_SHORT).show()
                     }
                 }
             },
@@ -165,7 +167,7 @@ fun LoginScreen(
                 CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White, strokeWidth = 2.dp)
             } else {
                 Text(
-                    text = if (selectedTabIndex == 0) "Login" else "Sign Up",
+                    text = if (selectedTabIndex == 0) stringResource(id = R.string.tab_login) else stringResource(id = R.string.tab_signup),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -187,13 +189,13 @@ fun AuthTabs(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         TabButton(
-            text = "Login",
+            text = stringResource(id = R.string.tab_login),
             isSelected = selectedTabIndex == 0,
             modifier = Modifier.weight(1f),
             onClick = { onTabSelected(0) }
         )
         TabButton(
-            text = "Sign Up",
+            text = stringResource(id = R.string.tab_signup),
             isSelected = selectedTabIndex == 1,
             modifier = Modifier.weight(1f),
             onClick = { onTabSelected(1) }
@@ -234,7 +236,7 @@ fun GoogleSignInButton(isLoading: Boolean, onClick: () -> Unit) {
             // Simple generic G to represent Google (Using colors could be added later or an image icon)
             Text(text = "G", color = Color(0xFFEA4335), fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
             Spacer(modifier = Modifier.width(12.dp))
-            Text("Continue with Google", color = Color.Black, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+            Text(stringResource(id = R.string.continue_with_google), color = Color.Black, fontSize = 16.sp, fontWeight = FontWeight.Medium)
         }
     }
 }
@@ -264,7 +266,7 @@ fun AuthForm(
         OutlinedTextField(
             value = email,
             onValueChange = onEmailChange,
-            label = { Text("Email Address") },
+            label = { Text(stringResource(id = R.string.lbl_email)) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             singleLine = true,
@@ -286,7 +288,7 @@ fun AuthForm(
         OutlinedTextField(
             value = password,
             onValueChange = onPasswordChange,
-            label = { Text("Password") },
+            label = { Text(stringResource(id = R.string.lbl_password)) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             singleLine = true,
@@ -316,7 +318,7 @@ fun AuthForm(
             OutlinedTextField(
                 value = confirmPassword,
                 onValueChange = onConfirmPasswordChange,
-                label = { Text("Confirm Password") },
+                label = { Text(stringResource(id = R.string.lbl_confirm_password)) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 singleLine = true,
@@ -342,7 +344,7 @@ fun AuthForm(
                     enabled = !isLoading
                 ) {
                     Text(
-                        text = "Forgot Password?",
+                        text = stringResource(id = R.string.btn_forgot_password),
                         color = Color(0xFF1E5DE6),
                         fontWeight = FontWeight.Medium
                     )

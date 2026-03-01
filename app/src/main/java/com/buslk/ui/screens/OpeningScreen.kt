@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -52,7 +53,7 @@ fun OpeningScreen(
         
         // Title
         Text(
-            text = "BusLK",
+            text = stringResource(id = com.buslk.R.string.app_name),
             color = Color.White,
             fontSize = 40.sp,
             fontWeight = FontWeight.Bold
@@ -62,7 +63,7 @@ fun OpeningScreen(
         
         // Subtitle
         Text(
-            text = "Your Smart Travel Companion",
+            text = stringResource(id = com.buslk.R.string.opening_subtitle),
             color = Color.White,
             fontSize = 16.sp
         )
@@ -82,7 +83,7 @@ fun OpeningScreen(
             shape = RoundedCornerShape(12.dp)
         ) {
             Text(
-                text = "Get Started",
+                text = stringResource(id = com.buslk.R.string.btn_get_started),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold
             )
@@ -92,7 +93,7 @@ fun OpeningScreen(
         
         // Footer Text
         Text(
-            text = "Track buses, report issues, and earn rewards",
+            text = stringResource(id = com.buslk.R.string.opening_footer),
             color = Color.White.copy(alpha = 0.8f),
             fontSize = 12.sp
         )
