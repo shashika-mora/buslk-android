@@ -74,7 +74,7 @@ fun BusLKApp() {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             com.buslk.ui.screens.OpeningScreen(
                 onGetStartedClick = {
-                    currentDestination = AppDestinations.LOGIN
+                    currentDestination = AppDestinations.LANGUAGE_SELECT
                 }
             )
         }
@@ -92,10 +92,22 @@ fun BusLKApp() {
                 }
             )
         }
+    } else if (currentDestination == AppDestinations.LANGUAGE_SELECT) {
+        Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
+            com.buslk.ui.screens.LanguageSelectionScreen(
+                onBackClick = {
+                    currentDestination = AppDestinations.OPENING
+                },
+                onLanguageSelected = { langCode ->
+                    // We'll process language matching later. For now navigate to login
+                    currentDestination = AppDestinations.LOGIN
+                }
+            )
+        }
     } else {
         NavigationSuiteScaffold(
             navigationSuiteItems = {
-                AppDestinations.entries.filter { it != AppDestinations.LOGIN && it != AppDestinations.OPENING }.forEach {
+                AppDestinations.entries.filter { it != AppDestinations.LOGIN && it != AppDestinations.OPENING && it != AppDestinations.LANGUAGE_SELECT }.forEach {
                     item(
                         icon = {
                             Icon(
