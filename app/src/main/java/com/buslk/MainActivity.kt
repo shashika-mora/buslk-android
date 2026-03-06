@@ -32,6 +32,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.annotation.StringRes
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.appcompat.app.AppCompatActivity
@@ -142,10 +144,10 @@ fun BusLKApp() {
                         icon = {
                             Icon(
                                 it.icon,
-                                contentDescription = it.label
+                                contentDescription = stringResource(it.labelResId)
                             )
                         },
-                        label = { Text(it.label) },
+                        label = { Text(stringResource(it.labelResId)) },
                         selected = it == currentDestination,
                         // Change screen when clicked
                         onClick = { currentDestination = it }
@@ -160,7 +162,7 @@ fun BusLKApp() {
                 } else {
                     // Placeholder for screens we haven't built yet
                     Greeting(
-                        name = currentDestination.label,
+                        name = stringResource(currentDestination.labelResId),
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -173,21 +175,21 @@ fun BusLKApp() {
  * An Enum describing all the physical screens in our app.
  * Using an Enum prevents spelling mistakes when routing compared to using raw Strings.
  * 
- * @property label The text displayed under the icon on the nav bar.
+ * @property labelResId The Android string resource ID displayed under the icon on the nav bar.
  * @property icon The Material vector icon displayed on the nav bar.
  */
 enum class AppDestinations(
-    val label: String,
+    @StringRes val labelResId: Int,
     val icon: ImageVector,
 ) {
-    OPENING("Opening", Icons.Default.Home),
-    LOGIN("Login", Icons.Default.AccountBox),
-    LANGUAGE_SELECT("Language", Icons.Default.Home),
-    HOME("Home", Icons.Default.Home),
-    SEARCH("Search", Icons.Default.Search),
-    COMMUNITY("Community", Icons.Default.Face),
-    LOST_AND_FOUND("Lost & Found", Icons.AutoMirrored.Filled.List),
-    PROFILE("Profile", Icons.Default.Person),
+    OPENING(R.string.nav_home, Icons.Default.Home),
+    LOGIN(R.string.tab_login, Icons.Default.AccountBox),
+    LANGUAGE_SELECT(R.string.select_language, Icons.Default.Home),
+    HOME(R.string.nav_home, Icons.Default.Home),
+    SEARCH(R.string.nav_search, Icons.Default.Search),
+    COMMUNITY(R.string.nav_community, Icons.Default.Face),
+    LOST_AND_FOUND(R.string.nav_lost_found, Icons.AutoMirrored.Filled.List),
+    PROFILE(R.string.nav_profile, Icons.Default.Person),
 }
 
 /** Placeholder component for unbuilt screens. */

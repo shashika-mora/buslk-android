@@ -26,11 +26,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
+import androidx.compose.material3.SearchBar
+import androidx.compose.ui.res.stringResource
+import com.buslk.R
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
@@ -160,8 +162,8 @@ fun HomeScreen(
                 active = it 
                 if (!it) searchViewModel.clearSearch()
             },
-            placeholder = { Text("Search bus route (e.g. 138) or Bus NO") },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search Icon") },
+            placeholder = { Text(stringResource(R.string.search_placeholder)) },
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.icon_search)) },
             trailingIcon = {
                 if (active) {
                     IconButton(onClick = { 
@@ -173,7 +175,7 @@ fun HomeScreen(
                             searchViewModel.clearSearch()
                         }
                     }) {
-                        Icon(Icons.Default.Clear, contentDescription = "Clear Search")
+                        Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.icon_clear))
                     }
                 }
             },

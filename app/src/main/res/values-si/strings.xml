@@ -2,30 +2,48 @@
 <resources>
     <string name="app_name">BusLK</string>
     <string name="select_language">භාෂාව තෝරන්න</string>
-    <string name="language_prompt">Select Language / மொழியைத் தேர்ந்தெடுக்கவும்</string>
+    <string name="language_prompt">භාෂාව තෝරන්න / மொழியைத் தேர்ந்தெடுக்கவும்</string>
     <string name="lang_english">English</string>
     <string name="lang_sinhala">සිංහල</string>
     <string name="lang_tamil">தமிழ்</string>
     
     <!-- Shared -->
-    <string name="back">ආපසු</string>
+    <string name="back">පසුපසට</string>
     
     <!-- Opening Screen -->
-    <string name="opening_subtitle">ඔබේ ස්මාර්ට් ගමන් සගයා</string>
+    <string name="opening_subtitle">ඔබගේ ස්මාර්ට් ගමන් සගයා</string>
     <string name="btn_get_started">ආරම්භ කරන්න</string>
-    <string name="opening_footer">බස් රථ ලුහුබැඳීම, ගැටළු වාර්තා කිරීම සහ ත්‍යාග ලබා ගැනීම</string>
+    <string name="opening_footer">බස් රථ ලුහුබඳින්න, ගැටළු වාර්තා කරන්න, සහ ත්‍යාග උපයන්න</string>
 
     <!-- Login Screen -->
-    <string name="welcome_back">ආයුබෝවන්!</string>
+    <string name="welcome_back">නැවතත් සාදරයෙන් පිළිගනිමු!</string>
     <string name="create_account">ගිණුමක් සාදන්න</string>
-    <string name="tab_login">පිවිසෙන්න</string>
+    <string name="tab_login">ඇතුල් වන්න</string>
     <string name="tab_signup">ලියාපදිංචි වන්න</string>
-    <string name="continue_with_google">Google සමඟ ඉදිරියට යන්න</string>
+    <string name="continue_with_google">Google සමඟින් ඉදිරියට යන්න</string>
     <string name="lbl_or">හෝ</string>
-    <string name="lbl_email">විද්‍යුත් තැපෑල (Email)</string>
+    <string name="lbl_email">විද්‍යුත් තැපෑල</string>
     <string name="lbl_password">මුරපදය</string>
     <string name="lbl_confirm_password">මුරපදය තහවුරු කරන්න</string>
     <string name="btn_forgot_password">මුරපදය අමතකද?</string>
     <string name="msg_passwords_not_match">මුරපද නොගැලපේ</string>
-    <string name="msg_login_success">සාර්ථකව පද්ධතියට සම්බන්ධ විය!</string>
+    <string name="msg_login_success">සාර්ථකව ඇතුල් විය!</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">මුල් පිටුව</string>
+    <string name="nav_search">සොයන්න</string>
+    <string name="nav_community">ප්‍රජාව</string>
+    <string name="nav_lost_found">නැතිවූ සහ හමුවූ</string>
+    <string name="nav_profile">පැතිකඩ</string>
+
+    <!-- Search Screen -->
+    <string name="search_placeholder">බස් මාර්ගයක් (උදා: 138) හෝ බස් අංකයක් සොයන්න</string>
+    <string name="search_prompt">බස් මාර්ග අංකයක් (උදා: 138) හෝ බස් ලියාපදිංචි අංකයක් ටයිප් කරන්න</string>
+    <string name="search_no_results">ප්‍රතිඵල හමුවූයේ නැත.</string>
+    <string name="search_routes">මාර්ග</string>
+    <string name="search_buses">බස් රථ</string>
+    <string name="search_runs_on">ධාවනය වන මාර්ගය</string>
+    <string name="search_stops">නැවතුම්</string>
+    <string name="icon_search">සෙවුම් නිරූපකය</string>
+    <string name="icon_clear">සෙවුම අහෝසි කරන්න</string>
 </resources>
