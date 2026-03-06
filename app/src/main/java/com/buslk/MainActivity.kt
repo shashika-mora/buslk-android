@@ -191,7 +191,7 @@ enum class AppDestinations(
     LANGUAGE_SELECT(R.string.select_language, Icons.Default.Home),
     HOME(R.string.nav_home, Icons.Default.Home),
     SEARCH(R.string.nav_search, Icons.Default.Search),
-    COMMUNITY(R.string.nav_community, Icons.Default.Face),
+    SOCIAL(R.string.nav_social, Icons.Default.Face),
     LOST_AND_FOUND(R.string.nav_lost_found, Icons.AutoMirrored.Filled.List),
     PROFILE(R.string.nav_profile, Icons.Default.Person),
 }

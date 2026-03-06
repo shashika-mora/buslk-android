@@ -32,13 +32,13 @@
 ### Phase 2: Authentication & Identity (Complete)
 - [x] Dual-method Auth: Custom Email/Password and Modern Google Sign-In.
 - [x] **Smart Identity Sync:** Registration logic that initializes `UserDoc` with default stats while preserving data for returning users.
-- [x] **Data Integrity:** Fully aligned `UserDoc` DTO with the `db.md` schema (Points, Levels, Preferences).
-- [x] **Defensive UX:** Strict input validation and robust error mapping for Firebase exceptions.
+- [] **Data Integrity:** Fully aligned `UserDoc` DTO with the `db.md` schema (Points, Levels, Preferences).
+- [] **Defensive UX:** Strict input validation and robust error mapping for Firebase exceptions.
 
 ### Phase 3: Core Features (In Progress)
-- [x] **Language Selection & Localization:** Extracted hardcoded UI strings into `strings.xml` dictionaries (en, si, ta) for dynamic switching.
-- [x] **Main App Navigation:** Implemented bottom `NavigationSuiteScaffold` with destinations for Home, Search, Community, Lost & Found, and Profile.
-- [x] **Search System MVP:** Robust local filtering of Firestore `Route` and `Bus` collections with Debounced Coroutines.
+- [] **Language Selection & Localization:** Extracted hardcoded UI strings into `strings.xml` dictionaries (en, si, ta) for dynamic switching.
+- [] **Main App Navigation:** Implemented bottom `NavigationSuiteScaffold` with destinations for Home, Search, Social, Lost & Found, and Profile.
+- [] **Search System MVP:** Robust local filtering of Firestore `Route` and `Bus` collections with Debounced Coroutines.
 - [ ] Map Integration & Live Bus Tracking (Map UI complete, Live tracking pending).
 - [ ] QR Code Scanning & Automated Ticketing.
 

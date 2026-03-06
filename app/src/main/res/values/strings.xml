@@ -31,13 +31,13 @@
     <!-- Navigation -->
     <string name="nav_home">Home</string>
     <string name="nav_search">Search</string>
-    <string name="nav_community">Community</string>
-    <string name="nav_lost_found">Lost &amp; Found</string>
+    <string name="nav_social">Social</string>
+    <string name="nav_lost_found">Lost&amp;Found</string>
     <string name="nav_profile">Profile</string>
 
     <!-- Search Screen -->
-    <string name="search_placeholder">Search bus route (e.g. 138) or Bus NO</string>
-    <string name="search_prompt">Type a route number (e.g. 138) or bus registration</string>
+    <string name="search_placeholder">Search Buses/Routes/Bus-Stops</string>
+    <string name="search_prompt">Search Buses/Routes/Bus-Stops</string>
     <string name="search_no_results">No results found.</string>
     <string name="search_routes">Routes</string>
     <string name="search_buses">Buses</string>
