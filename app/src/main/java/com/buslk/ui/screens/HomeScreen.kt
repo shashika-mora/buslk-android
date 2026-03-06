@@ -59,10 +59,15 @@ fun HomeScreen(
     val context = LocalContext.current
     
     // UI State for SearchBar
+    // Using 'rememberSaveable' ensures that if the user rotates their phone or the OS temporarily
+    // kills the app to save memory, their typed search query won't be erased.
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
     
     // Observe Business Logic State
+    // 'collectAsState()' transforms the ViewModel's Kotlin Flow into Compose State.
+    // Whenever the ViewModel changes this state, this entire HomeScreen function will cleanly
+    // and automatically redraw itself (Recomposition).
     val searchUiState by searchViewModel.uiState.collectAsState()
 
     // Grab the current LifecycleOwner (usually the Activity or Navigation BackStackEntry)
@@ -112,6 +117,9 @@ fun HomeScreen(
         /**
          * AndroidView acts as a "bridge" to use legacy XML-based View classes inside modern Jetpack Compose.
          * Since osmdroid's MapView is an old-school Android View, we wrap it in an AndroidView.
+         * 
+         * OOD Principle: Adapter Pattern.
+         * AndroidView adapts the legacy imperative API of MapView into the modern declarative API of Compose.
          */
         AndroidView(
             // 'factory' runs exactly ONCE to instantiate and configure the View.

@@ -20,7 +20,11 @@ import com.buslk.ui.search.SearchUiState
 
 /**
  * Composable that displays the content inside the expanded SearchBar.
- * It observes the immutable [SearchUiState] and draws the appropriate UI.
+ * 
+ * Architecture Principle: Unidirectional Data Flow (UDF).
+ * This component has no internal `MutableState` defining business logic. It simply observers the 
+ * purely immutable [SearchUiState] passed down to it ("State flows down"), and when the user 
+ * taps a route or bus, it triggers the callback functions passed as arguments ("Events flow up").
  */
 @Composable
 fun SearchContent(

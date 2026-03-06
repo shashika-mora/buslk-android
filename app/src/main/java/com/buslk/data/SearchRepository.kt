@@ -14,6 +14,12 @@ interface ISearchRepository {
 
 /**
  * Concrete implementation using Firestore.
+ * 
+ * Architecture Principle: Repository Pattern.
+ * This class abstracts away *how* the data is fetched (via Firebase API). 
+ * The ViewModel only knows it gets a `Result<List<RouteDoc>>`, meaning later on, we could easily
+ * swap Firestore out for a local SQLite database (Room) or a REST API, and the ViewModel wouldn't 
+ * need to change a single line of code.
  */
 class SearchRepository : ISearchRepository {
     private val db = FirebaseFirestore.getInstance()

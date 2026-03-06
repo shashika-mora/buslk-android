@@ -135,6 +135,9 @@ fun BusLKApp() {
         }
     } else {
         // App is in "Main Mode" (logged in/past intro). Show the Navigation Bar.
+        // OOD Principle: UI component reusability and isolation.
+        // NavigationSuiteScaffold automatically adapts its layout (Bottom Bar vs Navigation Rail)
+        // based on the device screen size (Phone vs Tablet), abstracting that complexity from us.
         NavigationSuiteScaffold(
             navigationSuiteItems = {
                 // Loop through destinations and create a button on the bottom bar for each one,
@@ -175,7 +178,8 @@ fun BusLKApp() {
  * An Enum describing all the physical screens in our app.
  * Using an Enum prevents spelling mistakes when routing compared to using raw Strings.
  * 
- * @property labelResId The Android string resource ID displayed under the icon on the nav bar.
+ * @property labelResId The Android string resource ID (from strings.xml) displayed under the icon on the nav bar.
+ *                      This integrates cleanly with our i18n localization system.
  * @property icon The Material vector icon displayed on the nav bar.
  */
 enum class AppDestinations(
