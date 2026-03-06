@@ -18,7 +18,7 @@ import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
@@ -186,7 +186,7 @@ enum class AppDestinations(
     HOME("Home", Icons.Default.Home),
     SEARCH("Search", Icons.Default.Search),
     COMMUNITY("Community", Icons.Default.Face),
-    LOST_AND_FOUND("Lost & Found", Icons.Default.List),
+    LOST_AND_FOUND("Lost & Found", Icons.AutoMirrored.Filled.List),
     PROFILE("Profile", Icons.Default.Person),
 }
 
