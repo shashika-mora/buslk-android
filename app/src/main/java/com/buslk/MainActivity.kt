@@ -15,8 +15,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -151,7 +155,7 @@ fun BusLKApp() {
         ) {
             // This Scaffold holds the actual content *above* the bottom navigation bar
             Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                if (currentDestination == AppDestinations.HOME || currentDestination == AppDestinations.PROFILE) {
+                if (currentDestination == AppDestinations.HOME) {
                     com.buslk.ui.screens.HomeScreen()
                 } else {
                     // Placeholder for screens we haven't built yet
@@ -180,8 +184,10 @@ enum class AppDestinations(
     LOGIN("Login", Icons.Default.AccountBox),
     LANGUAGE_SELECT("Language", Icons.Default.Home),
     HOME("Home", Icons.Default.Home),
-    FAVORITES("Favorites", Icons.Default.Favorite),
-    PROFILE("Profile", Icons.Default.AccountBox),
+    SEARCH("Search", Icons.Default.Search),
+    COMMUNITY("Community", Icons.Default.Face),
+    LOST_AND_FOUND("Lost & Found", Icons.Default.List),
+    PROFILE("Profile", Icons.Default.Person),
 }
 
 /** Placeholder component for unbuilt screens. */
