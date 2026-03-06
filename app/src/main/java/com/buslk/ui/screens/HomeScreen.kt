@@ -35,6 +35,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.buslk.ui.search.SearchViewModel
+import com.buslk.ui.search.SearchViewModelFactory
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.IconButton
 
 /**
  * The main Home Screen Composable containing the interactive Map.
@@ -45,13 +51,18 @@ import androidx.compose.ui.unit.dp
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    searchViewModel: SearchViewModel = viewModel(factory = SearchViewModelFactory())
+) {
     // Grab the current Android Context (Activity) needed to initialize native Android Views
     val context = LocalContext.current
     
     // UI State for SearchBar
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
+    
+    // Observe Business Logic State
+    val searchUiState by searchViewModel.uiState.collectAsState()
 
     // Grab the current LifecycleOwner (usually the Activity or Navigation BackStackEntry)
     // We need this to know when the app goes into the background or foreground.
@@ -137,22 +148,53 @@ fun HomeScreen() {
          */
         SearchBar(
             query = searchQuery,
-            onQueryChange = { searchQuery = it },
+            onQueryChange = { 
+                searchQuery = it 
+                searchViewModel.performSearch(it)
+            },
             onSearch = { 
-                active = false 
-                // Logic to be implemented later 
+                searchViewModel.performSearch(it)
             },
             active = active,
-            onActiveChange = { active = it },
-            placeholder = { Text("Search bus route (e.g. 138)") },
+            onActiveChange = { 
+                active = it 
+                if (!it) searchViewModel.clearSearch()
+            },
+            placeholder = { Text("Search bus route (e.g. 138) or Bus NO") },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search Icon") },
+            trailingIcon = {
+                if (active) {
+                    IconButton(onClick = { 
+                        if (searchQuery.isNotEmpty()) {
+                            searchQuery = ""
+                            searchViewModel.clearSearch()
+                        } else {
+                            active = false
+                            searchViewModel.clearSearch()
+                        }
+                    }) {
+                        Icon(Icons.Default.Clear, contentDescription = "Clear Search")
+                    }
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 24.dp)
+                .padding(horizontal = if (active) 0.dp else 16.dp, vertical = if (active) 0.dp else 24.dp)
                 .align(Alignment.TopCenter),
-            shape = RoundedCornerShape(100.dp)
+            shape = RoundedCornerShape(if (active) 0.dp else 100.dp)
         ) {
-            // Placeholder for search results list (UI only)
+            SearchContent(
+                uiState = searchUiState,
+                onRouteClick = { route -> 
+                    // MVP: Close search and maybe pan map to route later
+                    active = false 
+                    searchQuery = route.routeId
+                },
+                onBusClick = { bus -> 
+                    active = false
+                    searchQuery = bus.registrationNumber
+                }
+            )
         }
     }
 }
