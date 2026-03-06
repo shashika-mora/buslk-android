@@ -45,4 +45,6 @@
     <string name="search_stops">Stops</string>
     <string name="icon_search">Search Icon</string>
     <string name="icon_clear">Clear Search</string>
+    <!-- Actions -->
+    <string name="action_logout">Log Out</string>
 </resources>

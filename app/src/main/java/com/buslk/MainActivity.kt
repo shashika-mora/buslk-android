@@ -97,7 +97,9 @@ fun BusLKApp() {
     // 'rememberSaveable' ensures this state survives if Android temporarily kills the app
     // or if the user rotates their phone screen.
     var currentDestination by rememberSaveable { 
-        mutableStateOf(AppDestinations.HOME) 
+        val startDestination = if (authViewModel.isSignedIn()) AppDestinations.HOME else AppDestinations.OPENING
+        // Check if the saved state is empty (e.g., first launch) and if so, use the startDestination
+        mutableStateOf(startDestination) 
     }
 
     // Basic Routing Logic: Determine which Screen Composable to draw based on currentDestination
@@ -162,8 +164,15 @@ fun BusLKApp() {
             Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                 if (currentDestination == AppDestinations.HOME) {
                     com.buslk.ui.screens.HomeScreen()
+                } else if (currentDestination == AppDestinations.PROFILE) {
+                    com.buslk.ui.screens.ProfileScreen(
+                        authViewModel = authViewModel,
+                        onLogoutSuccess = {
+                            currentDestination = AppDestinations.LOGIN
+                        }
+                    )
                 } else {
-                    // Placeholder for screens we haven't built yet
+                    // Placeholder for screens we haven't built yet (SOCIAL, SEARCH, LOST_AND_FOUND)
                     Greeting(
                         name = stringResource(currentDestination.labelResId),
                         modifier = Modifier.padding(innerPadding)
