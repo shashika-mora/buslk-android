@@ -28,3 +28,10 @@ val LostOrange = Color(0xFFFF6D00)
 val OpenGreen = Color(0xFF00C853)
 val ClaimedYellow = Color(0xFFFFAB00)
 val RoutePillActive = Color(0xFFAB47BC)
+
+// --- Profile Colors ---
+val GoldBadge = Color(0xFFFFB300)
+val PointsOrangeStart = Color(0xFFFFCA28)
+val PointsOrangeEnd = Color(0xFFFF8F00)
+val PointsCardInner = Color(0x33FFFFFF) // Translucent white
+val PositiveGreen = Color(0xFF00E676)
