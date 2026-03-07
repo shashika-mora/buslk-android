@@ -17,3 +17,7 @@ val CrowdYellow = Color(0xFFFFB300)
 val CrowdRed = Color(0xFFF44336)
 val QuickActionBg = Color(0xFFF8F9FE) // Light purple/blue tint
 val TrendingOrange = Color(0xFFF57C00)
+
+val FriendsPurple = Color(0xFF8A00D4)
+val DarkButtonBg = Color(0xFF0F172A)
+val UnreadRed = Color(0xFFFF3B30)

@@ -99,6 +99,9 @@ fun BusLKApp() {
         // Check if the saved state is empty (e.g., first launch) and if so, use the startDestination
         mutableStateOf(startDestination) 
     }
+    
+    // State variable to track if the user is currently looking at a specific chat screen
+    var currentChatFriend: String? by rememberSaveable { mutableStateOf(null) }
 
     // Basic Routing Logic: Determine which Screen Composable to draw based on currentDestination
     if (currentDestination == AppDestinations.OPENING) {
@@ -133,6 +136,12 @@ fun BusLKApp() {
                 }
             )
         }
+    } else if (currentChatFriend != null) {
+        // Show Chat Screen over the entire app (hiding navigation)
+        com.buslk.ui.screens.ChatScreen(
+            friendName = currentChatFriend!!,
+            onBackClick = { currentChatFriend = null } // Close chat
+        )
     } else {
         // App is in "Main Mode" (logged in/past intro). Show the Navigation Bar.
         // OOD Principle: UI component reusability and isolation.
@@ -171,8 +180,14 @@ fun BusLKApp() {
                     )
                 } else if (currentDestination == AppDestinations.SEARCH) {
                     com.buslk.ui.screens.SearchScreen()
+                } else if (currentDestination == AppDestinations.FRIENDS) {
+                    com.buslk.ui.screens.FriendsScreen(
+                        onChatClick = { friendName -> 
+                            currentChatFriend = friendName 
+                        }
+                    )
                 } else {
-                    // Placeholder for screens we haven't built yet (FRIENDS, LOST_AND_FOUND)
+                    // Placeholder for screens we haven't built yet (LOST_AND_FOUND)
                     Greeting(
                         name = stringResource(currentDestination.labelResId),
                         modifier = Modifier.padding(innerPadding)
