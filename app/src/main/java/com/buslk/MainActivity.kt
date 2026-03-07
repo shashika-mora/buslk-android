@@ -186,8 +186,11 @@ fun BusLKApp() {
                             currentChatFriend = friendName 
                         }
                     )
+                } else if (currentDestination == AppDestinations.LOST_AND_FOUND) {
+                    // Tapping the tab named "L & F" opens the Lost And Found Screen
+                    com.buslk.ui.screens.LostAndFoundScreen()
                 } else {
-                    // Placeholder for screens we haven't built yet (LOST_AND_FOUND)
+                    // Fallback for any unknown screens
                     Greeting(
                         name = stringResource(currentDestination.labelResId),
                         modifier = Modifier.padding(innerPadding)

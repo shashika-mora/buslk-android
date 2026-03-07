@@ -21,3 +21,10 @@ val TrendingOrange = Color(0xFFF57C00)
 val FriendsPurple = Color(0xFF8A00D4)
 val DarkButtonBg = Color(0xFF0F172A)
 val UnreadRed = Color(0xFFFF3B30)
+
+// --- Lost & Found Colors ---
+val FoundBlue = Color(0xFF2962FF)
+val LostOrange = Color(0xFFFF6D00)
+val OpenGreen = Color(0xFF00C853)
+val ClaimedYellow = Color(0xFFFFAB00)
+val RoutePillActive = Color(0xFFAB47BC)
