@@ -22,7 +22,7 @@ interface IAuthRepository {
     fun getCurrentUser(): FirebaseUser?
     fun signOut()
     suspend fun signInWithEmailAndPassword(email: String, password: String): Result<FirebaseUser>
-    suspend fun signUpWithEmailAndPassword(email: String, password: String): Result<FirebaseUser>
+    suspend fun signUpWithEmailAndPassword(email: String, password: String, username: String? = null): Result<FirebaseUser>
     suspend fun signInWithGoogle(context: Context): Result<FirebaseUser>
 }
 
@@ -63,13 +63,13 @@ class AuthRepository : IAuthRepository {
      *
      * @return [Result.success] with the [FirebaseUser] on success, or [Result.failure] on error.
      */
-    override suspend fun signUpWithEmailAndPassword(email: String, password: String): Result<FirebaseUser> {
+    override suspend fun signUpWithEmailAndPassword(email: String, password: String, username: String?): Result<FirebaseUser> {
         return try {
             val authResult = auth.createUserWithEmailAndPassword(email, password).await()
             val user = authResult.user ?: return Result.failure(Exception("Sign-up succeeded but user is null"))
             
             // Sync user document in Firestore (Registration case)
-            syncUserToFirestore(user, isInitialRegistration = true)
+            syncUserToFirestore(user, isInitialRegistration = true, username = username)
 
             Result.success(user)
         } catch (e: Exception) {
@@ -132,7 +132,7 @@ class AuthRepository : IAuthRepository {
      * while existing users only get their 'updatedAt' timestamp or profile info refreshed,
      * protecting their accrued balance (points) and trip history.
      */
-    private suspend fun syncUserToFirestore(user: FirebaseUser, isInitialRegistration: Boolean = false) {
+    private suspend fun syncUserToFirestore(user: FirebaseUser, isInitialRegistration: Boolean = false, username: String? = null) {
         val db = FirebaseFirestore.getInstance()
         val userRef = db.collection("users").document(user.uid)
         
@@ -144,7 +144,7 @@ class AuthRepository : IAuthRepository {
                 // NEW USER case: Initialize with default schema from db.md
                 val newUserDoc = UserDoc(
                     uid = user.uid,
-                    displayName = user.displayName ?: if (isInitialRegistration) "New User" else "Google User",
+                    displayName = username ?: user.displayName ?: if (isInitialRegistration) "New User" else "Google User",
                     email = user.email ?: "",
                     photoUrl = user.photoUrl?.toString() ?: "",
                     role = "Passenger" // Default role as per auth.md

@@ -89,17 +89,23 @@ class AuthViewModel(
      * Signs up a new user using email and password.
      * Updates [uiState] to Loading → Success or Error.
      */
-    fun signUpWithEmailAndPassword(email: String, pass: String) {
+    fun signUpWithEmailAndPassword(email: String, pass: String, username: String) {
         if (_uiState.value is AuthUiState.Loading) return
 
         val trimmedEmail = email.trim()
         val trimmedPass = pass.trim()
+        val trimmedUsername = username.trim()
+
+        if (trimmedUsername.isEmpty()) {
+            _uiState.value = AuthUiState.Error("Username cannot be empty")
+            return
+        }
 
         if (!validateInputs(trimmedEmail, trimmedPass)) return
 
         _uiState.value = AuthUiState.Loading
         viewModelScope.launch {
-            val result = repository.signUpWithEmailAndPassword(trimmedEmail, trimmedPass)
+            val result = repository.signUpWithEmailAndPassword(trimmedEmail, trimmedPass, trimmedUsername)
             _uiState.value = result.fold(
                 onSuccess = { user -> AuthUiState.Success(user) },
                 onFailure = { e   -> AuthUiState.Error(mapErrorToMessage(e)) }

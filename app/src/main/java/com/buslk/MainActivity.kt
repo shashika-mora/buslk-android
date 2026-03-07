@@ -66,19 +66,11 @@ fun BusLKApp() {
         factory = com.buslk.ui.auth.AuthViewModelFactory(authRepository)
     )
 
-    var currentDestination by rememberSaveable { 
-        mutableStateOf(if (authRepository.getCurrentUser() != null) AppDestinations.HOME else AppDestinations.OPENING) 
+    var currentDestination by androidx.compose.runtime.remember { 
+        mutableStateOf(if (authRepository.getCurrentUser() != null) AppDestinations.HOME else AppDestinations.LOGIN) 
     }
 
-    if (currentDestination == AppDestinations.OPENING) {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            com.buslk.ui.screens.OpeningScreen(
-                onGetStartedClick = {
-                    currentDestination = AppDestinations.LOGIN
-                }
-            )
-        }
-    } else if (currentDestination == AppDestinations.LOGIN) {
+    if (currentDestination == AppDestinations.LOGIN) {
         // Hide navigation suite on login screen
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             // Pass innerPadding to LoginScreen if needed, or wrap it
@@ -88,12 +80,13 @@ fun BusLKApp() {
                     currentDestination = AppDestinations.HOME
                 },
                 onBackClick = {
-                    currentDestination = AppDestinations.OPENING
+                    // Do nothing or exit app, since OPENING is removed as default
                 }
             )
         }
     } else {
         NavigationSuiteScaffold(
+            modifier = Modifier.fillMaxSize(),
             navigationSuiteItems = {
                 AppDestinations.entries.filter { it != AppDestinations.LOGIN && it != AppDestinations.OPENING }.forEach {
                     item(
@@ -111,20 +104,33 @@ fun BusLKApp() {
             }
         ) {
             Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                if (currentDestination == AppDestinations.HOME || currentDestination == AppDestinations.PROFILE) {
-                    HomeScreen(
-                        user = authRepository.getCurrentUser(),
-                        onSignOut = {
-                            authViewModel.signOut()
-                            currentDestination = AppDestinations.OPENING
-                        },
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                } else {
-                    Greeting(
-                        name = currentDestination.label,
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                when (currentDestination) {
+                    AppDestinations.HOME -> {
+                        HomeScreen(
+                            user = authRepository.getCurrentUser(),
+                            onSignOut = {
+                                authViewModel.signOut()
+                                currentDestination = AppDestinations.LOGIN
+                            },
+                            modifier = Modifier.padding(innerPadding)
+                        )
+                    }
+                    AppDestinations.PROFILE -> {
+                        com.buslk.ui.screens.ProfileScreen(
+                            user = authRepository.getCurrentUser(),
+                            onSignOut = {
+                                authViewModel.signOut()
+                                currentDestination = AppDestinations.LOGIN
+                            },
+                            modifier = Modifier.padding(innerPadding)
+                        )
+                    }
+                    else -> {
+                        Greeting(
+                            name = currentDestination.label,
+                            modifier = Modifier.padding(innerPadding)
+                        )
+                    }
                 }
             }
         }

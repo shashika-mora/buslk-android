@@ -119,6 +119,7 @@ fun LoginScreen(
         
         Spacer(modifier = Modifier.height(24.dp))
 
+        var username by remember { mutableStateOf("") }
         var email by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }
         var confirmPassword by remember { mutableStateOf("") }
@@ -126,6 +127,8 @@ fun LoginScreen(
         // Form Fields
         AuthForm(
             isLogin = selectedTabIndex == 0,
+            username = username,
+            onUsernameChange = { username = it },
             email = email,
             onEmailChange = { email = it },
             password = password,
@@ -145,7 +148,7 @@ fun LoginScreen(
                     authViewModel.signInWithEmailAndPassword(email, password)
                 } else {
                     if (password == confirmPassword) {
-                        authViewModel.signUpWithEmailAndPassword(email, password)
+                        authViewModel.signUpWithEmailAndPassword(email, password, username)
                     } else {
                         Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
                     }
@@ -154,7 +157,7 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
-            enabled = !isLoading && email.isNotEmpty() && password.isNotEmpty(),
+            enabled = !isLoading && email.isNotEmpty() && password.isNotEmpty() && (selectedTabIndex == 0 || username.isNotEmpty()),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFF1E5DE6),
                 disabledContainerColor = Color.LightGray
@@ -242,6 +245,8 @@ fun GoogleSignInButton(isLoading: Boolean, onClick: () -> Unit) {
 @Composable
 fun AuthForm(
     isLogin: Boolean,
+    username: String,
+    onUsernameChange: (String) -> Unit,
     email: String,
     onEmailChange: (String) -> Unit,
     password: String,
@@ -261,6 +266,30 @@ fun AuthForm(
             (uiState as com.buslk.ui.auth.AuthUiState.Error).message.contains("Password", ignoreCase = true)
 
     Column {
+        if (!isLogin) {
+            OutlinedTextField(
+                value = username,
+                onValueChange = onUsernameChange,
+                label = { Text("Username") },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                singleLine = true,
+                enabled = !isLoading,
+                isError = uiState is com.buslk.ui.auth.AuthUiState.Error && 
+                        (uiState as com.buslk.ui.auth.AuthUiState.Error).message.contains("Username", ignoreCase = true),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = androidx.compose.ui.text.input.ImeAction.Next
+                ),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFF1E5DE6),
+                    focusedLabelColor = Color(0xFF1E5DE6),
+                    errorBorderColor = Color.Red
+                )
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
         OutlinedTextField(
             value = email,
             onValueChange = onEmailChange,
