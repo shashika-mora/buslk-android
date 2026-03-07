@@ -9,11 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.height
-import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
-import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material.icons.outlined.Face
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
@@ -79,8 +75,6 @@ class MainActivity : AppCompatActivity() {
 @PreviewScreenSizes
 @Composable
 fun BusLKApp() {
-    val context = LocalContext.current
-    
     // OOD Principle: Dependency Injection Setup (Composition Root)
     // We instantiate the AuthRepository here at the top level and inject it
     // into the AuthViewModelFactory. This ensures that the ViewModel doesn't
@@ -108,7 +102,7 @@ fun BusLKApp() {
 
     // Basic Routing Logic: Determine which Screen Composable to draw based on currentDestination
     if (currentDestination == AppDestinations.OPENING) {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        Scaffold(modifier = Modifier.fillMaxSize()) { _ ->
             com.buslk.ui.screens.OpeningScreen(
                 onGetStartedClick = {
                     currentDestination = AppDestinations.LANGUAGE_SELECT
@@ -117,7 +111,7 @@ fun BusLKApp() {
         }
     } else if (currentDestination == AppDestinations.LOGIN) {
         // Hide the bottom navigation bar by keeping the Login screen outside the NavigationSuiteScaffold
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        Scaffold(modifier = Modifier.fillMaxSize()) { _ ->
             LoginScreen(
                 authViewModel = authViewModel,
                 onSignInSuccess = {
@@ -129,12 +123,12 @@ fun BusLKApp() {
             )
         }
     } else if (currentDestination == AppDestinations.LANGUAGE_SELECT) {
-        Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
+        Scaffold(modifier = Modifier.fillMaxSize()) { _ ->
             com.buslk.ui.screens.LanguageSelectionScreen(
                 onBackClick = {
                     currentDestination = AppDestinations.OPENING
                 },
-                onLanguageSelected = { langCode ->
+                onLanguageSelected = { _ ->
                     currentDestination = AppDestinations.LOGIN
                 }
             )
@@ -182,33 +176,36 @@ fun BusLKApp() {
         ) {
             // This Scaffold holds the actual content *above* the bottom navigation bar
             Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                if (currentDestination == AppDestinations.HOME) {
-                    com.buslk.ui.screens.HomeScreen()
-                } else if (currentDestination == AppDestinations.PROFILE) {
-                    com.buslk.ui.screens.ProfileScreen(
-                        authViewModel = authViewModel,
-                        onLogoutSuccess = {
-                            currentDestination = AppDestinations.LOGIN
-                        },
-                        onSettingsClick = { isSettingsOpen = true }
-                    )
-                } else if (currentDestination == AppDestinations.SEARCH) {
-                    com.buslk.ui.screens.SearchScreen()
-                } else if (currentDestination == AppDestinations.FRIENDS) {
-                    com.buslk.ui.screens.FriendsScreen(
-                        onChatClick = { friendName -> 
-                            currentChatFriend = friendName 
-                        }
-                    )
-                } else if (currentDestination == AppDestinations.LOST_AND_FOUND) {
-                    // Tapping the tab named "L & F" opens the Lost And Found Screen
-                    com.buslk.ui.screens.LostAndFoundScreen()
-                } else {
-                    // Fallback for any unknown screens
-                    Greeting(
-                        name = stringResource(currentDestination.labelResId),
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                when (currentDestination) {
+                    AppDestinations.HOME -> com.buslk.ui.screens.HomeScreen()
+                    AppDestinations.PROFILE -> {
+                        com.buslk.ui.screens.ProfileScreen(
+                            authViewModel = authViewModel,
+                            onLogoutSuccess = {
+                                currentDestination = AppDestinations.LOGIN
+                            },
+                            onSettingsClick = { isSettingsOpen = true }
+                        )
+                    }
+                    AppDestinations.SEARCH -> com.buslk.ui.screens.SearchScreen()
+                    AppDestinations.FRIENDS -> {
+                        com.buslk.ui.screens.FriendsScreen(
+                            onChatClick = { friendName -> 
+                                currentChatFriend = friendName 
+                            }
+                        )
+                    }
+                    AppDestinations.LOST_AND_FOUND -> {
+                        // Tapping the tab named "L & F" opens the Lost And Found Screen
+                        com.buslk.ui.screens.LostAndFoundScreen()
+                    }
+                    else -> {
+                        // Fallback for any unknown screens
+                        Greeting(
+                            name = stringResource(currentDestination.labelResId),
+                            modifier = Modifier.padding(innerPadding)
+                        )
+                    }
                 }
             }
         }
