@@ -14,13 +14,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Face
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -195,14 +193,14 @@ enum class AppDestinations(
     @StringRes val labelResId: Int,
     val icon: ImageVector,
 ) {
-    OPENING(R.string.nav_home, Icons.Default.Home),
-    LOGIN(R.string.tab_login, Icons.Default.AccountBox),
-    LANGUAGE_SELECT(R.string.select_language, Icons.Default.Home),
-    HOME(R.string.nav_home, Icons.Default.Home),
-    SEARCH(R.string.nav_search, Icons.Default.Search),
-    SOCIAL(R.string.nav_social, Icons.Default.Face),
-    LOST_AND_FOUND(R.string.nav_lost_found, Icons.AutoMirrored.Filled.List),
-    PROFILE(R.string.nav_profile, Icons.Default.Person),
+    OPENING(R.string.nav_home, Icons.Outlined.Home),
+    LOGIN(R.string.tab_login, Icons.Outlined.Person),
+    LANGUAGE_SELECT(R.string.select_language, Icons.Outlined.Home),
+    HOME(R.string.nav_home, Icons.Outlined.Home),
+    SEARCH(R.string.nav_search, Icons.Outlined.Search),
+    FRIENDS(R.string.nav_friends, Icons.Outlined.Face),
+    LOST_AND_FOUND(R.string.nav_lost_found, Icons.Outlined.Info),
+    PROFILE(R.string.nav_profile, Icons.Outlined.Person),
 }
 
 /** Placeholder component for unbuilt screens. */

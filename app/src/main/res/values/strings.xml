@@ -31,8 +31,8 @@
     <!-- Navigation -->
     <string name="nav_home">Home</string>
     <string name="nav_search">Search</string>
-    <string name="nav_social">Social</string>
-    <string name="nav_lost_found">Lost&amp;Found</string>
+    <string name="nav_friends">Friends</string>
+    <string name="nav_lost_found">L &amp; F</string>
     <string name="nav_profile">Profile</string>
 
     <!-- Search Screen -->

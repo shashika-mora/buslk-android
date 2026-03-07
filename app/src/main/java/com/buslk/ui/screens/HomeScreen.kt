@@ -28,6 +28,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.ui.res.stringResource
 import com.buslk.R
 import androidx.compose.runtime.getValue
@@ -42,6 +43,53 @@ import com.buslk.ui.search.SearchViewModel
 import com.buslk.ui.search.SearchViewModelFactory
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.IconButton
+
+// --- New Imports for BottomSheet & Mock UI ---
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.outlined.Search
+import com.buslk.ui.theme.BusLKBlue
+import com.buslk.ui.theme.CrowdGreen
+import com.buslk.ui.theme.CrowdYellow
+import com.buslk.ui.theme.CrowdRed
+
+// --- Mock Data ---
+data class MockBus(
+    val route: String,
+    val reg: String,
+    val time: String,
+    val dist: String,
+    val crowd: String,
+    val crowdColor: Color
+)
+val mockBuses = listOf(
+    MockBus("138", "Bus NA-1234", "2 min", "0.5 km", "LOW", CrowdGreen),
+    MockBus("176", "Bus NB-5678", "5 min", "0.8 km", "MEDIUM", CrowdYellow),
+    MockBus("120", "Bus NC-9012", "8 min", "1.2 km", "HIGH", CrowdRed),
+    MockBus("177", "Bus ND-3456", "12 min", "1.5 km", "LOW", CrowdGreen)
+)
 
 /**
  * The main Home Screen Composable containing the interactive Map.
@@ -113,98 +161,210 @@ fun HomeScreen(
     /**
      * Wrap the legacy MapView and floating UI elements in a Box to allow layering (Z-index).
      */
-    Box(modifier = Modifier.fillMaxSize()) {
-        /**
-         * AndroidView acts as a "bridge" to use legacy XML-based View classes inside modern Jetpack Compose.
-         * Since osmdroid's MapView is an old-school Android View, we wrap it in an AndroidView.
-         * 
-         * OOD Principle: Adapter Pattern.
-         * AndroidView adapts the legacy imperative API of MapView into the modern declarative API of Compose.
-         */
-        AndroidView(
-            // 'factory' runs exactly ONCE to instantiate and configure the View.
-            factory = {
-                mapView.apply {
-                    // Set the visual style of the map to standard Mapnik (OpenStreetMap default)
-                    setTileSource(TileSourceFactory.MAPNIK)
-                    // Set default starting zoom level (15 is a close-up city view)
-                    controller.setZoom(15.0)
-                    // Center roughly on Colombo, Sri Lanka (Latitude, Longitude)
-                    controller.setCenter(GeoPoint(6.9271, 79.8612))
-                    // Allow pinch-to-zoom and two-finger rotation
-                    setMultiTouchControls(true)
-                    
-                    // --- Performance / UX Optimizations ---
-                    // 1. Force hardware acceleration for map drawing to free up the CPU
-                    setLayerType(android.view.View.LAYER_TYPE_HARDWARE, null)
-                    // 2. Scale the pixel tiles to match the high-density screens (DPI) of modern phones
-                    isTilesScaledToDpi = true
-                    // 3. Hide the ugly default zoom buttons (+/-); users expect pinch-to-zoom
-                    zoomController.setVisibility(org.osmdroid.views.CustomZoomButtonsController.Visibility.NEVER)
-                }
-            },
-            // 'update' runs every time Compose decides the screen needs to be redrawn (Recomposition).
-            // This is where we will eventually put logic to draw moving bus markers when we get live data.
-            update = {
-                // Future updates for markers will go here (Observing ViewModel StateFlows)
-            },
-            // Tell the AndroidView to stretch and fill the entire available screen space
-            modifier = Modifier.fillMaxSize()
-        )
+    val scaffoldState = rememberBottomSheetScaffoldState()
 
-        /**
-         * Floating Search Bar for routing.
-         */
-        @Suppress("DEPRECATION")
-        SearchBar(
-            query = searchQuery,
-            onQueryChange = { 
-                searchQuery = it 
-                searchViewModel.performSearch(it)
-            },
-            onSearch = { 
-                searchViewModel.performSearch(it)
-            },
-            active = active,
-            onActiveChange = { 
-                active = it 
-                if (!it) searchViewModel.clearSearch()
-            },
-            placeholder = { Text(stringResource(R.string.search_placeholder)) },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.icon_search)) },
-            trailingIcon = {
-                if (active) {
-                    IconButton(onClick = { 
-                        if (searchQuery.isNotEmpty()) {
-                            searchQuery = ""
-                            searchViewModel.clearSearch()
-                        } else {
-                            active = false
-                            searchViewModel.clearSearch()
-                        }
-                    }) {
-                        Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.icon_clear))
+    /**
+     * BottomSheetScaffold allows building a map base with a sheet that slides up over it.
+     */
+    BottomSheetScaffold(
+        scaffoldState = scaffoldState,
+        // The container color must be transparent so our SCAN button looks like it's floating above the sheet
+        sheetContainerColor = Color.Transparent,
+        sheetPeekHeight = 220.dp, // How much of the sheet is visible when collapsed
+        sheetShadowElevation = 0.dp,
+        sheetDragHandle = null, // We'll rely on the surface drag
+        sheetContent = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // SCAN Button floating above the white sheet
+                FloatingActionButton(
+                    onClick = { /* TODO: Scanner */ },
+                    shape = CircleShape,
+                    containerColor = BusLKBlue,
+                    contentColor = Color.White,
+                    modifier = Modifier
+                        .padding(bottom = 8.dp)
+                        .size(72.dp)
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        // Using a standard icon as placeholder for a QR scanner icon
+                        Icon(Icons.Default.Search, contentDescription = "Scan") 
+                        Text("SCAN", fontWeight = FontWeight.Bold, fontSize = 10.sp)
                     }
                 }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = if (active) 0.dp else 16.dp, vertical = if (active) 0.dp else 24.dp)
-                .align(Alignment.TopCenter),
-            shape = RoundedCornerShape(if (active) 0.dp else 100.dp)
-        ) {
-            SearchContent(
-                uiState = searchUiState,
-                onRouteClick = { route -> 
-                    // MVP: Close search and maybe pan map to route later
-                    active = false 
-                    searchQuery = route.routeId
-                },
-                onBusClick = { bus -> 
-                    active = false
-                    searchQuery = bus.registrationNumber
+                
+                // The White Sheet Content
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(450.dp), // Height of the sheet when dragged up
+                    shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    shadowElevation = 16.dp
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        // Drag Indicator Bar (Aesthetic)
+                        Box(
+                            modifier = Modifier
+                                .width(40.dp)
+                                .height(4.dp)
+                                .background(Color.LightGray, CircleShape)
+                                .align(Alignment.CenterHorizontally)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        // Header
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Outlined.LocationOn, contentDescription = null, tint = BusLKBlue)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Nearby Buses", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                        }
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        // Bus List
+                        LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            items(mockBuses) { bus ->
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                                    border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f)),
+                                    shape = RoundedCornerShape(16.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .padding(12.dp)
+                                            .fillMaxWidth(), 
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        // Left Col: Route & Dist
+                                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                            Surface(color = BusLKBlue, shape = RoundedCornerShape(12.dp), modifier = Modifier.size(56.dp)) {
+                                                Box(contentAlignment = Alignment.Center) { 
+                                                    Text(bus.route, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp) 
+                                                }
+                                            }
+                                            Spacer(modifier = Modifier.height(6.dp))
+                                            Surface(border = BorderStroke(1.dp, Color.LightGray), shape = RoundedCornerShape(50)) {
+                                                Text(bus.dist, fontSize = 10.sp, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp), color = Color.DarkGray)
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.width(16.dp))
+                                        
+                                        // Mid Col: Reg & Time
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Text(bus.reg, color = Color.Gray, fontSize = 14.sp)
+                                            Spacer(modifier = Modifier.height(6.dp))
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Icon(Icons.Outlined.LocationOn, contentDescription = null, modifier = Modifier.size(16.dp), tint = CrowdGreen)
+                                                Spacer(modifier = Modifier.width(4.dp))
+                                                Text(bus.time, fontWeight = FontWeight.Medium, fontSize = 16.sp)
+                                            }
+                                        }
+                                        
+                                        // Right Col: Crowd
+                                        Column(horizontalAlignment = Alignment.End) {
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Icon(Icons.Outlined.Person, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.Gray)
+                                                Spacer(modifier = Modifier.width(4.dp))
+                                                Box(modifier = Modifier
+                                                    .size(10.dp)
+                                                    .background(bus.crowdColor, CircleShape))
+                                            }
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                            Surface(color = bus.crowdColor, shape = RoundedCornerShape(50)) {
+                                                Text(
+                                                    text = bus.crowd, 
+                                                    color = Color.White, 
+                                                    fontSize = 10.sp, 
+                                                    fontWeight = FontWeight.Bold, 
+                                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
+            }
+        }
+    ) { paddingValues ->
+        // The background content (Map and SearchBar)
+        // We intentionally DO NOT apply paddingValues here so the Map draws underneath 
+        // the curved corners of the transparent BottomSheet, removing the white block.
+        Box(modifier = Modifier.fillMaxSize()) {
+            
+            AndroidView(
+                factory = {
+                    mapView.apply {
+                        setTileSource(TileSourceFactory.MAPNIK)
+                        controller.setZoom(15.0)
+                        controller.setCenter(GeoPoint(6.9271, 79.8612))
+                        setMultiTouchControls(true)
+                        setLayerType(android.view.View.LAYER_TYPE_HARDWARE, null)
+                        isTilesScaledToDpi = true
+                        zoomController.setVisibility(org.osmdroid.views.CustomZoomButtonsController.Visibility.NEVER)
+                    }
+                },
+                update = {},
+                modifier = Modifier.fillMaxSize()
             )
+
+            @Suppress("DEPRECATION")
+            SearchBar(
+                query = searchQuery,
+                onQueryChange = { 
+                    searchQuery = it 
+                    searchViewModel.performSearch(it)
+                },
+                onSearch = { 
+                    searchViewModel.performSearch(it)
+                },
+                active = active,
+                onActiveChange = { 
+                    active = it 
+                    if (!it) searchViewModel.clearSearch()
+                },
+                colors = SearchBarDefaults.colors(containerColor = Color.White),
+                placeholder = { Text(stringResource(R.string.search_placeholder)) },
+                leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = stringResource(R.string.icon_search)) },
+                trailingIcon = {
+                    if (active) {
+                        IconButton(onClick = { 
+                            if (searchQuery.isNotEmpty()) {
+                                searchQuery = ""
+                                searchViewModel.clearSearch()
+                            } else {
+                                active = false
+                                searchViewModel.clearSearch()
+                            }
+                        }) {
+                            Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.icon_clear))
+                        }
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = if (active) 0.dp else 16.dp, vertical = if (active) 0.dp else 24.dp)
+                    .align(Alignment.TopCenter),
+                shape = RoundedCornerShape(if (active) 0.dp else 100.dp)
+            ) {
+                SearchContent(
+                    uiState = searchUiState,
+                    onRouteClick = { route -> 
+                        active = false 
+                        searchQuery = route.routeId
+                    },
+                    onBusClick = { bus -> 
+                        active = false
+                        searchQuery = bus.registrationNumber
+                    }
+                )
+            }
         }
     }
 }
