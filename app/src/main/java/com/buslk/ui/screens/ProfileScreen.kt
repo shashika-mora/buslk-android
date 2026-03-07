@@ -182,7 +182,7 @@ fun ProfileScreen(
                                     colors = listOf(PointsOrangeStart, PointsOrangeEnd)
                                 )
                             )
-                            .padding(24.dp)
+                            .padding(horizontal = 24.dp, vertical = 20.dp)
                     ) {
                         Column {
                             // Top Row: Points & Trophy Placeholder
@@ -200,7 +200,7 @@ fun ProfileScreen(
                                 Text("🏆", fontSize = 48.sp)
                             }
                             
-                            Spacer(modifier = Modifier.height(24.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
                             // Bottom Row: 3 little stat cards
                             Row(
@@ -211,7 +211,7 @@ fun ProfileScreen(
                                     .weight(1f)
                                     .clip(RoundedCornerShape(8.dp))
                                     .background(PointsCardInner)
-                                    .padding(vertical = 12.dp)
+                                    .padding(vertical = 10.dp)
 
                                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = statModifier) {
                                     Text("47", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
