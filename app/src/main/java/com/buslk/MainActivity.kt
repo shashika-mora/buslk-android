@@ -102,6 +102,9 @@ fun BusLKApp() {
     
     // State variable to track if the user is currently looking at a specific chat screen
     var currentChatFriend: String? by rememberSaveable { mutableStateOf(null) }
+    
+    // State to track if Settings overlay is open
+    var isSettingsOpen by rememberSaveable { mutableStateOf(false) }
 
     // Basic Routing Logic: Determine which Screen Composable to draw based on currentDestination
     if (currentDestination == AppDestinations.OPENING) {
@@ -142,6 +145,16 @@ fun BusLKApp() {
             friendName = currentChatFriend!!,
             onBackClick = { currentChatFriend = null } // Close chat
         )
+    } else if (isSettingsOpen) {
+        // Show Settings Screen over the entire app
+        com.buslk.ui.screens.SettingsScreen(
+            onBack = { isSettingsOpen = false },
+            authViewModel = authViewModel,
+            onLogoutSuccess = {
+                isSettingsOpen = false
+                currentDestination = AppDestinations.LOGIN
+            }
+        )
     } else {
         // App is in "Main Mode" (logged in/past intro). Show the Navigation Bar.
         // OOD Principle: UI component reusability and isolation.
@@ -176,7 +189,8 @@ fun BusLKApp() {
                         authViewModel = authViewModel,
                         onLogoutSuccess = {
                             currentDestination = AppDestinations.LOGIN
-                        }
+                        },
+                        onSettingsClick = { isSettingsOpen = true }
                     )
                 } else if (currentDestination == AppDestinations.SEARCH) {
                     com.buslk.ui.screens.SearchScreen()

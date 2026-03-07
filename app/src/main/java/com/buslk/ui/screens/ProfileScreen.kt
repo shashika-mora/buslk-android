@@ -79,7 +79,8 @@ val mockFeedbacks = listOf(
 @Composable
 fun ProfileScreen(
     authViewModel: AuthViewModel,
-    onLogoutSuccess: () -> Unit
+    onLogoutSuccess: () -> Unit,
+    onSettingsClick: () -> Unit
 ) {
     var selectedTabIndex by remember { mutableStateOf(0) }
     val tabs = listOf("Trip History", "Feedbacks", "Achievements")
@@ -111,12 +112,9 @@ fun ProfileScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text("Profile", style = MaterialTheme.typography.titleLarge, color = Color.White, fontWeight = FontWeight.Bold)
-                        // Settings / Logout Button
-                        IconButton(onClick = {
-                            authViewModel.signOut()
-                            onLogoutSuccess()
-                        }) {
-                            Icon(Icons.Outlined.Settings, contentDescription = "Settings / Logout", tint = Color.White)
+                        // Settings Button
+                        IconButton(onClick = onSettingsClick) {
+                            Icon(Icons.Outlined.Settings, contentDescription = "Settings", tint = Color.White)
                         }
                     }
 
