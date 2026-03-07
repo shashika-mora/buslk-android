@@ -169,8 +169,10 @@ fun BusLKApp() {
                             currentDestination = AppDestinations.LOGIN
                         }
                     )
+                } else if (currentDestination == AppDestinations.SEARCH) {
+                    com.buslk.ui.screens.SearchScreen()
                 } else {
-                    // Placeholder for screens we haven't built yet (SOCIAL, SEARCH, LOST_AND_FOUND)
+                    // Placeholder for screens we haven't built yet (FRIENDS, LOST_AND_FOUND)
                     Greeting(
                         name = stringResource(currentDestination.labelResId),
                         modifier = Modifier.padding(innerPadding)

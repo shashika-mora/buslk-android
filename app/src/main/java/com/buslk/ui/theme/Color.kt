@@ -15,3 +15,5 @@ val BusLKBlue = Color(0xFF1A73E8)
 val CrowdGreen = Color(0xFF00C853)
 val CrowdYellow = Color(0xFFFFB300)
 val CrowdRed = Color(0xFFF44336)
+val QuickActionBg = Color(0xFFF8F9FE) // Light purple/blue tint
+val TrendingOrange = Color(0xFFF57C00)
