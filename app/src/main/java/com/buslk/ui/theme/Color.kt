@@ -21,6 +21,7 @@ val TrendingOrange = Color(0xFFF57C00)
 val FriendsPurple = Color(0xFF8A00D4)
 val DarkButtonBg = Color(0xFF0F172A)
 val UnreadRed = Color(0xFFFF3B30)
+val LightGrayBg = Color(0xFFF5F6FA)
 
 // --- Lost & Found Colors ---
 val FoundBlue = Color(0xFF2962FF)
