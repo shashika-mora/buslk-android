@@ -39,6 +39,9 @@ import com.buslk.ui.theme.BusLKTheme
 import com.buslk.data.UserPreferencesRepository
 import com.buslk.ui.viewmodels.SettingsViewModel
 import com.buslk.ui.viewmodels.SettingsViewModelFactory
+import com.buslk.data.LiveMapRepository
+import com.buslk.ui.viewmodels.MapViewModel
+import com.buslk.ui.viewmodels.MapViewModelFactory
 import com.google.firebase.FirebaseApp
 
 /**
@@ -114,6 +117,12 @@ fun BusLKApp(settingsViewModel: SettingsViewModel? = null) {
     val feedbackRepository = androidx.compose.runtime.remember { com.buslk.data.FeedbackRepository() }
     val profileViewModel: com.buslk.ui.viewmodels.ProfileViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
         factory = com.buslk.ui.viewmodels.ProfileViewModelFactory(userRepository, tripRepository, feedbackRepository)
+    )
+
+    // Instantiate Map dependencies
+    val liveMapRepository = androidx.compose.runtime.remember { LiveMapRepository() }
+    val mapViewModel: MapViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+        factory = MapViewModelFactory(liveMapRepository)
     )
 
     // State variable holding the current screen the user is looking at.
@@ -209,7 +218,7 @@ fun BusLKApp(settingsViewModel: SettingsViewModel? = null) {
             // This Scaffold holds the actual content *above* the bottom navigation bar
             Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                 when (currentDestination) {
-                    AppDestinations.HOME -> com.buslk.ui.screens.HomeScreen()
+                    AppDestinations.HOME -> com.buslk.ui.screens.HomeScreen(mapViewModel = mapViewModel)
                     AppDestinations.PROFILE -> {
                         com.buslk.ui.screens.ProfileScreen(
                             authViewModel = authViewModel,

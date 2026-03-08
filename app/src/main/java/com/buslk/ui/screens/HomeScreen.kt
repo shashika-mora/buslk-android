@@ -43,6 +43,11 @@ import com.buslk.ui.search.SearchViewModel
 import com.buslk.ui.search.SearchViewModelFactory
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.IconButton
+import com.buslk.ui.viewmodels.MapViewModel
+import com.buslk.ui.viewmodels.MapUiState
+import org.osmdroid.views.overlay.Marker
+import androidx.core.content.ContextCompat
+import java.util.Locale
 
 // --- New Imports for BottomSheet & Mock UI ---
 import androidx.compose.material3.BottomSheetScaffold
@@ -101,7 +106,8 @@ val mockBuses = listOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    searchViewModel: SearchViewModel = viewModel(factory = SearchViewModelFactory())
+    searchViewModel: SearchViewModel = viewModel(factory = SearchViewModelFactory()),
+    mapViewModel: MapViewModel
 ) {
     // Grab the current Android Context (Activity) needed to initialize native Android Views
     val context = LocalContext.current
@@ -117,6 +123,7 @@ fun HomeScreen(
     // Whenever the ViewModel changes this state, this entire HomeScreen function will cleanly
     // and automatically redraw itself (Recomposition).
     val searchUiState by searchViewModel.uiState.collectAsState()
+    val mapUiState by mapViewModel.mapState.collectAsState()
 
     // Grab the current LifecycleOwner (usually the Activity or Navigation BackStackEntry)
     // We need this to know when the app goes into the background or foreground.
@@ -302,15 +309,51 @@ fun HomeScreen(
                 factory = {
                     mapView.apply {
                         setTileSource(TileSourceFactory.MAPNIK)
-                        controller.setZoom(15.0)
-                        controller.setCenter(GeoPoint(6.9271, 79.8612))
+                        controller.setZoom(14.0)
+                        controller.setCenter(GeoPoint(6.9271, 79.8612)) // Center on Colombo
                         setMultiTouchControls(true)
                         setLayerType(android.view.View.LAYER_TYPE_HARDWARE, null)
                         isTilesScaledToDpi = true
                         zoomController.setVisibility(org.osmdroid.views.CustomZoomButtonsController.Visibility.NEVER)
                     }
                 },
-                update = {},
+                update = { view ->
+                    if (mapUiState is MapUiState.Success) {
+                        val allBuses = (mapUiState as MapUiState.Success).activeBuses
+                        
+                        // Filter Logic: If searchQuery is active, strictly show matching buses
+                        val filteredBuses = if (searchQuery.isNotBlank()) {
+                            val lowerQuery = searchQuery.lowercase(Locale.getDefault())
+                            allBuses.filter { bus ->
+                                bus.routeId.lowercase(Locale.getDefault()) == lowerQuery ||
+                                bus.busId.lowercase(Locale.getDefault()).contains(lowerQuery)
+                            }
+                        } else {
+                            allBuses // Show all if search is empty
+                        }
+                        
+                        // Clear existing markers to prevent ghost trails
+                        view.overlays.clear()
+                        
+                        // Cache the custom red marker drawable to avoid reading disk inside the loop
+                        val redBusIcon = ContextCompat.getDrawable(context, R.drawable.ic_bus_marker_red)
+                        
+                        filteredBuses.forEach { bus ->
+                            val marker = Marker(view).apply {
+                                position = GeoPoint(bus.lat, bus.lng)
+                                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                                rotation = bus.heading
+                                title = "Reg: ${bus.busId} | Crowd: ${bus.crowdLevel}"
+                                subDescription = "Speed: ${bus.speed} km/h | Route: ${bus.routeId}"
+                                icon = redBusIcon  // Apply the custom red Material Vector Graphic
+                            }
+                            view.overlays.add(marker)
+                        }
+                        
+                        // Force OSM to redraw the canvas with the new pins
+                        view.invalidate()
+                    }
+                },
                 modifier = Modifier.fillMaxSize()
             )
 
