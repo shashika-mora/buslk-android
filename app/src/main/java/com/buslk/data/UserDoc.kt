@@ -30,7 +30,20 @@ data class UserDoc(
     @ServerTimestamp
     val updatedAt: Timestamp? = null,
     val stats: UserStats = UserStats(),
-    val preferences: UserPreferences = UserPreferences()
+    val preferences: UserPreferences = UserPreferences(),
+    // Map of achievements by semantic key (e.g. "early_bird", "explorer")
+    val achievements: Map<String, AchievementDoc> = emptyMap()
+)
+
+/**
+ * Inner data structure representing a dynamically-scaled achievement
+ * Note: Firestore maps objects perfectly to nested Maps and Data classes.
+ */
+data class AchievementDoc(
+    val unlocked: Boolean = false,
+    val unlockedAt: Timestamp? = null,
+    val progress: Int = 0,
+    val target: Int = 1 // Prevent divide by zero scenarios
 )
 
 /**
