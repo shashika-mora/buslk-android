@@ -47,4 +47,20 @@
     <string name="icon_clear">Clear Search</string>
     <!-- Actions -->
     <string name="action_logout">Log Out</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_account_control">Account Control</string>
+    <string name="settings_edit_profile">Edit Profile</string>
+    <string name="settings_change_password">Change Password</string>
+    <string name="settings_ui_control">UI Control</string>
+    <string name="settings_app_theme">App Theme</string>
+    <string name="settings_theme_system">System Default</string>
+    <string name="settings_theme_light">Light Mode</string>
+    <string name="settings_theme_dark">Dark Mode</string>
+    <string name="settings_user_preferences">User Preferences</string>
+    <string name="settings_default_route">Default Route</string>
+    <string name="settings_route_138">Route 138</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_push_notifications">Push Notifications</string>
 </resources>
