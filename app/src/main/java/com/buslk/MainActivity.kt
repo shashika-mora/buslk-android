@@ -30,9 +30,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.annotation.StringRes
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
 import androidx.appcompat.app.AppCompatActivity
 import com.buslk.ui.screens.LoginScreen
 import com.buslk.ui.theme.BusLKTheme
+import com.buslk.data.UserPreferencesRepository
+import com.buslk.ui.viewmodels.SettingsViewModel
+import com.buslk.ui.viewmodels.SettingsViewModelFactory
 import com.google.firebase.FirebaseApp
 
 /**
@@ -58,9 +64,26 @@ class MainActivity : AppCompatActivity() {
         
         // Set the root UI content using Jetpack Compose
         setContent {
-            // BusLKTheme applies our global colors, typography, and shapes
-            BusLKTheme {
-                BusLKApp()
+            // Context needed for SharedPreferences/DataStore
+            val context = LocalContext.current
+            val userPreferencesRepository = androidx.compose.runtime.remember { UserPreferencesRepository(context) }
+            val settingsViewModel: SettingsViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+                factory = SettingsViewModelFactory(userPreferencesRepository)
+            )
+
+            // React to DataStore changes from the ViewModel natively
+            val currentThemeMode by settingsViewModel.themeMode.collectAsState(initial = 0)
+            
+            // 0 = Auto, 1 = Light, 2 = Dark
+            val isDarkTheme = when (currentThemeMode) {
+                1 -> false
+                2 -> true
+                else -> isSystemInDarkTheme()
+            }
+
+            // BusLKTheme applies our global colors conditionally
+            BusLKTheme(darkTheme = isDarkTheme) {
+                BusLKApp(settingsViewModel = settingsViewModel)
             }
         }
     }
@@ -74,7 +97,7 @@ class MainActivity : AppCompatActivity() {
  */
 @PreviewScreenSizes
 @Composable
-fun BusLKApp() {
+fun BusLKApp(settingsViewModel: SettingsViewModel? = null) {
     // OOD Principle: Dependency Injection Setup (Composition Root)
     // We instantiate the AuthRepository here at the top level and inject it
     // into the AuthViewModelFactory. This ensures that the ViewModel doesn't
@@ -83,6 +106,14 @@ fun BusLKApp() {
     val authRepository = androidx.compose.runtime.remember { com.buslk.data.AuthRepository() }
     val authViewModel: com.buslk.ui.auth.AuthViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
         factory = com.buslk.ui.auth.AuthViewModelFactory(authRepository)
+    )
+
+    // Instantiate Profile dependencies
+    val userRepository = androidx.compose.runtime.remember { com.buslk.data.UserRepository() }
+    val tripRepository = androidx.compose.runtime.remember { com.buslk.data.TripRepository() }
+    val feedbackRepository = androidx.compose.runtime.remember { com.buslk.data.FeedbackRepository() }
+    val profileViewModel: com.buslk.ui.viewmodels.ProfileViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+        factory = com.buslk.ui.viewmodels.ProfileViewModelFactory(userRepository, tripRepository, feedbackRepository)
     )
 
     // State variable holding the current screen the user is looking at.
@@ -139,11 +170,12 @@ fun BusLKApp() {
             friendName = currentChatFriend!!,
             onBackClick = { currentChatFriend = null } // Close chat
         )
-    } else if (isSettingsOpen) {
+    } else if (isSettingsOpen && settingsViewModel != null) {
         // Show Settings Screen over the entire app
         com.buslk.ui.screens.SettingsScreen(
             onBack = { isSettingsOpen = false },
             authViewModel = authViewModel,
+            settingsViewModel = settingsViewModel,
             onLogoutSuccess = {
                 isSettingsOpen = false
                 currentDestination = AppDestinations.LOGIN
@@ -181,9 +213,7 @@ fun BusLKApp() {
                     AppDestinations.PROFILE -> {
                         com.buslk.ui.screens.ProfileScreen(
                             authViewModel = authViewModel,
-                            onLogoutSuccess = {
-                                currentDestination = AppDestinations.LOGIN
-                            },
+                            profileViewModel = profileViewModel,
                             onSettingsClick = { isSettingsOpen = true }
                         )
                     }
