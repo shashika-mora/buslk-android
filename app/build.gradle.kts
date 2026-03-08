@@ -73,4 +73,5 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation(libs.androidx.appcompat)
     implementation(libs.osmdroid.android)
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 }
