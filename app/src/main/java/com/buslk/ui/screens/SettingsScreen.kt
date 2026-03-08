@@ -14,36 +14,40 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.buslk.R
 import com.buslk.ui.auth.AuthViewModel
+import com.buslk.ui.viewmodels.SettingsViewModel
 import com.buslk.ui.theme.BusLKBlue
+import com.buslk.ui.theme.UnreadRed
+import com.buslk.ui.theme.LightGrayBg
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
     authViewModel: AuthViewModel,
+    settingsViewModel: SettingsViewModel,
     onLogoutSuccess: () -> Unit
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.settings_title), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White,
-                    titleContentColor = Color.Black,
-                    navigationIconContentColor = Color.Black
+                    containerColor = Color.Transparent, // Often better for Dark Mode
                 )
             )
         },
-        containerColor = Color(0xFFF5F6FA) // Light grey background
+        containerColor = LightGrayBg // Replaced hardcoded grey 0xFFF5F6FA
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
@@ -54,48 +58,110 @@ fun SettingsScreen(
         ) {
             // --- Account Control ---
             item {
-                SettingsSection(title = "Account Control") {
-                    SettingsRow(icon = Icons.Outlined.Person, title = "Edit Profile", onClick = {})
-                    Divider(color = Color.LightGray.copy(alpha = 0.3f))
-                    SettingsRow(icon = Icons.Outlined.Lock, title = "Change Password", onClick = {})
+                SettingsSection(title = stringResource(R.string.settings_account_control)) {
+                    SettingsRow(icon = Icons.Outlined.Person, title = stringResource(R.string.settings_edit_profile), onClick = {})
+                    HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
+                    SettingsRow(icon = Icons.Outlined.Lock, title = stringResource(R.string.settings_change_password), onClick = {})
                 }
             }
 
             // --- UI Control ---
             item {
-                SettingsSection(title = "UI Control") {
-                    var isDarkMode by remember { mutableStateOf(false) } // Placeholder state
-                    
+                SettingsSection(title = stringResource(R.string.settings_ui_control)) {
+                    val currentThemeMode by settingsViewModel.themeMode.collectAsState()
+                    var themeDropdownExpanded by remember { mutableStateOf(false) }
+
+                    val themeText = when (currentThemeMode) {
+                        1 -> stringResource(R.string.settings_theme_light)
+                        2 -> stringResource(R.string.settings_theme_dark)
+                        else -> stringResource(R.string.settings_theme_system)
+                    }
+
+                    // Theme Dropdown Row
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                            .clickable { themeDropdownExpanded = true }
+                            .padding(horizontal = 16.dp, vertical = 16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Outlined.DarkMode, contentDescription = null, tint = BusLKBlue)
                             Spacer(modifier = Modifier.width(16.dp))
-                            Text("Dark Theme", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                            Text(stringResource(R.string.settings_app_theme), fontSize = 16.sp, fontWeight = FontWeight.Medium)
                         }
-                        Switch(
-                            checked = isDarkMode,
-                            onCheckedChange = { isDarkMode = it },
-                            colors = SwitchDefaults.colors(checkedTrackColor = BusLKBlue)
-                        )
+                        
+                        Box {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(themeText, color = Color.Gray, fontSize = 14.sp)
+                                Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Color.LightGray)
+                            }
+
+                            DropdownMenu(
+                                expanded = themeDropdownExpanded,
+                                onDismissRequest = { themeDropdownExpanded = false }
+                            ) {
+                                DropdownMenuItem(text = { Text(stringResource(R.string.settings_theme_system)) }, onClick = { settingsViewModel.updateThemeMode(0); themeDropdownExpanded = false })
+                                DropdownMenuItem(text = { Text(stringResource(R.string.settings_theme_light)) }, onClick = { settingsViewModel.updateThemeMode(1); themeDropdownExpanded = false })
+                                DropdownMenuItem(text = { Text(stringResource(R.string.settings_theme_dark)) }, onClick = { settingsViewModel.updateThemeMode(2); themeDropdownExpanded = false })
+                            }
+                        }
                     }
                 }
             }
 
             // --- Preferences ---
             item {
-                SettingsSection(title = "User Preferences") {
-                    SettingsRow(icon = Icons.Outlined.DirectionsBus, title = "Default Route", subtitle = "Route 138", onClick = {})
-                    Divider(color = Color.LightGray.copy(alpha = 0.3f))
-                    SettingsRow(icon = Icons.Outlined.Language, title = "Language", subtitle = "English", onClick = {})
-                    Divider(color = Color.LightGray.copy(alpha = 0.3f))
+                SettingsSection(title = stringResource(R.string.settings_user_preferences)) {
+                    // Default Route is non-functional MVP fallback for now, maybe wired later.
+                    SettingsRow(icon = Icons.Outlined.DirectionsBus, title = stringResource(R.string.settings_default_route), subtitle = stringResource(R.string.settings_route_138), onClick = {})
+                    HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
                     
-                    var pushNotifications by remember { mutableStateOf(true) } // Placeholder state
+                    val currentLanguage by settingsViewModel.appLanguage.collectAsState()
+                    var langDropdownExpanded by remember { mutableStateOf(false) }
+                    
+                    val langText = when (currentLanguage) {
+                        "si" -> stringResource(R.string.lang_sinhala)
+                        "ta" -> stringResource(R.string.lang_tamil)
+                        else -> stringResource(R.string.lang_english)
+                    }
+
+                    // Language Dropdown Row
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { langDropdownExpanded = true }
+                            .padding(horizontal = 16.dp, vertical = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Outlined.Language, contentDescription = null, tint = BusLKBlue)
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Text(stringResource(R.string.settings_language), fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                        }
+                        
+                        Box {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(langText, color = Color.Gray, fontSize = 14.sp)
+                                Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Color.LightGray)
+                            }
+
+                            DropdownMenu(
+                                expanded = langDropdownExpanded,
+                                onDismissRequest = { langDropdownExpanded = false }
+                            ) {
+                                DropdownMenuItem(text = { Text(stringResource(R.string.lang_english)) }, onClick = { settingsViewModel.updateLanguage("en"); langDropdownExpanded = false })
+                                DropdownMenuItem(text = { Text(stringResource(R.string.lang_sinhala)) }, onClick = { settingsViewModel.updateLanguage("si"); langDropdownExpanded = false })
+                                DropdownMenuItem(text = { Text(stringResource(R.string.lang_tamil)) }, onClick = { settingsViewModel.updateLanguage("ta"); langDropdownExpanded = false })
+                            }
+                        }
+                    }
+
+                    HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
+                    
+                    val pushNotifications by settingsViewModel.notificationsEnabled.collectAsState()
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -106,11 +172,11 @@ fun SettingsScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Outlined.NotificationsActive, contentDescription = null, tint = BusLKBlue)
                             Spacer(modifier = Modifier.width(16.dp))
-                            Text("Push Notifications", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                            Text(stringResource(R.string.settings_push_notifications), fontSize = 16.sp, fontWeight = FontWeight.Medium)
                         }
                         Switch(
                             checked = pushNotifications,
-                            onCheckedChange = { pushNotifications = it },
+                            onCheckedChange = { settingsViewModel.updateNotificationsEnabled(it) },
                             colors = SwitchDefaults.colors(checkedTrackColor = BusLKBlue)
                         )
                     }
@@ -125,13 +191,13 @@ fun SettingsScreen(
                         authViewModel.signOut()
                         onLogoutSuccess()
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF3B30)), // Red
+                    colors = ButtonDefaults.buttonColors(containerColor = UnreadRed), // Replaced hardcoded Red 0xFFFF3B30
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Log Out", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text(stringResource(R.string.action_logout), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 }
                 Spacer(modifier = Modifier.height(32.dp))
             }
@@ -151,7 +217,8 @@ fun SettingsSection(title: String, content: @Composable ColumnScope.() -> Unit) 
         )
         Surface(
             shape = RoundedCornerShape(16.dp),
-            color = Color.White,
+            // MaterialTheme handles dark/light automatically via BusLKTheme
+            color = MaterialTheme.colorScheme.surfaceVariant,
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(content = content)
