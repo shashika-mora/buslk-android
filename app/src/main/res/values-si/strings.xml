@@ -47,6 +47,9 @@
     <string name="icon_search">සෙවුම් නිරූපකය</string>
     <string name="icon_clear">සෙවුම අහෝසි කරන්න</string>
 
+    <!-- Actions -->
+    <string name="action_logout">ඉවත් වන්න</string>
+
     <!-- Settings Screen -->
     <string name="settings_title">සැකසුම්</string>
     <string name="settings_account_control">ගිණුම් පාලනය</string>

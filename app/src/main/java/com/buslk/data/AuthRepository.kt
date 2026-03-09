@@ -141,6 +141,8 @@ class AuthRepository : IAuthRepository {
         } catch (e: GetCredentialCancellationException) {
             // User swiped down or tapped outside the bottom sheet
             Result.failure(Exception("Sign-in cancelled"))
+        } catch (e: androidx.credentials.exceptions.NoCredentialException) {
+            Result.failure(Exception("No saved Google passwords found. Please sign up or continue manually."))
         } catch (e: GetCredentialException) {
             Result.failure(Exception("Sign-in failed: ${e.localizedMessage}"))
         } catch (e: Exception) {

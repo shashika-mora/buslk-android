@@ -58,7 +58,7 @@ fun LoginScreen(
     val uiState by authViewModel.uiState.collectAsState()
     
     // Local UI state: 0 represents the "Login" tab, 1 represents the "Sign Up" tab.
-    var selectedTabIndex by remember { mutableStateOf(0) } 
+    var selectedTabIndex by remember { mutableIntStateOf(0) } 
     
     // LaunchedEffect allows us to trigger one-off side effects (like showing a Toast)
     // inside Composable functions. It runs its block whenever the 'key' (uiState) changes.

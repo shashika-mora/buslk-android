@@ -43,14 +43,14 @@ class ProfileViewModel(
                     return@launch
                 }
 
-                // Fetch trips and feedback
-                val tripsResult = tripRepository.getUserTrips(uid)
-                val feedbackResult = feedbackRepository.getUserFeedback(uid)
+                // Fetch trips and feedback concurrently for faster load times
+                val tripsDeferred = async { tripRepository.getUserTrips(uid) }
+                val feedbackDeferred = async { feedbackRepository.getUserFeedback(uid) }
 
                 _uiState.value = ProfileUiState.Success(
                     userProfile = userProfile,
-                    tripHistory = tripsResult.getOrDefault(emptyList()),
-                    feedbacks = feedbackResult.getOrDefault(emptyList())
+                    tripHistory = tripsDeferred.await().getOrDefault(emptyList()),
+                    feedbacks = feedbackDeferred.await().getOrDefault(emptyList())
                 )
 
             } catch (e: Exception) {

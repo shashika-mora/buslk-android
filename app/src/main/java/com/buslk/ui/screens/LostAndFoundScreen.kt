@@ -89,7 +89,7 @@ val mockLostFoundItems = listOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LostAndFoundScreen() {
-    var selectedTabIndex by remember { mutableStateOf(0) } // Default "All (6)"
+    var selectedTabIndex by remember { mutableIntStateOf(0) } // Default "All (6)"
     val tabs = listOf("All (6)", "Found (4)", "Lost (2)")
     
     // Filter the items based on the tab

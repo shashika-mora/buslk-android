@@ -54,7 +54,7 @@ val mockOtherBusesFriends = listOf(
 fun FriendsScreen(
     onChatClick: (String) -> Unit
 ) {
-    var selectedTabIndex by remember { mutableStateOf(1) } // Default to "Online (2)"
+    var selectedTabIndex by remember { mutableIntStateOf(1) } // Default to "Online (2)"
     val tabs = listOf("On Bus", "Online (2)", "All (6)")
 
     Scaffold(
