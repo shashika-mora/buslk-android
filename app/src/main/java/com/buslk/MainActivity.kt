@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -29,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import com.buslk.ui.screens.LoginScreen
+import com.buslk.ui.screens.LostAndFoundScreen
 import com.buslk.ui.theme.BusLKTheme
 import com.google.firebase.FirebaseApp
 import org.osmdroid.config.Configuration
@@ -111,6 +113,7 @@ fun BusLKApp() {
                 }
         ) {
             Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+<<<<<<< Updated upstream
                 when (currentDestination) {
                     AppDestinations.HOME -> {
                         com.buslk.ui.map.LiveBusMap(modifier = Modifier.padding(innerPadding))
@@ -131,6 +134,29 @@ fun BusLKApp() {
                                 modifier = Modifier.padding(innerPadding)
                         )
                     }
+=======
+                if (currentDestination == AppDestinations.HOME || currentDestination == AppDestinations.PROFILE) {
+                    HomeScreen(
+                        user = authRepository.getCurrentUser(),
+                        onSignOut = {
+                            authViewModel.signOut()
+                            currentDestination = AppDestinations.OPENING
+                        },
+                        modifier = Modifier.padding(innerPadding)
+                    )
+                } else if (currentDestination == AppDestinations.LOST_AND_FOUND) {
+                    LostAndFoundScreen(
+                        onBackClick = {
+                            currentDestination = AppDestinations.HOME
+                        },
+                        modifier = Modifier.padding(innerPadding)
+                    )
+                } else {
+                    Greeting(
+                        name = currentDestination.label,
+                        modifier = Modifier.padding(innerPadding)
+                    )
+>>>>>>> Stashed changes
                 }
             }
         }
@@ -145,6 +171,7 @@ enum class AppDestinations(
     LOGIN("Login", Icons.Default.AccountBox),
     HOME("Home", Icons.Default.Home),
     FAVORITES("Favorites", Icons.Default.Favorite),
+    LOST_AND_FOUND("Lost & Found", Icons.Default.Inventory2),
     PROFILE("Profile", Icons.Default.AccountBox),
 }
 
