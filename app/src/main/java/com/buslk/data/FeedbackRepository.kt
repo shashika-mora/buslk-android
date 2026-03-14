@@ -10,6 +10,7 @@ import kotlinx.coroutines.tasks.await
  */
 interface IFeedbackRepository {
     suspend fun getUserFeedback(userId: String): Result<List<FeedbackDoc>>
+    suspend fun getBusFeedback(busId: String): Result<List<FeedbackDoc>>
 }
 
 class FeedbackRepository : IFeedbackRepository {
@@ -31,6 +32,25 @@ class FeedbackRepository : IFeedbackRepository {
             Result.success(sorted)
         } catch (e: Exception) {
             Log.e("FeedbackRepository", "Error fetching feedback for user $userId", e)
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Fetches all feedback left for a specific bus, ordered by timestamp.
+     */
+    override suspend fun getBusFeedback(busId: String): Result<List<FeedbackDoc>> {
+        return try {
+            val snapshot = firestore.collection("feedback")
+                .whereEqualTo("busId", busId)
+                .get()
+                .await()
+            
+            val feedback = snapshot.toObjects(FeedbackDoc::class.java)
+            val sorted = feedback.sortedByDescending { it.timestamp }
+            Result.success(sorted)
+        } catch (e: Exception) {
+            Log.e("FeedbackRepository", "Error fetching feedback for bus $busId", e)
             Result.failure(e)
         }
     }

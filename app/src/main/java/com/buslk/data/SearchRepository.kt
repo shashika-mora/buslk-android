@@ -10,6 +10,9 @@ import kotlinx.coroutines.tasks.await
 interface ISearchRepository {
     suspend fun searchRoutes(query: String): Result<List<RouteDoc>>
     suspend fun searchBuses(query: String): Result<List<BusDoc>>
+    suspend fun getAllRoutes(): Result<List<RouteDoc>>
+    suspend fun getBusDetails(busId: String): Result<BusDoc?>
+    suspend fun getBusesByRoute(routeId: String): Result<List<BusDoc>>
 }
 
 /**
@@ -63,6 +66,35 @@ class SearchRepository : ISearchRepository {
                 it.defaultRouteId.lowercase().contains(q)
             }
             Result.success(filtered)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getAllRoutes(): Result<List<RouteDoc>> {
+        return try {
+            val snapshot = db.collection("routes").get().await()
+            val allRoutes = snapshot.documents.mapNotNull { it.toObject(RouteDoc::class.java) }
+            Result.success(allRoutes)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getBusDetails(busId: String): Result<BusDoc?> {
+        return try {
+            val doc = db.collection("buses").document(busId).get().await()
+            Result.success(doc.toObject(BusDoc::class.java))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getBusesByRoute(routeId: String): Result<List<BusDoc>> {
+        return try {
+            val snapshot = db.collection("buses").whereEqualTo("defaultRouteId", routeId).get().await()
+            val buses = snapshot.documents.mapNotNull { it.toObject(BusDoc::class.java) }
+            Result.success(buses)
         } catch (e: Exception) {
             Result.failure(e)
         }

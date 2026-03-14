@@ -125,6 +125,24 @@ fun BusLKApp(settingsViewModel: SettingsViewModel? = null) {
         factory = MapViewModelFactory(liveMapRepository)
     )
 
+    // Instantiate Lost & Found dependencies
+    val lostAndFoundRepository = androidx.compose.runtime.remember { com.buslk.data.LostAndFoundRepository() }
+    val lostAndFoundViewModel: com.buslk.ui.viewmodels.LostAndFoundViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+        factory = com.buslk.ui.viewmodels.LostAndFoundViewModelFactory(lostAndFoundRepository, authRepository)
+    )
+
+    // Instantiate Search & Details dependencies
+    val searchRepository = androidx.compose.runtime.remember { com.buslk.data.SearchRepository() }
+    val searchViewModel: com.buslk.ui.search.SearchViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+        factory = com.buslk.ui.search.SearchViewModelFactory(searchRepository)
+    )
+    val routeDetailsViewModel: com.buslk.ui.search.RouteDetailsViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+        factory = com.buslk.ui.search.RouteDetailsViewModelFactory(liveMapRepository, searchRepository)
+    )
+    val busDetailsViewModel: com.buslk.ui.search.BusDetailsViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+        factory = com.buslk.ui.search.BusDetailsViewModelFactory(searchRepository, feedbackRepository, liveMapRepository)
+    )
+
     // State variable holding the current screen the user is looking at.
     // 'rememberSaveable' ensures this state survives if Android temporarily kills the app
     // or if the user rotates their phone screen.
@@ -226,7 +244,13 @@ fun BusLKApp(settingsViewModel: SettingsViewModel? = null) {
                             onSettingsClick = { isSettingsOpen = true }
                         )
                     }
-                    AppDestinations.SEARCH -> com.buslk.ui.screens.SearchScreen()
+                    AppDestinations.SEARCH -> {
+                        com.buslk.ui.screens.SearchScreen(
+                            searchViewModel = searchViewModel,
+                            routeDetailsViewModel = routeDetailsViewModel,
+                            busDetailsViewModel = busDetailsViewModel
+                        )
+                    }
                     AppDestinations.FRIENDS -> {
                         com.buslk.ui.screens.FriendsScreen(
                             onChatClick = { friendName -> 
@@ -236,7 +260,7 @@ fun BusLKApp(settingsViewModel: SettingsViewModel? = null) {
                     }
                     AppDestinations.LOST_AND_FOUND -> {
                         // Tapping the tab named "L & F" opens the Lost And Found Screen
-                        com.buslk.ui.screens.LostAndFoundScreen()
+                        com.buslk.ui.screens.LostAndFoundScreen(viewModel = lostAndFoundViewModel)
                     }
                     else -> {
                         // Fallback for any unknown screens

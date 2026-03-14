@@ -46,6 +46,10 @@ import com.buslk.ui.viewmodels.MapUiState
 import org.osmdroid.views.overlay.Marker
 import androidx.core.content.ContextCompat
 import java.util.Locale
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 
 // --- New Imports for BottomSheet & Mock UI ---
 import androidx.compose.material3.BottomSheetScaffold
@@ -394,17 +398,32 @@ fun HomeScreen(
                     .align(Alignment.TopCenter),
                 shape = RoundedCornerShape(if (active) 0.dp else 100.dp)
             ) {
-                SearchContent(
-                    uiState = searchUiState,
-                    onRouteClick = { route -> 
-                        active = false 
-                        searchQuery = route.routeId
-                    },
-                    onBusClick = { bus -> 
-                        active = false
-                        searchQuery = bus.registrationNumber
+                when (val state = searchUiState) {
+                    is com.buslk.ui.search.SearchUiState.Loading -> {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator()
+                        }
                     }
-                )
+                    is com.buslk.ui.search.SearchUiState.Error -> {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Text("Error: ${state.message}", color = MaterialTheme.colorScheme.error)
+                        }
+                    }
+                    is com.buslk.ui.search.SearchUiState.Success -> {
+                        LazyColumn {
+                            items(state.routes) { route ->
+                                androidx.compose.material3.ListItem(
+                                    headlineContent = { Text(route.routeId) },
+                                    supportingContent = { Text("${route.startLocation} to ${route.endLocation}") },
+                                    modifier = Modifier.clickable {
+                                        active = false
+                                        searchQuery = route.routeId
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }

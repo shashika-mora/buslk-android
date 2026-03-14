@@ -24,80 +24,53 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.buslk.data.LostAndFoundDoc
 import com.buslk.ui.theme.*
-
-// --- Mock Data ---
-data class LostFoundItem(
-    val id: String,
-    val title: String,
-    val description: String,
-    val route: String,
-    val location: String,
-    val timeAgo: String,
-    val reporterName: String,
-    val isFound: Boolean,
-    val isClosed: Boolean // "Claimed"
-)
-
-val mockLostFoundItems = listOf(
-    LostFoundItem(
-        id = "1",
-        title = "Black Backpack",
-        description = "Small black backpack with laptop inside. Found near seat 12A.",
-        route = "Route 138",
-        location = "Seat 12A",
-        timeAgo = "15 min ago",
-        reporterName = "Amal P.",
-        isFound = true,
-        isClosed = false
-    ),
-    LostFoundItem(
-        id = "2",
-        title = "Phone Charger",
-        description = "White iPhone charger cable with adapter",
-        route = "Route 176",
-        location = "Back seat area",
-        timeAgo = "1 hour ago",
-        reporterName = "Priya S.",
-        isFound = false, // It's "Lost"
-        isClosed = false
-    ),
-    LostFoundItem(
-        id = "3",
-        title = "Water Bottle",
-        description = "Blue metal water bottle with university stickers",
-        route = "Route 138",
-        location = "Front rows",
-        timeAgo = "3 hours ago",
-        reporterName = "Kamal F.",
-        isFound = true,
-        isClosed = true // Claimed
-    ),
-    LostFoundItem(
-        id = "4",
-        title = "Umbrella",
-        description = "Black folding umbrella, brand new",
-        route = "Route 120",
-        location = "Luggage rack",
-        timeAgo = "Yesterday",
-        reporterName = "Saman D.",
-        isFound = false,
-        isClosed = false
-    )
-)
+import com.buslk.ui.viewmodels.LostAndFoundViewModel
+import com.buslk.ui.viewmodels.LostFoundItemUiStore
+import com.buslk.ui.viewmodels.LostAndFoundUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LostAndFoundScreen() {
-    var selectedTabIndex by remember { mutableIntStateOf(0) } // Default "All (6)"
-    val tabs = listOf("All (6)", "Found (4)", "Lost (2)")
+fun LostAndFoundScreen(viewModel: LostAndFoundViewModel) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    var selectedTabIndex by remember { mutableIntStateOf(0) } 
+    var searchQuery by remember { mutableStateOf("") }
+    var selectedRoute by remember { mutableStateOf("All Routes") }
     
-    // Filter the items based on the tab
-    val displayedItems = when (selectedTabIndex) {
-        1 -> mockLostFoundItems.filter { it.isFound }
-        2 -> mockLostFoundItems.filter { !it.isFound }
-        else -> mockLostFoundItems
+    // Bottom Sheet State
+    var showBottomSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    // Safely extract the data list from the state, or an empty list if loading/error.
+    val actualItems = when (val state = uiState) {
+        is LostAndFoundUiState.Success -> state.items
+        else -> emptyList()
     }
+
+    // 1. Filter by Search Query
+    val searchedItems = if (searchQuery.isBlank()) actualItems else actualItems.filter {
+        it.title.contains(searchQuery, ignoreCase = true) || it.description.contains(searchQuery, ignoreCase = true)
+    }
+
+    // 2. Filter by Route Selection
+    val routedItems = if (selectedRoute == "All Routes") searchedItems else searchedItems.filter {
+        it.route.contains(selectedRoute, ignoreCase = true)
+    }
+
+    // 3. Filter by Segment Tab (All / Found / Lost)
+    val displayedItems = when (selectedTabIndex) {
+        1 -> routedItems.filter { it.isFound }
+        2 -> routedItems.filter { !it.isFound }
+        else -> routedItems
+    }
+
+    // Update the tabs text dynamically with accurate counts
+    val allCount = routedItems.size
+    val foundCount = routedItems.count { it.isFound }
+    val lostCount = routedItems.count { !it.isFound }
+    val tabs = listOf("All ($allCount)", "Found ($foundCount)", "Lost ($lostCount)")
 
     Scaffold(
         containerColor = Color.White
@@ -136,10 +109,9 @@ fun LostAndFoundScreen() {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Search Bar
-                    var text by remember { mutableStateOf("") }
                     OutlinedTextField(
-                        value = text,
-                        onValueChange = { text = it },
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
                         placeholder = { 
                             Text("Search items...", color = Color.White.copy(alpha = 0.7f)) 
                         },
@@ -166,7 +138,6 @@ fun LostAndFoundScreen() {
                     
                     // Route Filters (Scrollable Row)
                     val routes = listOf("All Routes", "Route 138", "Route 176", "Route 120", "Route 177")
-                    var selectedRoute by remember { mutableStateOf("All Routes") }
                     
                     Row(
                         modifier = Modifier.horizontalScroll(rememberScrollState()),
@@ -196,12 +167,12 @@ fun LostAndFoundScreen() {
             Surface(
                 modifier = Modifier.padding(16.dp),
                 shape = RoundedCornerShape(8.dp),
-                color = Color.Transparent // Wrapped in button
+                color = Color.Transparent 
             ) {
                 Button(
-                    onClick = { /* TODO */ },
+                    onClick = { showBottomSheet = true },
                     modifier = Modifier.fillMaxWidth().height(48.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = OpenGreen), // Deep Green
+                    colors = ButtonDefaults.buttonColors(containerColor = OpenGreen), 
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Icon(Icons.Default.CameraAlt, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -246,24 +217,161 @@ fun LostAndFoundScreen() {
             }
 
             // --- 4. Content List ---
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                items(displayedItems) { item ->
-                    LostFoundCard(item)
+            when (uiState) {
+                is LostAndFoundUiState.Loading -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = FriendsPurple)
+                    }
                 }
-                
-                // Add some empty space at bottom so FAB doesn't cover last item if we had one
-                item { Spacer(modifier = Modifier.height(32.dp)) }
+                is LostAndFoundUiState.Error -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(
+                            text = (uiState as LostAndFoundUiState.Error).message, 
+                            color = Color.Red,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                }
+                is LostAndFoundUiState.Success -> {
+                    if (displayedItems.isEmpty()) {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text("📭", fontSize = 48.sp)
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text("No items found matching criteria.", color = Color.Gray)
+                            }
+                        }
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            items(displayedItems, key = { it.id }) { item ->
+                                LostFoundCard(item)
+                            }
+                            
+                            // Add some empty space at bottom so FAB doesn't cover last item if we had one
+                            item { Spacer(modifier = Modifier.height(32.dp)) }
+                        }
+                    }
+                }
+            }
+        }
+        
+        // --- 5. Bottom Sheet Form ---
+        if (showBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = { showBottomSheet = false },
+                sheetState = sheetState,
+                containerColor = Color.White
+            ) {
+                NewItemForm(
+                    onDismiss = { showBottomSheet = false },
+                    onSubmit = { title: String, desc: String, type: String, route: String, loc: String ->
+                        viewModel.submitNewItem(
+                            title = title,
+                            description = desc,
+                            itemType = type,
+                            routeId = route,
+                            location = loc
+                        )
+                        showBottomSheet = false
+                    }
+                )
             }
         }
     }
 }
 
 @Composable
-fun LostFoundCard(item: LostFoundItem) {
+fun NewItemForm(onDismiss: () -> Unit, onSubmit: (String, String, String, String, String) -> Unit) {
+    var title by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
+    var type by remember { mutableStateOf("FOUND") }
+    var route by remember { mutableStateOf("138") }
+    var location by remember { mutableStateOf("") }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text("Report an Item", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+
+        // Type Segment
+        Row(modifier = Modifier.fillMaxWidth()) {
+            OutlinedButton(
+                onClick = { type = "LOST" },
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = if (type == "LOST") LostOrange.copy(alpha = 0.1f) else Color.Transparent,
+                    contentColor = if (type == "LOST") LostOrange else Color.Gray
+                ),
+                border = BorderStroke(1.dp, if (type == "LOST") LostOrange else Color.LightGray)
+            ) { Text("I Lost This") }
+            Spacer(modifier = Modifier.width(8.dp))
+            OutlinedButton(
+                onClick = { type = "FOUND" },
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = if (type == "FOUND") FoundBlue.copy(alpha = 0.1f) else Color.Transparent,
+                    contentColor = if (type == "FOUND") FoundBlue else Color.Gray
+                ),
+                border = BorderStroke(1.dp, if (type == "FOUND") FoundBlue else Color.LightGray)
+            ) { Text("I Found This") }
+        }
+
+        OutlinedTextField(
+            value = title,
+            onValueChange = { title = it },
+            label = { Text("What is it? (e.g., Black Umbrella)") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+
+        OutlinedTextField(
+            value = description,
+            onValueChange = { description = it },
+            label = { Text("Description & Appearance") },
+            modifier = Modifier.fillMaxWidth().height(100.dp)
+        )
+
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedTextField(
+                value = route,
+                onValueChange = { route = it },
+                label = { Text("Route") },
+                modifier = Modifier.weight(1f),
+                singleLine = true
+            )
+            OutlinedTextField(
+                value = location,
+                onValueChange = { location = it },
+                label = { Text("Location context") },
+                modifier = Modifier.weight(2f),
+                singleLine = true
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = { onSubmit(title, description, type, route, location) },
+            modifier = Modifier.fillMaxWidth().height(52.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = FriendsPurple),
+            enabled = title.isNotBlank() && description.isNotBlank() && location.isNotBlank()
+        ) {
+            Text("Submit Report", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        }
+        
+        Spacer(modifier = Modifier.height(24.dp))
+    }
+}
+
+@Composable
+fun LostFoundCard(item: LostFoundItemUiStore) {
     Surface(
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f)),

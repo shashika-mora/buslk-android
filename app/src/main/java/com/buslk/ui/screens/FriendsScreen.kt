@@ -76,9 +76,9 @@ fun FriendsScreen(
                 .background(Color.White)
                 .padding(paddingValues)
         ) {
-            // --- 1. Purple Header Sequence ---
+            // --- 1. Blue Header Sequence ---
             Surface(
-                color = FriendsPurple,
+                color = BusLKBlue,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(

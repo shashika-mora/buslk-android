@@ -18,12 +18,8 @@ import kotlinx.coroutines.launch
  * Represents the UI state of the search operation.
  */
 sealed class SearchUiState {
-    object Idle : SearchUiState()
     object Loading : SearchUiState()
-    data class Success(
-        val routes: List<RouteDoc>,
-        val buses: List<BusDoc>
-    ) : SearchUiState()
+    data class Success(val routes: List<RouteDoc>) : SearchUiState()
     data class Error(val message: String) : SearchUiState()
 }
 
@@ -39,56 +35,48 @@ class SearchViewModel(
     private val repository: ISearchRepository = SearchRepository()
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<SearchUiState>(SearchUiState.Idle)
+    private val _uiState = MutableStateFlow<SearchUiState>(SearchUiState.Loading)
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
-    private var searchJob: Job? = null
+    private var allRoutes: List<RouteDoc> = emptyList()
 
-    /**
-     * Executes a combined search for both routes and buses.
-     * 
-     * Concurrency & Performance Pattern: Debouncing via Coroutines.
-     * We don't want to query the Firestore database every single time the user presses a key, 
-     * as this would cause a massive spike in database reads (costing money and slowing the app).
-     * Instead, we use `delay(500)` to wait 500ms. If the user types another letter before 500ms 
-     * passes, the previous `searchJob` is cancelled and a new 500ms timer starts.
-     */
-    fun performSearch(query: String) {
-        // Cancel any previous search that was still waiting in the debounce period
-        searchJob?.cancel()
+    init {
+        loadAllRoutes()
+    }
 
-        if (query.trim().isEmpty()) {
-            _uiState.value = SearchUiState.Idle
-            return
-        }
-
-        searchJob = viewModelScope.launch {
-            // Debounce for 500ms so we don't query while the user is actively typing "1...3...8"
-            delay(500)
-            
+    private fun loadAllRoutes() {
+        viewModelScope.launch {
             _uiState.value = SearchUiState.Loading
-
-            // Suspend functions: These network calls happen on a background thread pool managed by 
-            // Kotlin Coroutines, completely freeing up the Android Main Thread so the UI never freezes.
-            // For MVP, we do this sequentially. Future optimization: use `async { ... }` to fetch in parallel.
-            val routeResult = repository.searchRoutes(query)
-            val busResult = repository.searchBuses(query)
-
-            if (routeResult.isSuccess && busResult.isSuccess) {
-                _uiState.value = SearchUiState.Success(
-                    routes = routeResult.getOrDefault(emptyList()),
-                    buses = busResult.getOrDefault(emptyList())
-                )
+            val result = repository.getAllRoutes()
+            if (result.isSuccess) {
+                allRoutes = result.getOrDefault(emptyList())
+                // Ensure routes are reasonably sorted by ID length then alphabetically
+                allRoutes = allRoutes.sortedWith(compareBy({ it.routeId.length }, { it.routeId }))
+                _uiState.value = SearchUiState.Success(allRoutes)
             } else {
-                val error = routeResult.exceptionOrNull() ?: busResult.exceptionOrNull()
-                _uiState.value = SearchUiState.Error(error?.message ?: "Unknown search error")
+                _uiState.value = SearchUiState.Error(result.exceptionOrNull()?.message ?: "Failed to load routes")
             }
         }
     }
 
+    fun performSearch(query: String) {
+        val q = query.trim().lowercase()
+        if (q.isEmpty()) {
+            _uiState.value = SearchUiState.Success(allRoutes)
+            return
+        }
+
+        val filtered = allRoutes.filter {
+            it.routeId.lowercase().contains(q) ||
+            it.name.lowercase().contains(q) ||
+            it.startLocation.lowercase().contains(q) ||
+            it.endLocation.lowercase().contains(q)
+        }
+        _uiState.value = SearchUiState.Success(filtered)
+    }
+
     fun clearSearch() {
-        searchJob?.cancel()
-        _uiState.value = SearchUiState.Idle
+        _uiState.value = SearchUiState.Success(allRoutes)
     }
 }
 
