@@ -3,16 +3,12 @@ package com.buslk
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.height
-import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Favorite
@@ -32,6 +28,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.appcompat.app.AppCompatActivity
 import com.buslk.ui.screens.LoginScreen
+import com.buslk.ui.screens.ProfileScreen
+import com.buslk.ui.screens.ProfileViewModel
 import com.buslk.ui.theme.BusLKTheme
 import com.google.firebase.FirebaseApp
 
@@ -78,18 +76,15 @@ fun BusLKApp() {
     val context = LocalContext.current
     
     // OOD Principle: Dependency Injection Setup (Composition Root)
-    // We instantiate the AuthRepository here at the top level and inject it
-    // into the AuthViewModelFactory. This ensures that the ViewModel doesn't
-    // hardcode its dependencies, making it modular and allowing us to easily swap out 
-    // real databases for fake/mock databases during automated testing.
     val authRepository = androidx.compose.runtime.remember { com.buslk.data.AuthRepository() }
     val authViewModel: com.buslk.ui.auth.AuthViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
         factory = com.buslk.ui.auth.AuthViewModelFactory(authRepository)
     )
 
+    // Instantiate ProfileViewModel
+    val profileViewModel: ProfileViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+
     // State variable holding the current screen the user is looking at.
-    // 'rememberSaveable' ensures this state survives if Android temporarily kills the app
-    // or if the user rotates their phone screen.
     var currentDestination by rememberSaveable { 
         mutableStateOf(AppDestinations.HOME) 
     }
@@ -131,8 +126,6 @@ fun BusLKApp() {
         // App is in "Main Mode" (logged in/past intro). Show the Navigation Bar.
         NavigationSuiteScaffold(
             navigationSuiteItems = {
-                // Loop through destinations and create a button on the bottom bar for each one,
-                // ignoring the intro screens.
                 AppDestinations.entries.filter { it != AppDestinations.LOGIN && it != AppDestinations.OPENING && it != AppDestinations.LANGUAGE_SELECT }.forEach {
                     item(
                         icon = {
@@ -151,11 +144,16 @@ fun BusLKApp() {
         ) {
             // This Scaffold holds the actual content *above* the bottom navigation bar
             Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                if (currentDestination == AppDestinations.HOME || currentDestination == AppDestinations.PROFILE) {
-                    com.buslk.ui.screens.HomeScreen()
-                } else {
-                    // Placeholder for screens we haven't built yet
-                    Greeting(
+                when (currentDestination) {
+                    AppDestinations.HOME -> com.buslk.ui.screens.HomeScreen()
+                    AppDestinations.PROFILE -> ProfileScreen(
+                        authViewModel = authViewModel,
+                        profileViewModel = profileViewModel,
+                        onSettingsClick = {
+                            // Handle settings click if needed
+                        }
+                    )
+                    else -> Greeting(
                         name = currentDestination.label,
                         modifier = Modifier.padding(innerPadding)
                     )
@@ -167,10 +165,6 @@ fun BusLKApp() {
 
 /**
  * An Enum describing all the physical screens in our app.
- * Using an Enum prevents spelling mistakes when routing compared to using raw Strings.
- * 
- * @property label The text displayed under the icon on the nav bar.
- * @property icon The Material vector icon displayed on the nav bar.
  */
 enum class AppDestinations(
     val label: String,

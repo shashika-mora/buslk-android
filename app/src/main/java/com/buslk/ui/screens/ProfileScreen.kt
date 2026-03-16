@@ -1,3 +1,35 @@
+package com.buslk.ui.screens
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.StarRate
+import androidx.compose.material3.*
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.buslk.data.Achievement
+import com.buslk.data.Trip
+import com.buslk.data.Feedback
+import com.buslk.ui.auth.AuthViewModel
+import com.buslk.ui.theme.*
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
@@ -11,17 +43,15 @@ fun ProfileScreen(
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf("Trip History", "Feedbacks", "Achievements")
 
+    // We trigger the load even if uid is empty to show mock data for testing
     val uid = currentUser?.uid ?: ""
     LaunchedEffect(key1 = uid) {
-        if (uid.isNotBlank()) {
-            profileViewModel.loadProfileData(uid)
-        }
+        profileViewModel.loadProfileData(uid)
     }
 
     Scaffold(
         containerColor = Color(0xFFF5F6FA)
     ) { paddingValues ->
-        // The 'when' block MUST contain the UI for each state
         when (uiState) {
             is ProfileUiState.Idle, is ProfileUiState.Loading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -45,7 +75,6 @@ fun ProfileScreen(
                 val feedbacks = successState.feedbacks
                 val achievementsMap = userData.achievements
 
-                // Everything from here down was previously "orphaned" outside the brackets
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -221,7 +250,93 @@ fun ProfileScreen(
                         }
                     }
                 }
-            } // End Success
-        } // End When
-    } // End Scaffold
+            }
+        }
+    }
+}
+
+@Composable
+fun TripHistoryList(trips: List<Trip>) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(trips) { trip ->
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(trip.route, fontWeight = FontWeight.Bold)
+                        Text(trip.date, fontSize = 12.sp, color = Color.Gray)
+                    }
+                    Text(trip.fare, color = BusLKBlue, fontWeight = FontWeight.SemiBold)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun FeedbackList(feedbacks: List<Feedback>) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(feedbacks) { feedback ->
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("Bus: ${feedback.busNo}", fontWeight = FontWeight.Bold)
+                        Text("⭐ ${feedback.rating}", color = GoldBadge)
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(feedback.comment, fontSize = 14.sp)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun AchievementsGrid(achievements: Map<String, Achievement>) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(3),
+        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+        contentPadding = PaddingValues(bottom = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(achievements.values.toList()) { achievement ->
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(if (achievement.unlocked) Color.White else Color.LightGray.copy(alpha = 0.3f))
+                    .padding(12.dp)
+            ) {
+                Text(if (achievement.unlocked) "🏆" else "🔒", fontSize = 24.sp)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    achievement.name,
+                    fontSize = 10.sp,
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+    }
 }
