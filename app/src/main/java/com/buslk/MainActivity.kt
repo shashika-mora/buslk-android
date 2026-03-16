@@ -29,34 +29,16 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.appcompat.app.AppCompatActivity
 import com.buslk.ui.screens.LoginScreen
 import com.buslk.ui.screens.ProfileScreen
-import com.buslk.ui.screens.ProfileViewModel
+import com.buslk.ui.viewmodels.ProfileViewModel
 import com.buslk.ui.theme.BusLKTheme
 import com.google.firebase.FirebaseApp
 
-/**
- * The main entry point of the Android application.
- * 
- * OOD Principle: Single Responsibility.
- * This Activity's only job is to initialize global tools (like Firebase) and host the 
- * root Jetpack Compose UI. It does not contain any actual UI drawing logic itself.
- * Note: We inherit from AppCompatActivity (instead of ComponentActivity) to support
- * the Android 13+ Per-App Language APIs.
- */
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
-        // Initialize Firebase Backend connection globally when the app first launches
         FirebaseApp.initializeApp(this)
-        Log.d("BusLK_Setup", "Firebase Initialized Successfully!")
-        Toast.makeText(this, "Firebase Initialized!", Toast.LENGTH_SHORT).show()
-        
-        // Tells Android to draw the app behind the transparent system navigation/status bars
         enableEdgeToEdge()
-        
-        // Set the root UI content using Jetpack Compose
         setContent {
-            // BusLKTheme applies our global colors, typography, and shapes
             BusLKTheme {
                 BusLKApp()
             }
@@ -64,32 +46,22 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-/**
- * The root Composable function that acts as the Navigation Controller for the entire app.
- * 
- * Centralizing navigation here means child screens (like Login or Home) don't need 
- * to know about each other, reducing coupling.
- */
 @PreviewScreenSizes
 @Composable
 fun BusLKApp() {
     val context = LocalContext.current
     
-    // OOD Principle: Dependency Injection Setup (Composition Root)
     val authRepository = androidx.compose.runtime.remember { com.buslk.data.AuthRepository() }
     val authViewModel: com.buslk.ui.auth.AuthViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
         factory = com.buslk.ui.auth.AuthViewModelFactory(authRepository)
     )
 
-    // Instantiate ProfileViewModel
     val profileViewModel: ProfileViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 
-    // State variable holding the current screen the user is looking at.
     var currentDestination by rememberSaveable { 
         mutableStateOf(AppDestinations.HOME) 
     }
 
-    // Basic Routing Logic: Determine which Screen Composable to draw based on currentDestination
     if (currentDestination == AppDestinations.OPENING) {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             com.buslk.ui.screens.OpeningScreen(
@@ -99,7 +71,6 @@ fun BusLKApp() {
             )
         }
     } else if (currentDestination == AppDestinations.LOGIN) {
-        // Hide the bottom navigation bar by keeping the Login screen outside the NavigationSuiteScaffold
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             LoginScreen(
                 authViewModel = authViewModel,
@@ -123,35 +94,25 @@ fun BusLKApp() {
             )
         }
     } else {
-        // App is in "Main Mode" (logged in/past intro). Show the Navigation Bar.
         NavigationSuiteScaffold(
             navigationSuiteItems = {
                 AppDestinations.entries.filter { it != AppDestinations.LOGIN && it != AppDestinations.OPENING && it != AppDestinations.LANGUAGE_SELECT }.forEach {
                     item(
-                        icon = {
-                            Icon(
-                                it.icon,
-                                contentDescription = it.label
-                            )
-                        },
+                        icon = { Icon(it.icon, contentDescription = it.label) },
                         label = { Text(it.label) },
                         selected = it == currentDestination,
-                        // Change screen when clicked
                         onClick = { currentDestination = it }
                     )
                 }
             }
         ) {
-            // This Scaffold holds the actual content *above* the bottom navigation bar
             Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                 when (currentDestination) {
                     AppDestinations.HOME -> com.buslk.ui.screens.HomeScreen()
                     AppDestinations.PROFILE -> ProfileScreen(
                         authViewModel = authViewModel,
                         profileViewModel = profileViewModel,
-                        onSettingsClick = {
-                            // Handle settings click if needed
-                        }
+                        onSettingsClick = { }
                     )
                     else -> Greeting(
                         name = currentDestination.label,
@@ -163,9 +124,6 @@ fun BusLKApp() {
     }
 }
 
-/**
- * An Enum describing all the physical screens in our app.
- */
 enum class AppDestinations(
     val label: String,
     val icon: ImageVector,
@@ -178,7 +136,6 @@ enum class AppDestinations(
     PROFILE("Profile", Icons.Default.AccountBox),
 }
 
-/** Placeholder component for unbuilt screens. */
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     Box(modifier = modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
@@ -186,13 +143,5 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
             text = "Hello $name!",
             style = androidx.compose.material3.MaterialTheme.typography.headlineMedium
         )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    BusLKTheme {
-        Greeting("Android")
     }
 }
