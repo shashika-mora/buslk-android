@@ -15,6 +15,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.buslk.R
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -27,46 +29,70 @@ import androidx.compose.ui.unit.sp
 import com.buslk.ui.theme.BusLKTheme
 import kotlinx.coroutines.launch
 
-// OOD Principle: Dependency Injection & State Hoisting.
-// Instead of creating the ViewModel inside the screen or managing its own complex
-// authentication logic, LoginScreen accepts the AuthViewModel as a parameter.
-// This decouples the UI from the business logic.
+/**
+ * The screen responsible for user Authentication (Login & Sign Up).
+ * 
+ * OOD Principle: Dependency Injection & State Hoisting (Abstraction).
+ * Instead of creating the AuthViewModel inside this screen or managing complex Firebase
+ * authentication logic directly, `LoginScreen` accepts the `AuthViewModel` as a parameter.
+ * This completely decouples the UI layer from the data/business logic layer (Separation of Concerns).
+ * The screen also delegates navigation decisions to its parent via `onSignInSuccess` and `onBackClick`.
+ * 
+ * @param authViewModel The ViewModel managing authentication state and actions.
+ * @param onSignInSuccess Callback triggered when authentication successfully completes.
+ * @param onBackClick Callback triggered when the back button is pressed.
+ */
 @Composable
 fun LoginScreen(
     authViewModel: com.buslk.ui.auth.AuthViewModel,
     onSignInSuccess: () -> Unit,
     onBackClick: () -> Unit
 ) {
+    // LocalContext allows us to access Android-specific resources like Toasts or Strings
+    // from within a Composable function.
     val context = LocalContext.current
+    
+    // We observe the AuthViewModel's StateFlow. Every time the ViewModel emits a new state
+    // (e.g., Loading -> Error), Jetpack Compose automatically re-executes (recomposes) 
+    // this function to update the UI based on the new state.
     val uiState by authViewModel.uiState.collectAsState()
     
-    var selectedTabIndex by remember { mutableStateOf(0) } // 0 for Login, 1 for Sign Up
+    // Local UI state: 0 represents the "Login" tab, 1 represents the "Sign Up" tab.
+    var selectedTabIndex by remember { mutableStateOf(0) } 
     
+    // LaunchedEffect allows us to trigger one-off side effects (like showing a Toast)
+    // inside Composable functions. It runs its block whenever the 'key' (uiState) changes.
     LaunchedEffect(uiState) {
         when (uiState) {
             is com.buslk.ui.auth.AuthUiState.Success -> {
-                Toast.makeText(context, "Sign in & Sync successful!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.msg_login_success), Toast.LENGTH_SHORT).show()
                 onSignInSuccess()
             }
             is com.buslk.ui.auth.AuthUiState.Error -> {
+                // Cast the state to Error to access its specific 'message' property
                 val msg = (uiState as com.buslk.ui.auth.AuthUiState.Error).message
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                // Reset the state to Idle so the error Toast doesn't show again uncontrollably
                 authViewModel.resetState()
             }
-            else -> {}
+            else -> {
+                // Do nothing for Idle or Loading states
+            }
         }
     }
 
+    // A convenience variable determining if a network request is currently active
     val isLoading = uiState is com.buslk.ui.auth.AuthUiState.Loading
 
+    // The main container for the screen's content
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
             .padding(24.dp)
-            .statusBarsPadding()
+            .statusBarsPadding() // Ensures content isn't drawn under the device's status bar
     ) {
-        // Back Button
+        // --- Top Row: Back Button ---
         IconButton(
             onClick = onBackClick,
             modifier = Modifier.align(Alignment.Start)
@@ -80,9 +106,10 @@ fun LoginScreen(
         
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Title
+        // --- Header Text ---
+        // Dynamically change the title based on which tab is active
         Text(
-            text = if (selectedTabIndex == 0) "Welcome Back!" else "Create Account",
+            text = if (selectedTabIndex == 0) stringResource(id = R.string.welcome_back) else stringResource(id = R.string.create_account),
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black
@@ -90,26 +117,30 @@ fun LoginScreen(
         
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Tabs
+        // --- Custom Tab Bar ---
+        // Encapsulated UI component for selecting Login vs Sign Up
         AuthTabs(selectedTabIndex = selectedTabIndex, onTabSelected = { selectedTabIndex = it })
         
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Google SignIn Button
+        // --- Google Sign-In Area ---
         GoogleSignInButton(isLoading = isLoading) {
+            // Initiate the Google Sign-In flow via the ViewModel
             authViewModel.signInWithGoogle(context)
         }
         
         Spacer(modifier = Modifier.height(24.dp))
         
-        // OR Divider
+        // --- "OR" Divider section ---
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // HorizontalDivider draws a thin line. weight(1f) tells it to fill available space
+            // pushing the text to the exact center of the screen.
             HorizontalDivider(modifier = Modifier.weight(1f), color = Color.LightGray)
             Text(
-                text = "Or",
+                text = stringResource(id = R.string.lbl_or),
                 modifier = Modifier.padding(horizontal = 16.dp),
                 color = Color.Gray,
                 fontSize = 14.sp
@@ -119,16 +150,15 @@ fun LoginScreen(
         
         Spacer(modifier = Modifier.height(24.dp))
 
-        var username by remember { mutableStateOf("") }
+        // --- Email/Password Form State Variables ---
+        // We manage form input state locally in the UI layer until the user clicks submit.
         var email by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }
         var confirmPassword by remember { mutableStateOf("") }
 
-        // Form Fields
+        // Form Fields encapsulated into a separate function for cleaner code
         AuthForm(
             isLogin = selectedTabIndex == 0,
-            username = username,
-            onUsernameChange = { username = it },
             email = email,
             onEmailChange = { email = it },
             password = password,
@@ -139,36 +169,42 @@ fun LoginScreen(
             authViewModel = authViewModel
         )
         
+        // Pushes the main action button to the bottom of the screen
         Spacer(modifier = Modifier.weight(1f))
         
-        // Main Action Button
+        // --- Main Action Button (Login or Register) ---
         Button(
             onClick = { 
                 if (selectedTabIndex == 0) {
+                    // Execute Login
                     authViewModel.signInWithEmailAndPassword(email, password)
                 } else {
+                    // Execute Registration (with basic UI-level validation)
                     if (password == confirmPassword) {
-                        authViewModel.signUpWithEmailAndPassword(email, password, username)
+                        authViewModel.signUpWithEmailAndPassword(email, password)
                     } else {
-                        Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.msg_passwords_not_match), Toast.LENGTH_SHORT).show()
                     }
                 }
             },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
-            enabled = !isLoading && email.isNotEmpty() && password.isNotEmpty() && (selectedTabIndex == 0 || username.isNotEmpty()),
+            // Disable the button if a network request is loading OR if inputs are empty
+            // This is a UI-level defensive programming technique.
+            enabled = !isLoading && email.isNotEmpty() && password.isNotEmpty(),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFF1E5DE6),
                 disabledContainerColor = Color.LightGray
             ),
             shape = RoundedCornerShape(12.dp)
         ) {
+            // Conditional Rendering: Show a spinner if loading, otherwise show the text
             if (isLoading) {
                 CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White, strokeWidth = 2.dp)
             } else {
                 Text(
-                    text = if (selectedTabIndex == 0) "Login" else "Sign Up",
+                    text = if (selectedTabIndex == 0) stringResource(id = R.string.tab_login) else stringResource(id = R.string.tab_signup),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -179,6 +215,12 @@ fun LoginScreen(
     }
 }
 
+/**
+ * A custom Tab component specifically designed for transitioning between Login and Signup modes.
+ * 
+ * @param selectedTabIndex Current state (0 = Login, 1 = Signup)
+ * @param onTabSelected Callback providing the index of the newly tapped tab.
+ */
 @Composable
 fun AuthTabs(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
     Row(
@@ -190,13 +232,13 @@ fun AuthTabs(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         TabButton(
-            text = "Login",
+            text = stringResource(id = R.string.tab_login),
             isSelected = selectedTabIndex == 0,
             modifier = Modifier.weight(1f),
             onClick = { onTabSelected(0) }
         )
         TabButton(
-            text = "Sign Up",
+            text = stringResource(id = R.string.tab_signup),
             isSelected = selectedTabIndex == 1,
             modifier = Modifier.weight(1f),
             onClick = { onTabSelected(1) }
@@ -204,6 +246,9 @@ fun AuthTabs(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
     }
 }
 
+/**
+ * Represents a single button within the AuthTabs component.
+ */
 @Composable
 fun TabButton(text: String, isSelected: Boolean, modifier: Modifier, onClick: () -> Unit) {
     val backgroundColor = if (isSelected) Color(0xFF1E5DE6) else Color.Transparent
@@ -213,13 +258,16 @@ fun TabButton(text: String, isSelected: Boolean, modifier: Modifier, onClick: ()
         modifier = modifier
             .fillMaxHeight()
             .background(backgroundColor, RoundedCornerShape(24.dp))
-            .clickable { onClick() },
+            .clickable { onClick() }, // Makes the box respond to touch events
         contentAlignment = Alignment.Center
     ) {
         Text(text = text, color = textColor, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
     }
 }
 
+/**
+ * Encapsulates the visual design of the Google Sign-In button.
+ */
 @Composable
 fun GoogleSignInButton(isLoading: Boolean, onClick: () -> Unit) {
     OutlinedButton(
@@ -237,16 +285,24 @@ fun GoogleSignInButton(isLoading: Boolean, onClick: () -> Unit) {
             // Simple generic G to represent Google (Using colors could be added later or an image icon)
             Text(text = "G", color = Color(0xFFEA4335), fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
             Spacer(modifier = Modifier.width(12.dp))
-            Text("Continue with Google", color = Color.Black, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+            Text(stringResource(id = R.string.continue_with_google), color = Color.Black, fontSize = 16.sp, fontWeight = FontWeight.Medium)
         }
     }
 }
 
+/**
+ * Contains the actual form input fields (Email, Password, Confirm Password).
+ * 
+ * OOD Principle: State Hoisting.
+ * This component does not manage its own state (email, password). It takes them as arguments
+ * and passes changes back up via callback lambdas (`onEmailChange`, `onPasswordChange`).
+ * 
+ * @param isLogin Boolean indicating whether to render the form for Login or Sign Up.
+ * @param isLoading Used to disable the inputs while a network request is running.
+ */
 @Composable
 fun AuthForm(
     isLogin: Boolean,
-    username: String,
-    onUsernameChange: (String) -> Unit,
     email: String,
     onEmailChange: (String) -> Unit,
     password: String,
@@ -256,49 +312,33 @@ fun AuthForm(
     isLoading: Boolean,
     authViewModel: com.buslk.ui.auth.AuthViewModel
 ) {
+    // Local state to toggle obscuring the password text (asterisks vs plain text)
     var passwordVisible by remember { mutableStateOf(false) }
+    
+    // We observe the AuthViewModel's state specifically to extract validation errors
+    // and highlight the appropriate text fields in red.
     val uiState by authViewModel.uiState.collectAsState()
     
+    // Pattern matching to detect if the error message from the ViewModel pertains to Email
     val isEmailError = uiState is com.buslk.ui.auth.AuthUiState.Error && 
             (uiState as com.buslk.ui.auth.AuthUiState.Error).message.contains("Email", ignoreCase = true)
     
+    // Pattern matching to detect if the error message pertains to Password
     val isPasswordError = uiState is com.buslk.ui.auth.AuthUiState.Error && 
             (uiState as com.buslk.ui.auth.AuthUiState.Error).message.contains("Password", ignoreCase = true)
 
     Column {
-        if (!isLogin) {
-            OutlinedTextField(
-                value = username,
-                onValueChange = onUsernameChange,
-                label = { Text("Username") },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                singleLine = true,
-                enabled = !isLoading,
-                isError = uiState is com.buslk.ui.auth.AuthUiState.Error && 
-                        (uiState as com.buslk.ui.auth.AuthUiState.Error).message.contains("Username", ignoreCase = true),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = androidx.compose.ui.text.input.ImeAction.Next
-                ),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF1E5DE6),
-                    focusedLabelColor = Color(0xFF1E5DE6),
-                    errorBorderColor = Color.Red
-                )
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
+        // --- Email Input ---
         OutlinedTextField(
             value = email,
             onValueChange = onEmailChange,
-            label = { Text("Email Address") },
+            label = { Text(stringResource(id = R.string.lbl_email)) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             singleLine = true,
             enabled = !isLoading,
             isError = isEmailError,
+            // Configure the soft keyboard: Show an '@' symbol and a "Next" button
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
                 imeAction = androidx.compose.ui.text.input.ImeAction.Next
@@ -312,20 +352,24 @@ fun AuthForm(
         
         Spacer(modifier = Modifier.height(16.dp))
         
+        // --- Password Input ---
         OutlinedTextField(
             value = password,
             onValueChange = onPasswordChange,
-            label = { Text("Password") },
+            label = { Text(stringResource(id = R.string.lbl_password)) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             singleLine = true,
             enabled = !isLoading,
             isError = isPasswordError,
+            // Toggle visual security (obscuring text) based on local state
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            // Configure the soft keyboard: Show a "Done" button if logging in, or "Next" if signing up
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
                 imeAction = if (isLogin) androidx.compose.ui.text.input.ImeAction.Done else androidx.compose.ui.text.input.ImeAction.Next
             ),
+            // Add a clickable eye icon to the end of the text field
             trailingIcon = {
                 val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
@@ -339,13 +383,15 @@ fun AuthForm(
             )
         )
 
+        // --- Additional UI unique to Sign Up vs Login ---
         if (!isLogin) {
+            // Sign Up Mode: Show Confirm Password field
             Spacer(modifier = Modifier.height(16.dp))
             
             OutlinedTextField(
                 value = confirmPassword,
                 onValueChange = onConfirmPasswordChange,
-                label = { Text("Confirm Password") },
+                label = { Text(stringResource(id = R.string.lbl_confirm_password)) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 singleLine = true,
@@ -361,17 +407,17 @@ fun AuthForm(
                 )
             )
         } else {
-            // Forgot Password Link
+            // Login Mode: Show "Forgot Password?" Link
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.CenterEnd
             ) {
                 TextButton(
-                    onClick = { /* TODO: Implement Forgot Password */ },
+                    onClick = { /* TODO: Implement Forgot Password Flow */ },
                     enabled = !isLoading
                 ) {
                     Text(
-                        text = "Forgot Password?",
+                        text = stringResource(id = R.string.btn_forgot_password),
                         color = Color(0xFF1E5DE6),
                         fontWeight = FontWeight.Medium
                     )
@@ -381,6 +427,9 @@ fun AuthForm(
     }
 }
 
+/**
+ * Jetpack Compose Preview for inspecting the UI without launching the emulator.
+ */
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
@@ -390,3 +439,4 @@ fun LoginScreenPreview() {
         // LoginScreen(authViewModel = ..., onSignInSuccess = {}, onBackClick = {})
     }
 }
+

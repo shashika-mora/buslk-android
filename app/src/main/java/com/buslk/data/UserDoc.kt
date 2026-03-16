@@ -5,9 +5,12 @@ import com.google.firebase.firestore.ServerTimestamp
 
 /**
  * Data class representing a User document in Firestore.
+ * 
  * OOD Principle: Data Transfer Object (DTO) / Entity.
  * This class simply holds data representing the "User" state. It does
  * not contain business logic, adhering to the Single Responsibility Principle.
+ * By using a `data class`, Kotlin automatically generates useful methods like 
+ * `equals()`, `hashCode()`, and `copy()`, making it ideal for holding state.
  * 
  * Aligned with docs/db.md specification.
  */
@@ -19,6 +22,9 @@ data class UserDoc(
     val role: String = "Passenger", // "Passenger" | "Driver" | "Admin"
     val points: Int = 0,
     val level: String = "Newcomer",
+    // @ServerTimestamp tells the Firebase Android SDK to automatically populate 
+    // this field with the server's exact time when writing to the database,
+    // avoiding issues with incorrect client device clocks.
     @ServerTimestamp
     val joinedAt: Timestamp? = null,
     @ServerTimestamp
@@ -28,7 +34,7 @@ data class UserDoc(
 )
 
 /**
- * Nested stats for the user.
+ * Nested stats for the user, demonstrating object composition.
  */
 data class UserStats(
     val totalTrips: Int = 0,
@@ -37,7 +43,7 @@ data class UserStats(
 )
 
 /**
- * User preferences.
+ * User preferences, keeping the data structure organized and modular.
  */
 data class UserPreferences(
     val language: String = "en",

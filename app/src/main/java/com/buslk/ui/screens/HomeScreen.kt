@@ -1,0 +1,100 @@
+package com.buslk.ui.screens
+
+import android.preference.PreferenceManager
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.viewinterop.AndroidView
+import org.osmdroid.config.Configuration
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import com.buslk.utils.OsmMapManager
+
+/**
+ * The main Home Screen Composable containing the interactive Map.
+ * 
+ * OOD Principle: UI as a Function of State.
+ * This function defines *what* the screen looks like. It delegates the complex
+ * map initialization to the [OsmMapManager] Singleton, keeping this function focused solely on rendering.
+ */
+@Composable
+fun HomeScreen() {
+    // Grab the current Android Context (Activity) needed to initialize native Android Views
+    val context = LocalContext.current
+    
+    // Grab the current LifecycleOwner (usually the Activity or Navigation BackStackEntry)
+    // We need this to know when the app goes into the background or foreground.
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    // Initialize OSM configuration via Singleton Manager (OOP Encapsulation)
+    // This is safe to call here because the Singleton guarantees it only runs once.
+    OsmMapManager.initialize(context)
+
+    // 'remember' tells Jetpack Compose to keep this MapView object alive across Recompositions.
+    // If we didn't use 'remember', Compose would create a brand new map every time the screen redraws!
+    val mapView = remember { MapView(context) }
+
+    // Tie MapView lifecycle to the Compose Lifecycle Owner.
+    // DisposableEffect runs once when the Composable enters the screen, and provides an 'onDispose'
+    // block for when the Composable leaves the screen, ensuring we clean up memory.
+    DisposableEffect(lifecycleOwner, mapView) {
+        // Create an observer that listens for Android OS events (like switching apps)
+        val lifecycleObserver = LifecycleEventObserver { _, event ->
+            when (event) {
+                // App came to the foreground
+                Lifecycle.Event.ON_RESUME -> mapView.onResume()
+                // App went to the background (Pause the map so it stops draining memory/battery)
+                Lifecycle.Event.ON_PAUSE -> mapView.onPause()
+                // Activity is being destroyed
+                Lifecycle.Event.ON_DESTROY -> mapView.onDetach()
+                else -> {}
+            }
+        }
+        
+        // Attach our listener to the Android OS
+        lifecycleOwner.lifecycle.addObserver(lifecycleObserver)
+        
+        // Cleanup routine when this Composable is completely removed from UI
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(lifecycleObserver)
+            // Detach disconnects the map from the hardware rendering, preventing strict memory leaks
+            mapView.onDetach()
+        }
+    }
+
+    /**
+     * AndroidView acts as a "bridge" to use legacy XML-based View classes inside modern Jetpack Compose.
+     * Since osmdroid's MapView is an old-school Android View, we wrap it in an AndroidView.
+     */
+    AndroidView(
+        // 'factory' runs exactly ONCE to instantiate and configure the View.
+        factory = {
+            mapView.apply {
+                // Set the visual style of the map to standard Mapnik (OpenStreetMap default)
+                setTileSource(TileSourceFactory.MAPNIK)
+                // Set default starting zoom level (15 is a close-up city view)
+                controller.setZoom(15.0)
+                // Center roughly on Colombo, Sri Lanka (Latitude, Longitude)
+                controller.setCenter(GeoPoint(6.9271, 79.8612))
+                // Allow pinch-to-zoom and two-finger rotation
+                setMultiTouchControls(true)
+            }
+        },
+        // 'update' runs every time Compose decides the screen needs to be redrawn (Recomposition).
+        // This is where we will eventually put logic to draw moving bus markers when we get live data.
+        update = {
+            // Future updates for markers will go here (Observing ViewModel StateFlows)
+        },
+        // Tell the AndroidView to stretch and fill the entire available screen space
+        modifier = Modifier.fillMaxSize()
+    )
+}
