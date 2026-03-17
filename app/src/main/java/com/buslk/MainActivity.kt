@@ -17,6 +17,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -39,8 +40,11 @@ class MainActivity : AppCompatActivity() {
         FirebaseApp.initializeApp(this)
         enableEdgeToEdge()
         setContent {
-            BusLKTheme {
-                BusLKApp()
+            val settingsViewModel: SettingsViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+            val themeMode by settingsViewModel.themeMode.collectAsState()
+            
+            BusLKTheme(themeMode = themeMode) {
+                BusLKApp(settingsViewModel = settingsViewModel)
             }
         }
     }
@@ -48,7 +52,7 @@ class MainActivity : AppCompatActivity() {
 
 @PreviewScreenSizes
 @Composable
-fun BusLKApp() {
+fun BusLKApp(settingsViewModel: SettingsViewModel) {
     val context = LocalContext.current
     
     val authRepository = androidx.compose.runtime.remember { com.buslk.data.AuthRepository() }
@@ -57,7 +61,6 @@ fun BusLKApp() {
     )
 
     val profileViewModel: ProfileViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
-    val settingsViewModel: SettingsViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 
     var currentDestination by rememberSaveable { 
         mutableStateOf(AppDestinations.HOME) 
