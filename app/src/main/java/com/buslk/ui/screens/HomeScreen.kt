@@ -160,6 +160,21 @@ fun HomeScreen(
             },
             placeholder = { Text("Search bus route (e.g. 138) or Bus NO") },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search Icon") },
+            trailingIcon = {
+                if (active) {
+                    IconButton(onClick = {
+                        if (searchQuery.isNotEmpty()) {
+                            searchQuery = ""
+                            searchViewModel.clearSearch()
+                        } else {
+                            active = false
+                            searchViewModel.clearSearch()
+                        }
+                    }) {
+                        Icon(Icons.Default.Clear, contentDescription = "Clear Search")
+                    }
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 24.dp)
