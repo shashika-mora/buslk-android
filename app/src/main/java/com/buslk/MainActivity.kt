@@ -13,6 +13,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -29,7 +30,9 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.appcompat.app.AppCompatActivity
 import com.buslk.ui.screens.LoginScreen
 import com.buslk.ui.screens.ProfileScreen
+import com.buslk.ui.screens.SettingsScreen
 import com.buslk.ui.viewmodels.ProfileViewModel
+import com.buslk.ui.viewmodels.SettingsViewModel
 import com.buslk.ui.theme.BusLKTheme
 import com.google.firebase.FirebaseApp
 
@@ -57,6 +60,7 @@ fun BusLKApp() {
     )
 
     val profileViewModel: ProfileViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    val settingsViewModel: SettingsViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 
     var currentDestination by rememberSaveable { 
         mutableStateOf(AppDestinations.HOME) 
@@ -96,7 +100,12 @@ fun BusLKApp() {
     } else {
         NavigationSuiteScaffold(
             navigationSuiteItems = {
-                AppDestinations.entries.filter { it != AppDestinations.LOGIN && it != AppDestinations.OPENING && it != AppDestinations.LANGUAGE_SELECT }.forEach {
+                AppDestinations.entries.filter { 
+                    it != AppDestinations.LOGIN && 
+                    it != AppDestinations.OPENING && 
+                    it != AppDestinations.LANGUAGE_SELECT &&
+                    it != AppDestinations.SETTINGS 
+                }.forEach {
                     item(
                         icon = { Icon(it.icon, contentDescription = it.label) },
                         label = { Text(it.label) },
@@ -112,7 +121,15 @@ fun BusLKApp() {
                     AppDestinations.PROFILE -> ProfileScreen(
                         authViewModel = authViewModel,
                         profileViewModel = profileViewModel,
-                        onSettingsClick = { }
+                        onSettingsClick = { 
+                            currentDestination = AppDestinations.SETTINGS
+                        }
+                    )
+                    AppDestinations.SETTINGS -> SettingsScreen(
+                        onBack = { currentDestination = AppDestinations.PROFILE },
+                        authViewModel = authViewModel,
+                        settingsViewModel = settingsViewModel,
+                        onLogoutSuccess = { currentDestination = AppDestinations.LOGIN }
                     )
                     else -> Greeting(
                         name = currentDestination.label,
@@ -134,6 +151,7 @@ enum class AppDestinations(
     HOME("Home", Icons.Default.Home),
     FAVORITES("Favorites", Icons.Default.Favorite),
     PROFILE("Profile", Icons.Default.AccountBox),
+    SETTINGS("Settings", Icons.Default.Settings),
 }
 
 @Composable
