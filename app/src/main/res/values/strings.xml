@@ -1,9 +1,32 @@
 <resources>
     <string name="app_name">BusLK</string>
+    <string name="select_language">Select Language</string>
+    <string name="language_prompt">භාෂාව තෝරන්න / மொழியைத் தேர்ந்தெடுக்கவும்</string>
+    <string name="lang_english">English</string>
+    <string name="lang_sinhala">සිංහල (Sinhala)</string>
+    <string name="lang_tamil">தமிழ் (Tamil)</string>
+
+    <!-- Shared -->
+    <string name="back">Back</string>
+
+    <!-- Opening Screen -->
     <string name="opening_subtitle">Real-time bus tracking and smart ticketing</string>
     <string name="btn_get_started">Get Started</string>
     <string name="opening_footer">Your smart companion for public transport</string>
-    <string name="back">Back</string>
+
+    <!-- Login Screen -->
+    <string name="welcome_back">Welcome Back!</string>
+    <string name="create_account">Create Account</string>
+    <string name="tab_login">Login</string>
+    <string name="tab_signup">Sign Up</string>
+    <string name="continue_with_google">Continue with Google</string>
+    <string name="lbl_or">Or</string>
+    <string name="lbl_email">Email Address</string>
+    <string name="lbl_password">Password</string>
+    <string name="lbl_confirm_password">Confirm Password</string>
+    <string name="btn_forgot_password">Forgot Password?</string>
+    <string name="msg_passwords_not_match">Passwords do not match</string>
+    <string name="msg_login_success">Sign in &amp; Sync successful!</string>
     
     <!-- Settings Screen -->
     <string name="settings_title">Settings</string>
@@ -20,8 +43,5 @@
     <string name="settings_push_notifications">Push Notifications</string>
     <string name="settings_default_route">Default Route</string>
     <string name="settings_route_138">138 - Maharagama - Pettah</string>
-    <string name="lang_english">English</string>
-    <string name="lang_sinhala">සිංහල (Sinhala)</string>
-    <string name="lang_tamil">தமிழ் (Tamil)</string>
     <string name="action_logout">Logout</string>
 </resources>

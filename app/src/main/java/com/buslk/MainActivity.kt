@@ -1,8 +1,6 @@
 package com.buslk
 
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,7 +23,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.appcompat.app.AppCompatActivity
 import com.buslk.ui.screens.LoginScreen
@@ -68,34 +65,40 @@ fun BusLKApp() {
 
     if (currentDestination == AppDestinations.OPENING) {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            com.buslk.ui.screens.OpeningScreen(
-                onGetStartedClick = {
-                    currentDestination = AppDestinations.LANGUAGE_SELECT
-                }
-            )
+            Box(modifier = Modifier.padding(innerPadding)) {
+                com.buslk.ui.screens.OpeningScreen(
+                    onGetStartedClick = {
+                        currentDestination = AppDestinations.LANGUAGE_SELECT
+                    }
+                )
+            }
         }
     } else if (currentDestination == AppDestinations.LOGIN) {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            LoginScreen(
-                authViewModel = authViewModel,
-                onSignInSuccess = {
-                    currentDestination = AppDestinations.HOME
-                },
-                onBackClick = {
-                    currentDestination = AppDestinations.LANGUAGE_SELECT
-                }
-            )
+            Box(modifier = Modifier.padding(innerPadding)) {
+                LoginScreen(
+                    authViewModel = authViewModel,
+                    onSignInSuccess = {
+                        currentDestination = AppDestinations.HOME
+                    },
+                    onBackClick = {
+                        currentDestination = AppDestinations.LANGUAGE_SELECT
+                    }
+                )
+            }
         }
     } else if (currentDestination == AppDestinations.LANGUAGE_SELECT) {
         Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
-            com.buslk.ui.screens.LanguageSelectionScreen(
-                onBackClick = {
-                    currentDestination = AppDestinations.OPENING
-                },
-                onLanguageSelected = { langCode ->
-                    currentDestination = AppDestinations.LOGIN
-                }
-            )
+            Box(modifier = Modifier.padding(paddingValues)) {
+                com.buslk.ui.screens.LanguageSelectionScreen(
+                    onBackClick = {
+                        currentDestination = AppDestinations.OPENING
+                    },
+                    onLanguageSelected = { langCode ->
+                        currentDestination = AppDestinations.LOGIN
+                    }
+                )
+            }
         }
     } else {
         NavigationSuiteScaffold(
@@ -116,25 +119,27 @@ fun BusLKApp() {
             }
         ) {
             Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                when (currentDestination) {
-                    AppDestinations.HOME -> com.buslk.ui.screens.HomeScreen()
-                    AppDestinations.PROFILE -> ProfileScreen(
-                        authViewModel = authViewModel,
-                        profileViewModel = profileViewModel,
-                        onSettingsClick = { 
-                            currentDestination = AppDestinations.SETTINGS
-                        }
-                    )
-                    AppDestinations.SETTINGS -> SettingsScreen(
-                        onBack = { currentDestination = AppDestinations.PROFILE },
-                        authViewModel = authViewModel,
-                        settingsViewModel = settingsViewModel,
-                        onLogoutSuccess = { currentDestination = AppDestinations.LOGIN }
-                    )
-                    else -> Greeting(
-                        name = currentDestination.label,
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                Box(modifier = Modifier.padding(innerPadding)) {
+                    when (currentDestination) {
+                        AppDestinations.HOME -> com.buslk.ui.screens.HomeScreen()
+                        AppDestinations.PROFILE -> ProfileScreen(
+                            authViewModel = authViewModel,
+                            profileViewModel = profileViewModel,
+                            onSettingsClick = { 
+                                currentDestination = AppDestinations.SETTINGS
+                            }
+                        )
+                        AppDestinations.SETTINGS -> SettingsScreen(
+                            onBack = { currentDestination = AppDestinations.PROFILE },
+                            authViewModel = authViewModel,
+                            settingsViewModel = settingsViewModel,
+                            onLogoutSuccess = { currentDestination = AppDestinations.LOGIN }
+                        )
+                        else -> Greeting(
+                            name = currentDestination.label,
+                            modifier = Modifier
+                        )
+                    }
                 }
             }
         }
