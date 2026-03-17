@@ -41,6 +41,7 @@ import com.buslk.ui.search.SearchViewModel
 import com.buslk.ui.search.SearchViewModelFactory
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.IconButton
+
 /**
  * The main Home Screen Composable containing the interactive Map.
  * 
@@ -59,6 +60,7 @@ fun HomeScreen(
     // UI State for SearchBar
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
+
     // Observe Business Logic State
     val searchUiState by searchViewModel.uiState.collectAsState()
 
@@ -144,7 +146,10 @@ fun HomeScreen(
          */
         SearchBar(
             query = searchQuery,
-            onQueryChange = { searchQuery = it },
+            onQueryChange = {
+                searchQuery = it
+                searchViewModel.performSearch(it)
+            },
             onSearch = {
                 active = false
                 // Logic to be implemented later
