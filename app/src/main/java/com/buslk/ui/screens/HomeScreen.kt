@@ -177,7 +177,7 @@ fun HomeScreen(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 24.dp)
+                .padding(horizontal = if (active) 0.dp else 16.dp, vertical = if (active) 0.dp else 24.dp)
                 .align(Alignment.TopCenter),
             shape = RoundedCornerShape(100.dp)
         ) {
