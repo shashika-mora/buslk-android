@@ -35,7 +35,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
-
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.buslk.ui.search.SearchViewModel
+import com.buslk.ui.search.SearchViewModelFactory
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.IconButton
 /**
  * The main Home Screen Composable containing the interactive Map.
  * 
@@ -45,7 +50,9 @@ import androidx.compose.ui.unit.dp
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    searchViewModel: SearchViewModel = viewModel(factory = SearchViewModelFactory())
+) {
     // Grab the current Android Context (Activity) needed to initialize native Android Views
     val context = LocalContext.current
 
