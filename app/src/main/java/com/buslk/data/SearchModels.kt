@@ -23,3 +23,16 @@ data class RouteStop(
     @set:PropertyName("isTransferHub")
     var isTransferHub: Boolean = false
 )
+
+/**
+ * Data model for a Bus fetched from Firestore.
+ */
+data class BusDoc(
+    val registrationNumber: String = "",
+    val owner: String = "",
+    val type: String = "",
+    val capacity: Int = 0,
+    val qrCodeString: String = "",
+    val defaultRouteId: String = "",
+    val lastMaintenance: String = ""
+)
