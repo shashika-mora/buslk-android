@@ -19,6 +19,23 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.buslk.utils.OsmMapManager
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.Text
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
+
 /**
  * The main Home Screen Composable containing the interactive Map.
  * 
@@ -26,11 +43,16 @@ import com.buslk.utils.OsmMapManager
  * This function defines *what* the screen looks like. It delegates the complex
  * map initialization to the [OsmMapManager] Singleton, keeping this function focused solely on rendering.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen() {
     // Grab the current Android Context (Activity) needed to initialize native Android Views
     val context = LocalContext.current
-    
+
+    // UI State for SearchBar
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+    var active by rememberSaveable { mutableStateOf(false) }
+
     // Grab the current LifecycleOwner (usually the Activity or Navigation BackStackEntry)
     // We need this to know when the app goes into the background or foreground.
     val lifecycleOwner = LocalLifecycleOwner.current
