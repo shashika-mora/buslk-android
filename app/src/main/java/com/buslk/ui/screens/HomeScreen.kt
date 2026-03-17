@@ -181,7 +181,18 @@ fun HomeScreen(
                 .align(Alignment.TopCenter),
             shape = RoundedCornerShape(if (active) 0.dp else 100.dp)
         ) {
-            // Placeholder for search results list (UI only)
+            SearchContent(
+                uiState = searchUiState,
+                onRouteClick = { route ->
+                    // MVP: Close search and maybe pan map to route later
+                    active = false
+                    searchQuery = route.routeId
+                },
+                onBusClick = { bus ->
+                    active = false
+                    searchQuery = bus.registrationNumber
+                }
+            )
         }
     }
 }
