@@ -98,3 +98,44 @@ fun SearchContent(
         }
     }
 }
+
+@Composable
+fun RouteResultCard(route: RouteDoc, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Route ${route.routeId}",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "${route.distanceKm} km",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "${route.startLocation} ⇄ ${route.endLocation}",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            if (route.stops.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "${route.stops.size} Stops",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    }
+}
