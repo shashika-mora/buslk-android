@@ -3,16 +3,16 @@
     <string name="select_language">Select Language</string>
     <string name="language_prompt">භාෂාව තෝරන්න / மொழியைத் தேர்ந்தெடுக்கவும்</string>
     <string name="lang_english">English</string>
-    <string name="lang_sinhala">සිංහල</string>
-    <string name="lang_tamil">தமிழ்</string>
-    
+    <string name="lang_sinhala">සිංහල (Sinhala)</string>
+    <string name="lang_tamil">தமிழ் (Tamil)</string>
+
     <!-- Shared -->
     <string name="back">Back</string>
-    
+
     <!-- Opening Screen -->
-    <string name="opening_subtitle">Your Smart Travel Companion</string>
+    <string name="opening_subtitle">Real-time bus tracking and smart ticketing</string>
     <string name="btn_get_started">Get Started</string>
-    <string name="opening_footer">Track buses, report issues, and earn rewards</string>
+    <string name="opening_footer">Your smart companion for public transport</string>
 
     <!-- Login Screen -->
     <string name="welcome_back">Welcome Back!</string>
@@ -27,4 +27,21 @@
     <string name="btn_forgot_password">Forgot Password?</string>
     <string name="msg_passwords_not_match">Passwords do not match</string>
     <string name="msg_login_success">Sign in &amp; Sync successful!</string>
+    
+    <!-- Settings Screen -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_account_control">Account Control</string>
+    <string name="settings_edit_profile">Edit Profile</string>
+    <string name="settings_change_password">Change Password</string>
+    <string name="settings_ui_control">Display &amp; Theme</string>
+    <string name="settings_app_theme">App Theme</string>
+    <string name="settings_theme_system">System Default</string>
+    <string name="settings_theme_light">Light Mode</string>
+    <string name="settings_theme_dark">Dark Mode</string>
+    <string name="settings_user_preferences">Preferences</string>
+    <string name="settings_language">App Language</string>
+    <string name="settings_push_notifications">Push Notifications</string>
+    <string name="settings_default_route">Default Route</string>
+    <string name="settings_route_138">138 - Maharagama - Pettah</string>
+    <string name="action_logout">Logout</string>
 </resources>
