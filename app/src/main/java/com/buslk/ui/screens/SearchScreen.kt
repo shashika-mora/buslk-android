@@ -53,3 +53,48 @@ fun SearchContent(
                     Text(text = uiState.message, color = MaterialTheme.colorScheme.error)
                 }
             }
+            is SearchUiState.Success -> {
+                if (uiState.routes.isEmpty() && uiState.buses.isEmpty()) {
+                    Text(
+                        text = "No results found.",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        if (uiState.routes.isNotEmpty()) {
+                            item {
+                                Text(
+                                    text = "Routes",
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                            items(items = uiState.routes, key = { it.routeId }) { route ->
+                                RouteResultCard(route = route, onClick = { onRouteClick(route) })
+                            }
+                        }
+
+                        if (uiState.buses.isNotEmpty()) {
+                            item {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "Buses",
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                            items(items = uiState.buses, key = { it.registrationNumber }) { bus ->
+                                BusResultCard(bus = bus, onClick = { onBusClick(bus) })
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
