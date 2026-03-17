@@ -179,7 +179,7 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .padding(horizontal = if (active) 0.dp else 16.dp, vertical = if (active) 0.dp else 24.dp)
                 .align(Alignment.TopCenter),
-            shape = RoundedCornerShape(100.dp)
+            shape = RoundedCornerShape(if (active) 0.dp else 100.dp)
         ) {
             // Placeholder for search results list (UI only)
         }
