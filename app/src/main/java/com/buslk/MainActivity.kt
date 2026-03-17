@@ -110,7 +110,9 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
                     it != AppDestinations.LOGIN && 
                     it != AppDestinations.OPENING && 
                     it != AppDestinations.LANGUAGE_SELECT &&
-                    it != AppDestinations.SETTINGS 
+                    it != AppDestinations.SETTINGS &&
+                    it != AppDestinations.SCAN_QR &&
+                    it != AppDestinations.TRIP_SCREEN
                 }.forEach {
                     item(
                         icon = { Icon(it.icon, contentDescription = it.label) },
@@ -124,7 +126,9 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
             Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                 Box(modifier = Modifier.padding(innerPadding)) {
                     when (currentDestination) {
-                        AppDestinations.HOME -> com.buslk.ui.screens.HomeScreen()
+                        AppDestinations.HOME -> com.buslk.ui.screens.HomeScreen(
+                            onScanClick = { currentDestination = AppDestinations.SCAN_QR }
+                        )
                         AppDestinations.PROFILE -> ProfileScreen(
                             authViewModel = authViewModel,
                             profileViewModel = profileViewModel,
@@ -137,6 +141,13 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
                             authViewModel = authViewModel,
                             settingsViewModel = settingsViewModel,
                             onLogoutSuccess = { currentDestination = AppDestinations.LOGIN }
+                        )
+                        AppDestinations.SCAN_QR -> com.buslk.ui.screens.ScanQRScreen(
+                            onCheckInSuccess = { _ -> currentDestination = AppDestinations.TRIP_SCREEN },
+                            onBack = { currentDestination = AppDestinations.HOME }
+                        )
+                        AppDestinations.TRIP_SCREEN -> com.buslk.ui.screens.TripScreen(
+                            onBack = { currentDestination = AppDestinations.HOME }
                         )
                         else -> Greeting(
                             name = currentDestination.label,
@@ -160,6 +171,8 @@ enum class AppDestinations(
     FAVORITES("Favorites", Icons.Default.Favorite),
     PROFILE("Profile", Icons.Default.AccountBox),
     SETTINGS("Settings", Icons.Default.Settings),
+    SCAN_QR("Scan QR", Icons.Default.Home),
+    TRIP_SCREEN("Trip", Icons.Default.Home),
 }
 
 @Composable

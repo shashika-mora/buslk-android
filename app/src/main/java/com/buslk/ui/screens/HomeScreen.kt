@@ -59,6 +59,8 @@ fun HomeScreen(
     // UI State for SearchBar
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
+    // Observe Business Logic State
+    val searchUiState by searchViewModel.uiState.collectAsState()
 
     // Grab the current LifecycleOwner (usually the Activity or Navigation BackStackEntry)
     // We need this to know when the app goes into the background or foreground.
