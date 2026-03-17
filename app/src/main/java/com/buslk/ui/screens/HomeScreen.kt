@@ -40,14 +40,13 @@ import com.google.firebase.database.FirebaseDatabase
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(onScanClick: () -> Unit = {}) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
     // --- UI STATE ---
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
-    var isScannerOpen by rememberSaveable { mutableStateOf(false) }
 
     // Initialize Map Configuration
     OsmMapManager.initialize(context)
@@ -114,7 +113,7 @@ fun HomeScreen() {
 
         // LAYER 3: QR Scanner Toggle (Bottom)
         FloatingActionButton(
-            onClick = { isScannerOpen = true },
+            onClick = onScanClick,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 40.dp),
@@ -124,37 +123,5 @@ fun HomeScreen() {
             Icon(Icons.Default.QrCodeScanner, contentDescription = "Scan QR")
         }
 
-        // LAYER 4: QR Scanner Overlay (Conditional)
-        if (isScannerOpen) {
-            QRScanner(
-                onQrScanned = { busId ->
-                    isScannerOpen = false
-
-                    // Passenger-as-a-Sensor: Real-time Database Check-in
-                    val userId = FirebaseAuth.getInstance().currentUser?.uid
-                    if (userId != null) {
-                        val database = FirebaseDatabase.getInstance()
-                        val tripRef = database.getReference("trips").child(userId)
-
-                        val tripData = mapOf(
-                            "busId" to busId,
-                            "startTime" to System.currentTimeMillis(),
-                            "status" to "active"
-                        )
-
-                        tripRef.setValue(tripData)
-                            .addOnSuccessListener {
-                                Toast.makeText(context, "Checked-in to Bus: $busId", Toast.LENGTH_SHORT).show()
-                            }
-                            .addOnFailureListener {
-                                Toast.makeText(context, "Network error. Try again.", Toast.LENGTH_SHORT).show()
-                            }
-                    } else {
-                        Toast.makeText(context, "Authentication required.", Toast.LENGTH_SHORT).show()
-                    }
-                },
-                onClose = { isScannerOpen = false }
-            )
-        }
     }
 }
