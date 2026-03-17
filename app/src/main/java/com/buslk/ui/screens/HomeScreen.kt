@@ -87,6 +87,13 @@ fun HomeScreen() {
                 controller.setCenter(GeoPoint(6.9271, 79.8612))
                 // Allow pinch-to-zoom and two-finger rotation
                 setMultiTouchControls(true)
+                // --- Performance / UX Optimizations ---
+                // 1. Force hardware acceleration for map drawing to free up the CPU
+                setLayerType(android.view.View.LAYER_TYPE_HARDWARE, null)
+                // 2. Scale the pixel tiles to match the high-density screens (DPI) of modern phones
+                isTilesScaledToDpi = true
+                // 3. Hide the ugly default zoom buttons (+/-); users expect pinch-to-zoom
+                zoomController.setVisibility(org.osmdroid.views.CustomZoomButtonsController.Visibility.NEVER)
             }
         },
         // 'update' runs every time Compose decides the screen needs to be redrawn (Recomposition).
