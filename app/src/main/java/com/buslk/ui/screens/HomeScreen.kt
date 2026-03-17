@@ -154,7 +154,10 @@ fun HomeScreen(
                 searchViewModel.performSearch(it)
             },
             active = active,
-            onActiveChange = { active = it },
+            onActiveChange = {
+                active = it
+                if (!it) searchViewModel.clearSearch()
+            },
             placeholder = { Text("Search bus route (e.g. 138)") },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search Icon") },
             modifier = Modifier
