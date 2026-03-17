@@ -151,8 +151,7 @@ fun HomeScreen(
                 searchViewModel.performSearch(it)
             },
             onSearch = {
-                active = false
-                // Logic to be implemented later
+                searchViewModel.performSearch(it)
             },
             active = active,
             onActiveChange = { active = it },
