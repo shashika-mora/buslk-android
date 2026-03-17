@@ -39,6 +39,7 @@ fun SearchContent(
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
             is SearchUiState.Error -> {
+                val errorMessage = uiState.message
                 Column(
                     modifier = Modifier.align(Alignment.Center),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -50,11 +51,13 @@ fun SearchContent(
                         modifier = Modifier.size(48.dp)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = uiState.message, color = MaterialTheme.colorScheme.error)
+                    Text(text = errorMessage, color = MaterialTheme.colorScheme.error)
                 }
             }
             is SearchUiState.Success -> {
-                if (uiState.routes.isEmpty() && uiState.buses.isEmpty()) {
+                val routes = uiState.routes
+                val buses = uiState.buses
+                if (routes.isEmpty() && buses.isEmpty()) {
                     Text(
                         text = "No results found.",
                         style = MaterialTheme.typography.bodyLarge,
@@ -66,7 +69,7 @@ fun SearchContent(
                         contentPadding = PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        if (uiState.routes.isNotEmpty()) {
+                        if (routes.isNotEmpty()) {
                             item {
                                 Text(
                                     text = "Routes",
@@ -74,12 +77,12 @@ fun SearchContent(
                                     color = MaterialTheme.colorScheme.primary
                                 )
                             }
-                            items(items = uiState.routes, key = { it.routeId }) { route ->
+                            items(items = routes, key = { it.routeId }) { route ->
                                 RouteResultCard(route = route, onClick = { onRouteClick(route) })
                             }
                         }
 
-                        if (uiState.buses.isNotEmpty()) {
+                        if (buses.isNotEmpty()) {
                             item {
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
@@ -88,7 +91,7 @@ fun SearchContent(
                                     color = MaterialTheme.colorScheme.primary
                                 )
                             }
-                            items(items = uiState.buses, key = { it.registrationNumber }) { bus ->
+                            items(items = buses, key = { it.registrationNumber }) { bus ->
                                 BusResultCard(bus = bus, onClick = { onBusClick(bus) })
                             }
                         }
