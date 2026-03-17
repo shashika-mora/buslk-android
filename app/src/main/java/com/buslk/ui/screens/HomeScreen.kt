@@ -94,36 +94,63 @@ fun HomeScreen() {
     }
 
     /**
+     * Wrap the legacy MapView and floating UI elements in a Box to allow layering (Z-index).
+     */
+    Box(modifier = Modifier.fillMaxSize()) {
+        /**
      * AndroidView acts as a "bridge" to use legacy XML-based View classes inside modern Jetpack Compose.
      * Since osmdroid's MapView is an old-school Android View, we wrap it in an AndroidView.
      */
-    AndroidView(
-        // 'factory' runs exactly ONCE to instantiate and configure the View.
-        factory = {
-            mapView.apply {
-                // Set the visual style of the map to standard Mapnik (OpenStreetMap default)
-                setTileSource(TileSourceFactory.MAPNIK)
-                // Set default starting zoom level (15 is a close-up city view)
-                controller.setZoom(15.0)
-                // Center roughly on Colombo, Sri Lanka (Latitude, Longitude)
-                controller.setCenter(GeoPoint(6.9271, 79.8612))
-                // Allow pinch-to-zoom and two-finger rotation
-                setMultiTouchControls(true)
-                // --- Performance / UX Optimizations ---
-                // 1. Force hardware acceleration for map drawing to free up the CPU
-                setLayerType(android.view.View.LAYER_TYPE_HARDWARE, null)
-                // 2. Scale the pixel tiles to match the high-density screens (DPI) of modern phones
-                isTilesScaledToDpi = true
-                // 3. Hide the ugly default zoom buttons (+/-); users expect pinch-to-zoom
-                zoomController.setVisibility(org.osmdroid.views.CustomZoomButtonsController.Visibility.NEVER)
-            }
-        },
-        // 'update' runs every time Compose decides the screen needs to be redrawn (Recomposition).
-        // This is where we will eventually put logic to draw moving bus markers when we get live data.
-        update = {
-            // Future updates for markers will go here (Observing ViewModel StateFlows)
-        },
-        // Tell the AndroidView to stretch and fill the entire available screen space
-        modifier = Modifier.fillMaxSize()
-    )
+        AndroidView(
+            // 'factory' runs exactly ONCE to instantiate and configure the View.
+            factory = {
+                mapView.apply {
+                    // Set the visual style of the map to standard Mapnik (OpenStreetMap default)
+                    setTileSource(TileSourceFactory.MAPNIK)
+                    // Set default starting zoom level (15 is a close-up city view)
+                    controller.setZoom(15.0)
+                    // Center roughly on Colombo, Sri Lanka (Latitude, Longitude)
+                    controller.setCenter(GeoPoint(6.9271, 79.8612))
+                    // Allow pinch-to-zoom and two-finger rotation
+                    setMultiTouchControls(true)
+                    // --- Performance / UX Optimizations ---
+                    // 1. Force hardware acceleration for map drawing to free up the CPU
+                    setLayerType(android.view.View.LAYER_TYPE_HARDWARE, null)
+                    // 2. Scale the pixel tiles to match the high-density screens (DPI) of modern phones
+                    isTilesScaledToDpi = true
+                    // 3. Hide the ugly default zoom buttons (+/-); users expect pinch-to-zoom
+                    zoomController.setVisibility(org.osmdroid.views.CustomZoomButtonsController.Visibility.NEVER)
+                }
+            },
+            // 'update' runs every time Compose decides the screen needs to be redrawn (Recomposition).
+            // This is where we will eventually put logic to draw moving bus markers when we get live data.
+            update = {
+                // Future updates for markers will go here (Observing ViewModel StateFlows)
+            },
+            // Tell the AndroidView to stretch and fill the entire available screen space
+            modifier = Modifier.fillMaxSize()
+        )
+        /**
+         * Floating Search Bar for routing.
+         */
+        SearchBar(
+            query = searchQuery,
+            onQueryChange = { searchQuery = it },
+            onSearch = {
+                active = false
+                // Logic to be implemented later
+            },
+            active = active,
+            onActiveChange = { active = it },
+            placeholder = { Text("Search bus route (e.g. 138)") },
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search Icon") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 24.dp)
+                .align(Alignment.TopCenter),
+            shape = RoundedCornerShape(100.dp)
+        ) {
+            // Placeholder for search results list (UI only)
+        }
+    }
 }
