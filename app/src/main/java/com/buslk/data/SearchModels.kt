@@ -13,3 +13,13 @@ data class RouteDoc(
     val distanceKm: Double = 0.0,
     val stops: List<RouteStop> = emptyList()
 )
+
+data class RouteStop(
+    val name: String = "",
+    val lat: Double = 0.0,
+    val lng: Double = 0.0,
+    val order: Int = 0,
+    @get:PropertyName("isTransferHub")
+    @set:PropertyName("isTransferHub")
+    var isTransferHub: Boolean = false
+)
