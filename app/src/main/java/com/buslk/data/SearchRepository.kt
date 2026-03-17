@@ -42,3 +42,23 @@ class SearchRepository : ISearchRepository {
             Result.failure(e)
         }
     }
+
+    override suspend fun searchBuses(query: String): Result<List<BusDoc>> {
+        return try {
+            val q = query.trim().lowercase()
+            if (q.isEmpty()) return Result.success(emptyList())
+
+            // Fetch buses and filter locally for MVP
+            val snapshot = db.collection("buses").get().await()
+            val allBuses = snapshot.documents.mapNotNull { it.toObject(BusDoc::class.java) }
+
+            val filtered = allBuses.filter {
+                it.registrationNumber.lowercase().contains(q) ||
+                        it.defaultRouteId.lowercase().contains(q)
+            }
+            Result.success(filtered)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+}
