@@ -158,7 +158,7 @@ fun HomeScreen(
                 active = it
                 if (!it) searchViewModel.clearSearch()
             },
-            placeholder = { Text("Search bus route (e.g. 138)") },
+            placeholder = { Text("Search bus route (e.g. 138) or Bus NO") },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search Icon") },
             modifier = Modifier
                 .fillMaxWidth()
