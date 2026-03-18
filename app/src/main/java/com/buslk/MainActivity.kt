@@ -65,6 +65,10 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
     var currentDestination by rememberSaveable { 
         mutableStateOf(AppDestinations.HOME) 
     }
+    
+    var scannedBusId by rememberSaveable {
+        mutableStateOf("")
+    }
 
     if (currentDestination == AppDestinations.OPENING) {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -143,10 +147,14 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
                             onLogoutSuccess = { currentDestination = AppDestinations.LOGIN }
                         )
                         AppDestinations.SCAN_QR -> com.buslk.ui.screens.ScanQRScreen(
-                            onCheckInSuccess = { _ -> currentDestination = AppDestinations.TRIP_SCREEN },
+                            onCheckInSuccess = { busId -> 
+                                scannedBusId = busId
+                                currentDestination = AppDestinations.TRIP_SCREEN 
+                            },
                             onBack = { currentDestination = AppDestinations.HOME }
                         )
                         AppDestinations.TRIP_SCREEN -> com.buslk.ui.screens.TripScreen(
+                            busId = scannedBusId,
                             onBack = { currentDestination = AppDestinations.HOME }
                         )
                         else -> Greeting(
