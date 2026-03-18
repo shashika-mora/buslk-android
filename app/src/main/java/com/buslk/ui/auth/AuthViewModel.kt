@@ -144,6 +144,49 @@ class AuthViewModel(
     }
 
     /**
+     * Updates the user's display name.
+     */
+    fun updateDisplayName(newName: String, onComplete: (Result<Unit>) -> Unit) {
+        if (newName.isBlank()) return
+        _uiState.value = AuthUiState.Loading
+        viewModelScope.launch {
+            val result = repository.updateDisplayName(newName)
+            result.onSuccess {
+                val user = repository.getCurrentUser()
+                if (user != null) {
+                    _uiState.value = AuthUiState.Success(user)
+                }
+            }.onFailure { e ->
+                _uiState.value = AuthUiState.Error(mapErrorToMessage(e))
+            }
+            onComplete(result)
+        }
+    }
+
+    /**
+     * Changes the user's password.
+     */
+    fun changePassword(newPass: String, onComplete: (Result<Unit>) -> Unit) {
+        if (newPass.length < 6) {
+            _uiState.value = AuthUiState.Error("Password must be at least 6 characters")
+            return
+        }
+        _uiState.value = AuthUiState.Loading
+        viewModelScope.launch {
+            val result = repository.changePassword(newPass)
+            result.onSuccess {
+                val user = repository.getCurrentUser()
+                if (user != null) {
+                    _uiState.value = AuthUiState.Success(user)
+                }
+            }.onFailure { e ->
+                _uiState.value = AuthUiState.Error(mapErrorToMessage(e))
+            }
+            onComplete(result)
+        }
+    }
+
+    /**
      * OOSD Principle: Defensive Programming.
      * Validates inputs before making network requests to save bandwidth and 
      * provide instant visual feedback to the user.
