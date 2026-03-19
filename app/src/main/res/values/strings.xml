@@ -1,13 +1,15 @@
 <resources>
     <string name="app_name">BusLK</string>
     <string name="select_language">Select Language</string>
-    <string name="language_prompt">භාෂාව තෝරන්න / மொழியைத் தேர்ந்தெடுக்கவும்</string>
+    <string name="language_prompt">භාෂාව තෝරන්න / மொழියැத் தேர்ந்தெடுக்கவும்</string>
     <string name="lang_english">English</string>
     <string name="lang_sinhala">සිංහල (Sinhala)</string>
     <string name="lang_tamil">தமிழ் (Tamil)</string>
 
     <!-- Shared -->
     <string name="back">Back</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_save">Save</string>
 
     <!-- Opening Screen -->
     <string name="opening_subtitle">Real-time bus tracking and smart ticketing</string>
@@ -44,4 +46,11 @@
     <string name="settings_default_route">Default Route</string>
     <string name="settings_route_138">138 - Maharagama - Pettah</string>
     <string name="action_logout">Logout</string>
+
+    <string name="dialog_edit_profile_title">Edit Profile</string>
+    <string name="lbl_new_name">New Display Name</string>
+    <string name="dialog_change_password_title">Change Password</string>
+    <string name="lbl_new_password">New Password</string>
+    <string name="msg_profile_updated">Profile updated successfully</string>
+    <string name="msg_password_changed">Password changed successfully</string>
 </resources>
