@@ -32,13 +32,13 @@
     <!-- Navigation -->
     <string name="nav_home">මුල් පිටුව</string>
     <string name="nav_search">සොයන්න</string>
-    <string name="nav_community">ප්‍රජාව</string>
+    <string name="nav_social">සමාජ</string>
     <string name="nav_lost_found">නැතිවූ සහ හමුවූ</string>
     <string name="nav_profile">පැතිකඩ</string>
 
     <!-- Search Screen -->
-    <string name="search_placeholder">බස් මාර්ගයක් (උදා: 138) හෝ බස් අංකයක් සොයන්න</string>
-    <string name="search_prompt">බස් මාර්ග අංකයක් (උදා: 138) හෝ බස් ලියාපදිංචි අංකයක් ටයිප් කරන්න</string>
+    <string name="search_placeholder">බස් මාර්ගයක්/බස් අංකයක්/බස් නැවතුමක් සොයන්න</string>
+    <string name="search_prompt">බස් මාර්ගයක්/බස් අංකයක්/බස් නැවතුමක් සොයන්න</string>
     <string name="search_no_results">ප්‍රතිඵල හමුවූයේ නැත.</string>
     <string name="search_routes">මාර්ග</string>
     <string name="search_buses">බස් රථ</string>

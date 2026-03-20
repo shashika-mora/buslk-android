@@ -32,7 +32,7 @@
     <!-- Navigation -->
     <string name="nav_home">முகப்பு</string>
     <string name="nav_search">தேடு</string>
-    <string name="nav_community">சமூகம்</string>
+    <string name="nav_social">சமூக</string>
     <string name="nav_lost_found">இழந்து &amp; கண்டுபிடித்தது</string>
     <string name="nav_profile">சுயவிவரம்</string>
 
