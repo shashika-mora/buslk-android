@@ -11,7 +11,6 @@ import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
@@ -27,6 +26,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import com.buslk.ui.screens.LoginScreen
 import com.buslk.ui.screens.ProfileScreen
@@ -118,8 +120,8 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
                     it != AppDestinations.TRIP_SCREEN
                 }.forEach {
                     item(
-                        icon = { Icon(it.icon, contentDescription = it.label) },
-                        label = { Text(it.label) },
+                        icon = { Icon(it.icon, contentDescription = stringResource(it.labelResId)) },
+                        label = { Text(stringResource(it.labelResId)) },
                         selected = it == currentDestination,
                         onClick = { currentDestination = it }
                     )
@@ -157,7 +159,7 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
                             onBack = { currentDestination = AppDestinations.HOME }
                         )
                         else -> Greeting(
-                            name = currentDestination.label,
+                            name = stringResource(currentDestination.labelResId),
                             modifier = Modifier
                         )
                     }
@@ -166,22 +168,29 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
         }
     }
 }
+/**
+ * An Enum describing all the physical screens in our app.
+ * Using an Enum prevents spelling mistakes when routing compared to using raw Strings.
+ *
+ * @property labelResId The Android string resource ID displayed under the icon on the nav bar.
+ * @property icon The Material vector icon displayed on the nav bar.
+ */
 
 enum class AppDestinations(
-    val label: String,
+    @StringRes val labelResId: Int,
     val icon: ImageVector,
 ) {
-    OPENING("Opening", Icons.Default.Home),
-    LOGIN("Login", Icons.Default.AccountBox),
-    LANGUAGE_SELECT("Language", Icons.Default.Home),
-    HOME("Home", Icons.Default.Home),
-    SEARCH("Search", Icons.Default.Search),
-    COMMUNITY("Community", Icons.Default.Face),
-    LOST_AND_FOUND("Lost & Found", Icons.AutoMirrored.Filled.List),
-    PROFILE("Profile", Icons.Default.Person),
-    SETTINGS("Settings", Icons.Default.Settings),
-    SCAN_QR("Scan QR", Icons.Default.Home),
-    TRIP_SCREEN("Trip", Icons.Default.Home),
+    OPENING(R.string.nav_home, Icons.Default.Home),
+    LOGIN(R.string.tab_login, Icons.Default.AccountBox),
+    LANGUAGE_SELECT(R.string.select_language, Icons.Default.Home),
+    HOME(R.string.nav_home, Icons.Default.Home),
+    SEARCH(R.string.nav_search, Icons.Default.Search),
+    COMMUNITY(R.string.nav_community, Icons.Default.Face),
+    LOST_AND_FOUND(R.string.nav_lost_found, Icons.AutoMirrored.Filled.List),
+    PROFILE(R.string.nav_profile, Icons.Default.Person),
+    SETTINGS(R.string.nav_settings, Icons.Default.Settings),
+    SCAN_QR(R.string.nav_scan_qr, Icons.Default.Home),
+    TRIP_SCREEN(R.string.nav_trip, Icons.Default.Home),
 }
 
 @Composable
@@ -191,5 +200,13 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
             text = "Hello $name!",
             style = androidx.compose.material3.MaterialTheme.typography.headlineMedium
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    BusLKTheme {
+        Greeting("Android")
     }
 }

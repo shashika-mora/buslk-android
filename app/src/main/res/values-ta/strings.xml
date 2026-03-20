@@ -2,30 +2,48 @@
 <resources>
     <string name="app_name">BusLK</string>
     <string name="select_language">மொழியைத் தேர்ந்தெடுக்கவும்</string>
-    <string name="language_prompt">Select Language / භාෂාව තෝරන්න</string>
+    <string name="language_prompt">භාෂාව තෝරන්න / மொழியைத் தேர்ந்தெடுக்கவும்</string>
     <string name="lang_english">English</string>
     <string name="lang_sinhala">සිංහල</string>
     <string name="lang_tamil">தமிழ்</string>
-    
+
     <!-- Shared -->
-    <string name="back">பின்வாங்கு</string>
+    <string name="back">பின்னே</string>
 
     <!-- Opening Screen -->
     <string name="opening_subtitle">உங்கள் திறமையான பயணத் துணை</string>
     <string name="btn_get_started">தொடங்குங்கள்</string>
-    <string name="opening_footer">பேருந்துகளைக் கண்காணிக்கவும், சிக்கல்களைப் புகாரளிக்கவும், வெகுமதிகளைப் பெறவும்</string>
+    <string name="opening_footer">பேருந்துகளைக் கண்காணிக்கவும், சிக்கல்களைப் புகாரளிக்கவும் மற்றும் வெகுமதிகளைப் பெறவும்</string>
 
     <!-- Login Screen -->
     <string name="welcome_back">மீண்டும் வருக!</string>
-    <string name="create_account">கணக்கை உருவாக்குங்கள்</string>
-    <string name="tab_login">உள்நுழைய</string>
-    <string name="tab_signup">பதிவு செய்க</string>
+    <string name="create_account">கணக்கை உருவாக்கு</string>
+    <string name="tab_login">உள்நுழை</string>
+    <string name="tab_signup">பதிவு செய்</string>
     <string name="continue_with_google">Google உடன் தொடரவும்</string>
     <string name="lbl_or">அல்லது</string>
     <string name="lbl_email">மின்னஞ்சல் முகவரி</string>
     <string name="lbl_password">கடவுச்சொல்</string>
-    <string name="lbl_confirm_password">கடவுச்சொல்லை மீண்டும் உள்ளிடவும்</string>
+    <string name="lbl_confirm_password">கடவுச்சொல்லை உறுதிப்படுத்து</string>
     <string name="btn_forgot_password">கடவுச்சொல் மறந்துவிட்டதா?</string>
     <string name="msg_passwords_not_match">கடவுச்சொற்கள் பொருந்தவில்லை</string>
-    <string name="msg_login_success">வெற்றிகரமாக உள்நுழையப்பட்டது!</string>
+    <string name="msg_login_success">உள்நுழைவு வெற்றிகரம்!</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">முகப்பு</string>
+    <string name="nav_search">தேடு</string>
+    <string name="nav_community">சமூகம்</string>
+    <string name="nav_lost_found">இழந்து &amp; கண்டுபிடித்தது</string>
+    <string name="nav_profile">சுயவிவரம்</string>
+
+    <!-- Search Screen -->
+    <string name="search_placeholder">பஸ் பாதை (உ-ம்: 138) அல்லது பஸ் எண்ணைத் தேடவும்</string>
+    <string name="search_prompt">ஒரு பாதை எண் (உதாரணமாக 138) அல்லது பஸ் பதிவு எண்ணைத் தட்டச்சு செய்க</string>
+    <string name="search_no_results">முடிவுகள் எதுவும் கிடைக்கவில்லை.</string>
+    <string name="search_routes">பாதைகள்</string>
+    <string name="search_buses">பேருந்துகள்</string>
+    <string name="search_runs_on">இயங்கும் பாதை</string>
+    <string name="search_stops">நிறுத்தங்கள்</string>
+    <string name="icon_search">தேடல் ஐகான்</string>
+    <string name="icon_clear">தேடலை அழிக்கவும்</string>
 </resources>

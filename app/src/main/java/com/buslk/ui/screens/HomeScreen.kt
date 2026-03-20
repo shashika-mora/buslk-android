@@ -7,12 +7,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
-import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -28,12 +26,14 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
+import androidx.compose.material3.SearchBar
+import androidx.compose.ui.res.stringResource
+import com.buslk.R
+import androidx.compose.runtime.getValue
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
@@ -45,6 +45,8 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.IconButton
 import com.buslk.ui.theme.BusLKBlue
 import androidx.compose.ui.graphics.Color
+import com.buslk.data.BusDoc
+import com.buslk.data.RouteDoc
 
 /**
  * The main Home Screen Composable containing the interactive Map.
@@ -110,8 +112,8 @@ fun HomeScreen(
                 active = it
                 if (!it) searchViewModel.clearSearch()
             },
-            placeholder = { Text("Search bus route (e.g. 138) or Bus NO") },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search Icon") },
+            placeholder = { Text(stringResource(R.string.search_placeholder)) },
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.icon_search)) },
             trailingIcon = {
                 if (active) {
                     IconButton(onClick = {
@@ -123,7 +125,7 @@ fun HomeScreen(
                             searchViewModel.clearSearch()
                         }
                     }) {
-                        Icon(Icons.Default.Clear, contentDescription = "Clear Search")
+                        Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.icon_clear))
                     }
                 }
             },
@@ -135,11 +137,11 @@ fun HomeScreen(
         ) {
             SearchContent(
                 uiState = searchUiState,
-                onRouteClick = { route ->
+                onRouteClick = { route: RouteDoc ->
                     active = false
                     searchQuery = route.routeId
                 },
-                onBusClick = { bus ->
+                onBusClick = { bus: BusDoc ->
                     active = false
                     searchQuery = bus.registrationNumber
                 }

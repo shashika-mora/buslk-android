@@ -12,6 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.buslk.R
 import com.buslk.data.BusDoc
 import com.buslk.data.RouteDoc
 import com.buslk.ui.search.SearchUiState
@@ -30,7 +32,7 @@ fun SearchContent(
         when (uiState) {
             is SearchUiState.Idle -> {
                 Text(
-                    text = "Type a route number (e.g. 138) or bus registration",
+                    text = stringResource(R.string.search_prompt),
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.align(Alignment.Center)
                 )
@@ -39,7 +41,6 @@ fun SearchContent(
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
             is SearchUiState.Error -> {
-                val errorMessage = uiState.message
                 Column(
                     modifier = Modifier.align(Alignment.Center),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -51,15 +52,13 @@ fun SearchContent(
                         modifier = Modifier.size(48.dp)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = errorMessage, color = MaterialTheme.colorScheme.error)
+                    Text(text = uiState.message, color = MaterialTheme.colorScheme.error)
                 }
             }
             is SearchUiState.Success -> {
-                val routes = uiState.routes
-                val buses = uiState.buses
-                if (routes.isEmpty() && buses.isEmpty()) {
+                if (uiState.routes.isEmpty() && uiState.buses.isEmpty()) {
                     Text(
-                        text = "No results found.",
+                        text = stringResource(R.string.search_no_results),
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.align(Alignment.Center)
                     )
@@ -69,29 +68,29 @@ fun SearchContent(
                         contentPadding = PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        if (routes.isNotEmpty()) {
+                        if (uiState.routes.isNotEmpty()) {
                             item {
                                 Text(
-                                    text = "Routes",
+                                    text = stringResource(R.string.search_routes),
                                     style = MaterialTheme.typography.labelLarge,
                                     color = MaterialTheme.colorScheme.primary
                                 )
                             }
-                            items(items = routes, key = { it.routeId }) { route ->
+                            items(items = uiState.routes, key = { it.routeId }) { route ->
                                 RouteResultCard(route = route, onClick = { onRouteClick(route) })
                             }
                         }
 
-                        if (buses.isNotEmpty()) {
+                        if (uiState.buses.isNotEmpty()) {
                             item {
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    text = "Buses",
+                                    text = stringResource(R.string.search_buses),
                                     style = MaterialTheme.typography.labelLarge,
                                     color = MaterialTheme.colorScheme.primary
                                 )
                             }
-                            items(items = buses, key = { it.registrationNumber }) { bus ->
+                            items(items = uiState.buses, key = { it.registrationNumber }) { bus ->
                                 BusResultCard(bus = bus, onClick = { onBusClick(bus) })
                             }
                         }
@@ -134,7 +133,7 @@ fun RouteResultCard(route: RouteDoc, onClick: () -> Unit) {
             if (route.stops.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "${route.stops.size} Stops",
+                    text = "${route.stops.size} ${stringResource(R.string.search_stops)}",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -163,7 +162,7 @@ fun BusResultCard(bus: BusDoc, onClick: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Runs on Route: ${bus.defaultRouteId}",
+                text = "${stringResource(R.string.search_runs_on)}: ${bus.defaultRouteId}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSecondaryContainer
             )
