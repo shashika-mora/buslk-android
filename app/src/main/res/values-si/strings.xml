@@ -32,7 +32,7 @@
     <!-- Navigation -->
     <string name="nav_home">මුල් පිටුව</string>
     <string name="nav_search">සොයන්න</string>
-    <string name="nav_social">සමාජ</string>
+    <string name="nav_friends">මිතුරන්</string>
     <string name="nav_lost_found">නැතිවූ සහ හමුවූ</string>
     <string name="nav_profile">පැතිකඩ</string>
 

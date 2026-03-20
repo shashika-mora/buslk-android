@@ -10,12 +10,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -65,8 +65,10 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
 
     val profileViewModel: ProfileViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 
-    var currentDestination by rememberSaveable { 
-        mutableStateOf(AppDestinations.HOME) 
+    var currentDestination by rememberSaveable {
+        val startDestination = if (authViewModel.isSignedIn()) AppDestinations.HOME else AppDestinations.OPENING
+        // Check if the saved state is empty (e.g., first launch) and if so, use the startDestination
+        mutableStateOf(startDestination)
     }
     
     var scannedBusId by rememberSaveable {
@@ -193,13 +195,14 @@ enum class AppDestinations(
     LANGUAGE_SELECT(R.string.select_language, Icons.Default.Home),
     HOME(R.string.nav_home, Icons.Default.Home),
     SEARCH(R.string.nav_search, Icons.Default.Search),
-    SOCIAL(R.string.nav_social, Icons.Default.Face),
+    SOCIAL(R.string.nav_friends, Icons.Default.Face),
     LOST_AND_FOUND(R.string.nav_lost_found, Icons.AutoMirrored.Filled.List),
     PROFILE(R.string.nav_profile, Icons.Default.Person),
-    SETTINGS(R.string.nav_settings, Icons.Default.Settings),
+
     SCAN_QR(R.string.nav_scan_qr, Icons.Default.Home),
     TRIP_SCREEN(R.string.nav_trip, Icons.Default.Home),
     FEEDBACK(R.string.nav_feedback, Icons.Default.Star),
+    SETTINGS(R.string.nav_settings, Icons.Default.Settings),
 }
 
 @Composable

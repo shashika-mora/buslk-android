@@ -26,6 +26,7 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun BusLKTheme(
     themeMode: Int = 0, // 0: System, 1: Light, 2: Dark
+    // Disable dynamic color by default to enforce BusLK Blue branding across all Android versions
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
