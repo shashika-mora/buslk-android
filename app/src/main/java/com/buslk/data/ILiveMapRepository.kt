@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
  * Interface defining the contract for accessing live map telemetry data.
  * Adheres to Dependency Inversion Principle.
  */
-interface `ILiveMapRepository.kt` {
+interface ILiveMapRepository {
 
     /**
      * Subscribes to live GPS updates for all active buses.

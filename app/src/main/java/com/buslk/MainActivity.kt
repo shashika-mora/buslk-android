@@ -39,6 +39,9 @@ import com.buslk.ui.viewmodels.ProfileViewModel
 import com.buslk.ui.viewmodels.SettingsViewModel
 import com.buslk.ui.theme.BusLKTheme
 import com.google.firebase.FirebaseApp
+import com.buslk.data.LiveMapRepository
+import com.buslk.ui.viewmodels.MapViewModel
+import com.buslk.ui.viewmodels.MapViewModelFactory
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,6 +67,13 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
     )
 
     val profileViewModel: ProfileViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+
+    // Instantiate Map dependencies
+    val liveMapRepository = androidx.compose.runtime.remember { LiveMapRepository() }
+    val mapViewModel: MapViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+        factory = MapViewModelFactory(liveMapRepository)
+    )
+
 
     var currentDestination by rememberSaveable {
         val startDestination = if (authViewModel.isSignedIn()) AppDestinations.HOME else AppDestinations.OPENING
@@ -137,7 +147,8 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
                 Box(modifier = Modifier.padding(innerPadding)) {
                     when (currentDestination) {
                         AppDestinations.HOME -> com.buslk.ui.screens.HomeScreen(
-                            onScanClick = { currentDestination = AppDestinations.SCAN_QR }
+                            onScanClick = { currentDestination = AppDestinations.SCAN_QR },
+                            mapViewModel = mapViewModel
                         )
                         AppDestinations.SEARCH -> com.buslk.ui.screens.SearchScreen()
 

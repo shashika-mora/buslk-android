@@ -36,6 +36,11 @@ import com.buslk.data.RouteDoc
 import com.buslk.ui.search.SearchViewModel
 import com.buslk.ui.search.SearchViewModelFactory
 import com.buslk.ui.theme.*
+import com.buslk.ui.viewmodels.MapViewModel
+import com.buslk.ui.viewmodels.MapUiState
+import org.osmdroid.views.overlay.Marker
+import androidx.core.content.ContextCompat
+import java.util.Locale
 import com.buslk.utils.OsmMapManager
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -67,12 +72,14 @@ fun getMockBuses(): List<MockBus> = listOf(
 @Composable
 fun HomeScreen(
     onScanClick: () -> Unit,
-    searchViewModel: SearchViewModel = viewModel(factory = SearchViewModelFactory())
+    searchViewModel: SearchViewModel = viewModel(factory = SearchViewModelFactory()),
+    mapViewModel: MapViewModel
 ) {
     val context = LocalContext.current
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
     val searchUiState by searchViewModel.uiState.collectAsState()
+    val mapUiState by mapViewModel.mapState.collectAsState()
     val lifecycleOwner = LocalLifecycleOwner.current
     val mockBuses = getMockBuses()
 
@@ -221,12 +228,49 @@ fun HomeScreen(
                 factory = {
                     mapView.apply {
                         setTileSource(TileSourceFactory.MAPNIK)
-                        controller.setZoom(15.0)
-                        controller.setCenter(GeoPoint(6.9271, 79.8612))
+                        controller.setZoom(14.0)
+                        controller.setCenter(GeoPoint(6.9271, 79.8612)) // Center on Colombo
                         setMultiTouchControls(true)
                         setLayerType(View.LAYER_TYPE_HARDWARE, null)
                         isTilesScaledToDpi = true
                         zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
+                    }
+                },
+                update = { view ->
+                    if (mapUiState is MapUiState.Success) {
+                        val allBuses = (mapUiState as MapUiState.Success).activeBuses
+
+                        // Filter Logic: If searchQuery is active, strictly show matching buses
+                        val filteredBuses = if (searchQuery.isNotBlank()) {
+                            val lowerQuery = searchQuery.lowercase(Locale.getDefault())
+                            allBuses.filter { bus ->
+                                bus.routeId.lowercase(Locale.getDefault()) == lowerQuery ||
+                                        bus.busId.lowercase(Locale.getDefault()).contains(lowerQuery)
+                            }
+                        } else {
+                            allBuses // Show all if search is empty
+                        }
+
+                        // Clear existing markers to prevent ghost trails
+                        view.overlays.clear()
+
+                        // Cache the custom red marker drawable to avoid reading disk inside the loop
+                        val redBusIcon = ContextCompat.getDrawable(context, R.drawable.ic_bus_marker_red)
+
+                        filteredBuses.forEach { bus ->
+                            val marker = Marker(view).apply {
+                                position = GeoPoint(bus.lat, bus.lng)
+                                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                                rotation = bus.heading
+                                title = "Reg: ${bus.busId} | Crowd: ${bus.crowdLevel}"
+                                subDescription = "Speed: ${bus.speed} km/h | Route: ${bus.routeId}"
+                                icon = redBusIcon  // Apply the custom red Material Vector Graphic
+                            }
+                            view.overlays.add(marker)
+                        }
+
+                        // Force OSM to redraw the canvas with the new pins
+                        view.invalidate()
                     }
                 },
                 modifier = Modifier.fillMaxSize()
