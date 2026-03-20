@@ -139,6 +139,8 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
                         AppDestinations.HOME -> com.buslk.ui.screens.HomeScreen(
                             onScanClick = { currentDestination = AppDestinations.SCAN_QR }
                         )
+                        AppDestinations.SEARCH -> com.buslk.ui.screens.SearchScreen()
+
                         AppDestinations.PROFILE -> ProfileScreen(
                             authViewModel = authViewModel,
                             profileViewModel = profileViewModel,
