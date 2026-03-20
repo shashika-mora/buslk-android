@@ -1,61 +1,65 @@
-package com.buslk.ui.screens
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LostAndFoundScreen() {
+    var selectedTabIndex by remember { mutableStateOf(0) }
+    val tabs = listOf("All (6)", "Found (4)", "Lost (2)")
 
-// --- Mock Data ---
-data class LostFoundItem(
-    val id: String,
-    val title: String,
-    val description: String,
-    val route: String,
-    val location: String,
-    val timeAgo: String,
-    val reporterName: String,
-    val isFound: Boolean,
-    val isClosed: Boolean
-)
+    val displayedItems = when (selectedTabIndex) {
+        1 -> mockLostFoundItems.filter { it.isFound }
+        2 -> mockLostFoundItems.filter { !it.isFound }
+        else -> mockLostFoundItems
+    }
 
-val mockLostFoundItems = listOf(
-    LostFoundItem(
-        id = "1",
-        title = "Black Backpack",
-        description = "Small black backpack with laptop inside. Found near seat 12A.",
-        route = "Route 138",
-        location = "Seat 12A",
-        timeAgo = "15 min ago",
-        reporterName = "Amal P.",
-        isFound = true,
-        isClosed = false
-    ),
-    LostFoundItem(
-        id = "2",
-        title = "Phone Charger",
-        description = "White iPhone charger cable with adapter",
-        route = "Route 176",
-        location = "Back seat area",
-        timeAgo = "1 hour ago",
-        reporterName = "Priya S.",
-        isFound = false,
-        isClosed = false
-    ),
-    LostFoundItem(
-        id = "3",
-        title = "Water Bottle",
-        description = "Blue metal water bottle with university stickers",
-        route = "Route 138",
-        location = "Front rows",
-        timeAgo = "3 hours ago",
-        reporterName = "Kamal F.",
-        isFound = true,
-        isClosed = true
-    ),
-    LostFoundItem(
-        id = "4",
-        title = "Umbrella",
-        description = "Black folding umbrella, brand new",
-        route = "Route 120",
-        location = "Luggage rack",
-        timeAgo = "Yesterday",
-        reporterName = "Saman D.",
-        isFound = false,
-        isClosed = false
-    )
-)
+    Scaffold(containerColor = Color.White) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            Surface(color = FriendsPurple, modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Outlined.Search, contentDescription = "Lost and Found Icon", tint = Color.White, modifier = Modifier.size(24.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Lost & Found", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    var text by remember { mutableStateOf("") }
+                    OutlinedTextField(
+                        value = text,
+                        onValueChange = { text = it },
+                        placeholder = { Text("Search items...", color = Color.White.copy(alpha = 0.7f)) },
+                        leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = null, tint = Color.White.copy(alpha = 0.7f)) },
+                        modifier = Modifier.fillMaxWidth().height(52.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    val routes = listOf("All Routes", "Route 138", "Route 176", "Route 120", "Route 177")
+                    var selectedRoute by remember { mutableStateOf("All Routes") }
+
+                    Row(modifier = Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        routes.forEach { route ->
+                            val isSelected = route == selectedRoute
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = if (isSelected) Color.White else RoutePillActive,
+                                modifier = Modifier.clickable { selectedRoute = route }
+                            ) {
+                                Text(
+                                    text = route,
+                                    color = if (isSelected) FriendsPurple else Color.White,
+                                    fontWeight = FontWeight.Medium,
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
