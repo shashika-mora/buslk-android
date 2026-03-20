@@ -49,7 +49,8 @@ class ProfileViewModel : ViewModel() {
                     ),
                     tripHistory = listOf(
                         TripDoc(
-                            id = "1", 
+                            tripId = "1",
+                            userId = uid,
                             routeId = "138-homagama", 
                             busId = "NB-5521", 
                             startLocationName = "Maharagama", 
@@ -61,7 +62,8 @@ class ProfileViewModel : ViewModel() {
                             startTime = Timestamp(Date())
                         ),
                         TripDoc(
-                            id = "2", 
+                            tripId = "2",
+                            userId = uid,
                             routeId = "120-fort", 
                             busId = "LY-8842", 
                             startLocationName = "Piliyandala", 

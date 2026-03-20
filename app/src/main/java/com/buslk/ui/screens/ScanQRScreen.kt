@@ -13,7 +13,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.buslk.ui.map.QRScanner
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
+import com.buslk.data.TripDoc
 
 @Composable
 fun ScanQRScreen(
@@ -26,16 +27,17 @@ fun ScanQRScreen(
         // Passenger-as-a-Sensor: Real-time Database Check-in
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
-            val database = FirebaseDatabase.getInstance()
-            val tripRef = database.getReference("trips").child(userId)
+            val db = FirebaseFirestore.getInstance()
+            val tripRef = db.collection("trips").document() // auto-generate ID
 
-            val tripData = mapOf(
-                "busId" to busId,
-                "startTime" to System.currentTimeMillis(),
-                "status" to "active"
+            val tripData = TripDoc(
+                tripId = tripRef.id,
+                userId = userId,
+                busId = busId,
+                status = "ACTIVE"
             )
 
-            tripRef.setValue(tripData)
+            tripRef.set(tripData)
                 .addOnSuccessListener {
                     Toast.makeText(context, "Checked-in to Bus: $busId", Toast.LENGTH_SHORT).show()
                     onCheckInSuccess(busId)
