@@ -16,17 +16,24 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.buslk.ui.theme.*
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TripScreen(
     busId: String,
+    onEndTrip: () -> Unit,
     onBack: () -> Unit
 ) {
+    val context = LocalContext.current
+    var reportedCrowdLevel by remember { mutableStateOf<String?>(null) }
+
     // For now, mapping busId to a route or using mock "Route 138"
     val routeName = if (busId.contains("138")) "Route 138" else "Route 138" // Defaulting to 138 as per screenshot
     
@@ -128,7 +135,7 @@ fun TripScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Button(
-                        onClick = onBack,
+                        onClick = onEndTrip,
                         colors = ButtonDefaults.buttonColors(containerColor = UnreadRed),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -175,9 +182,41 @@ fun TripScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        CrowdReportButton("Low", Icons.Outlined.Groups, Modifier.weight(1f))
-                        CrowdReportButton("Medium", Icons.Outlined.Groups, Modifier.weight(1f))
-                        CrowdReportButton("High", Icons.Outlined.Groups, Modifier.weight(1f))
+                        val handleReport: (String) -> Unit = { level ->
+                            if (reportedCrowdLevel == null) {
+                                reportedCrowdLevel = level
+                                addPointsForReport()
+                            }
+                        }
+
+                        CrowdReportButton(
+                            label = "Low", 
+                            icon = Icons.Outlined.Groups, 
+                            isSelected = reportedCrowdLevel == "Low",
+                            modifier = Modifier.weight(1f),
+                            onClick = { handleReport("Low") }
+                        )
+                        CrowdReportButton(
+                            label = "Medium", 
+                            icon = Icons.Outlined.Groups, 
+                            isSelected = reportedCrowdLevel == "Medium",
+                            modifier = Modifier.weight(1f),
+                            onClick = { handleReport("Medium") }
+                        )
+                        CrowdReportButton(
+                            label = "High", 
+                            icon = Icons.Outlined.Groups, 
+                            isSelected = reportedCrowdLevel == "High",
+                            modifier = Modifier.weight(1f),
+                            onClick = { handleReport("High") }
+                        )
+                    }
+
+                    if (reportedCrowdLevel != null) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                            Text("✓ Crowd level reported! +5 points", color = PositiveGreen, fontSize = 12.sp)
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
@@ -199,23 +238,48 @@ fun TripScreen(
 }
 
 @Composable
-fun CrowdReportButton(label: String, icon: androidx.compose.ui.graphics.vector.ImageVector, modifier: Modifier = Modifier) {
+fun CrowdReportButton(
+    label: String, 
+    icon: androidx.compose.ui.graphics.vector.ImageVector, 
+    isSelected: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    val backgroundColor = if (isSelected) Color(0xFF1F2232) else Color.White
+    val contentColor = if (isSelected) Color.White else Color.Gray
+
     Surface(
         shape = RoundedCornerShape(12.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f)),
-        color = Color.White,
+        border = if (isSelected) null else androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f)),
+        color = backgroundColor,
         modifier = modifier
             .height(48.dp)
-            .clickable { /* Handle report */ }
+            .clickable { onClick() }
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier.padding(horizontal = 8.dp)
         ) {
-            Icon(icon, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.Gray)
+            Icon(icon, contentDescription = null, modifier = Modifier.size(16.dp), tint = contentColor)
             Spacer(modifier = Modifier.width(4.dp))
-            Text(label, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+            Text(label, color = contentColor, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+        }
+    }
+}
+
+private fun addPointsForReport() {
+    val userId = FirebaseAuth.getInstance().currentUser?.uid
+    if (userId != null) {
+        val db = FirebaseFirestore.getInstance()
+        val userRef = db.collection("users").document(userId)
+
+        db.runTransaction { transaction ->
+            val snapshot = transaction.get(userRef)
+            val currentPoints = snapshot.getLong("points") ?: 0
+            transaction.update(userRef, "points", currentPoints + 5)
+        }.addOnFailureListener {
+            // Optional: Handle failure or log
         }
     }
 }

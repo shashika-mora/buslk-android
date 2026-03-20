@@ -11,9 +11,11 @@ import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -117,7 +119,8 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
                     it != AppDestinations.LANGUAGE_SELECT &&
                     it != AppDestinations.SETTINGS &&
                     it != AppDestinations.SCAN_QR &&
-                    it != AppDestinations.TRIP_SCREEN
+                    it != AppDestinations.TRIP_SCREEN &&
+                    it != AppDestinations.FEEDBACK
                 }.forEach {
                     item(
                         icon = { Icon(it.icon, contentDescription = stringResource(it.labelResId)) },
@@ -156,7 +159,12 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
                         )
                         AppDestinations.TRIP_SCREEN -> com.buslk.ui.screens.TripScreen(
                             busId = scannedBusId,
+                            onEndTrip = { currentDestination = AppDestinations.FEEDBACK },
                             onBack = { currentDestination = AppDestinations.HOME }
+                        )
+                        AppDestinations.FEEDBACK -> com.buslk.ui.screens.FeedbackScreen(
+                            busId = scannedBusId,
+                            onBackToHome = { currentDestination = AppDestinations.HOME }
                         )
                         else -> Greeting(
                             name = stringResource(currentDestination.labelResId),
@@ -191,6 +199,7 @@ enum class AppDestinations(
     SETTINGS(R.string.nav_settings, Icons.Default.Settings),
     SCAN_QR(R.string.nav_scan_qr, Icons.Default.Home),
     TRIP_SCREEN(R.string.nav_trip, Icons.Default.Home),
+    FEEDBACK(R.string.nav_feedback, Icons.Default.Star),
 }
 
 @Composable

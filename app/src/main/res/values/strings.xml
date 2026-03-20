@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">BusLK</string>
     <string name="select_language">Select Language</string>
-    <string name="language_prompt">භාෂාව තෝරන්න / மொழியැத் தேர்ந்தெடுக்கவும்</string>
+    <string name="language_prompt">භාෂාව තෝරන්න / மொழියැත් தேர்ந்தெடுக்கவும்</string>
     <string name="lang_english">English</string>
     <string name="lang_sinhala">සිංහල (Sinhala)</string>
     <string name="lang_tamil">தமிழ் (Tamil)</string>
@@ -39,6 +39,7 @@
     <string name="nav_settings">Settings</string>
     <string name="nav_scan_qr">Scan QR</string>
     <string name="nav_trip">Trip</string>
+    <string name="nav_feedback">Feedback</string>
 
     <!-- Search Screen -->
     <string name="search_placeholder">Search bus route (e.g. 138) or Bus NO</string>
