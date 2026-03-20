@@ -1,65 +1,36 @@
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun LostAndFoundScreen() {
-    var selectedTabIndex by remember { mutableStateOf(0) }
-    val tabs = listOf("All (6)", "Found (4)", "Lost (2)")
+// Inside LostAndFoundScreen Column, after route filters
 
-    val displayedItems = when (selectedTabIndex) {
-        1 -> mockLostFoundItems.filter { it.isFound }
-        2 -> mockLostFoundItems.filter { !it.isFound }
-        else -> mockLostFoundItems
+// Post New Item Button
+Surface(modifier = Modifier.padding(16.dp), shape = RoundedCornerShape(8.dp), color = Color.Transparent) {
+    Button(
+        onClick = { /* TODO */ },
+        modifier = Modifier.fillMaxWidth().height(48.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = OpenGreen),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Icon(Icons.Default.CameraAlt, contentDescription = null, modifier = Modifier.size(18.dp))
+        Spacer(modifier = Modifier.width(8.dp))
+        Text("Post New Item", fontSize = 16.sp, fontWeight = FontWeight.Bold)
     }
+}
 
-    Scaffold(containerColor = Color.White) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+// Tabs
+TabRow(
+selectedTabIndex = selectedTabIndex,
+containerColor = Color(0xFFF5F6FA),
+contentColor = Color.Black,
+divider = {},
+indicator = { tabPositions -> TabRowDefaults.Indicator(modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]), color = Color.Transparent) },
+modifier = Modifier.padding(horizontal = 16.dp).clip(RoundedCornerShape(24.dp))
+) {
+    tabs.forEachIndexed { index, title ->
+        val selected = selectedTabIndex == index
+        Tab(
+            selected = selected,
+            onClick = { selectedTabIndex = index },
+            modifier = Modifier.background(if (selected) Color.White else Color.Transparent).clip(RoundedCornerShape(50))
         ) {
-            Surface(color = FriendsPurple, modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Outlined.Search, contentDescription = "Lost and Found Icon", tint = Color.White, modifier = Modifier.size(24.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Lost & Found", color = Color.White, fontWeight = FontWeight.Bold)
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    var text by remember { mutableStateOf("") }
-                    OutlinedTextField(
-                        value = text,
-                        onValueChange = { text = it },
-                        placeholder = { Text("Search items...", color = Color.White.copy(alpha = 0.7f)) },
-                        leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = null, tint = Color.White.copy(alpha = 0.7f)) },
-                        modifier = Modifier.fillMaxWidth().height(52.dp),
-                        shape = RoundedCornerShape(12.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    val routes = listOf("All Routes", "Route 138", "Route 176", "Route 120", "Route 177")
-                    var selectedRoute by remember { mutableStateOf("All Routes") }
-
-                    Row(modifier = Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        routes.forEach { route ->
-                            val isSelected = route == selectedRoute
-                            Surface(
-                                shape = RoundedCornerShape(8.dp),
-                                color = if (isSelected) Color.White else RoutePillActive,
-                                modifier = Modifier.clickable { selectedRoute = route }
-                            ) {
-                                Text(
-                                    text = route,
-                                    color = if (isSelected) FriendsPurple else Color.White,
-                                    fontWeight = FontWeight.Medium,
-                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-                                )
-                            }
-                        }
-                    }
-                }
-            }
+            Text(text = title, modifier = Modifier.padding(vertical = 12.dp), fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal, fontSize = 14.sp)
         }
     }
 }
