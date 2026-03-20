@@ -194,34 +194,37 @@ fun FeedbackScreen(
                         Text("Tell us more (optional)", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        val tags = listOf(
-                            "✨ Clean Bus", "🛋️ Comfortable", "⏰ On Time", "🛡️ Safe Driving",
-                            "😃 Friendly Staff", "👥 Too Crowded", "⏱️ Delayed", "⚠️ Rough Driving"
+                        val chunkedTags = listOf(
+                            listOf("✨ Clean Bus", "🛋️ Comfortable", "⏰ On Time"),
+                            listOf("🛡️ Safe Driving", "😃 Friendly Staff", "👥 Too Crowded"),
+                            listOf("⏱️ Delayed", "⚠️ Rough Driving")
                         )
                         
-                        @OptIn(ExperimentalLayoutApi::class)
-                        FlowRow(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            tags.forEach { tag ->
-                                val isSelected = selectedTags.contains(tag)
-                                Surface(
-                                    shape = RoundedCornerShape(8.dp),
-                                    border = androidx.compose.foundation.BorderStroke(1.dp, if (isSelected) BusLKBlue else Color.LightGray.copy(alpha = 0.5f)),
-                                    color = if (isSelected) BusLKBlue.copy(alpha = 0.1f) else Color.White,
-                                    modifier = Modifier.clickable {
-                                        if (isSelected) selectedTags.remove(tag) else selectedTags.add(tag)
-                                    }
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                            chunkedTags.forEach { rowTags ->
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    Text(
-                                        text = tag,
-                                        fontSize = 12.sp,
-                                        fontWeight = FontWeight.Medium,
-                                        color = if (isSelected) BusLKBlue else Color.DarkGray,
-                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
-                                    )
+                                    rowTags.forEach { tag ->
+                                        val isSelected = selectedTags.contains(tag)
+                                        Surface(
+                                            shape = RoundedCornerShape(8.dp),
+                                            border = androidx.compose.foundation.BorderStroke(1.dp, if (isSelected) BusLKBlue else Color.LightGray.copy(alpha = 0.5f)),
+                                            color = if (isSelected) BusLKBlue.copy(alpha = 0.1f) else Color.White,
+                                            modifier = Modifier.clickable {
+                                                if (isSelected) selectedTags.remove(tag) else selectedTags.add(tag)
+                                            }
+                                        ) {
+                                            Text(
+                                                text = tag,
+                                                fontSize = 12.sp,
+                                                fontWeight = FontWeight.Medium,
+                                                color = if (isSelected) BusLKBlue else Color.DarkGray,
+                                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }
