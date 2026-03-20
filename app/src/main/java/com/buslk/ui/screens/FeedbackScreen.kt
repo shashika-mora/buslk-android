@@ -123,12 +123,12 @@ fun FeedbackScreen(
             }
         }
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-        ) {
+        Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+            ) {
             // --- Blue Header ---
             Surface(
                 color = BusLKBlue,
@@ -279,6 +279,7 @@ fun FeedbackScreen(
                 }
             }
         }
+    }
     }
 }
 
