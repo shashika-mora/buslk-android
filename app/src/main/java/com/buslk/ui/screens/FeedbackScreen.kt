@@ -161,6 +161,20 @@ fun FeedbackScreen(
                         Text("Overall Experience", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         Spacer(modifier = Modifier.height(16.dp))
                         RatingStars(currentRating = overallRating, onRatingChanged = { overallRating = it }, starSize = 48.dp)
+                        
+                        val ratingText = when (overallRating) {
+                            1 -> "😔 Needs improvement"
+                            2 -> "😐 Could be better"
+                            3 -> "👍 Good"
+                            4 -> "😊 Great!"
+                            5 -> "🌟 Excellent!"
+                            else -> null
+                        }
+                        
+                        if (ratingText != null) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(ratingText, color = Color.Gray, fontSize = 14.sp)
+                        }
                     }
                 }
 
