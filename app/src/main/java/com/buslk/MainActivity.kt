@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.List
