@@ -1,60 +1,70 @@
 package com.buslk.ui.screens
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
+import android.preference.PreferenceManager
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import android.widget.Toast
-import androidx.compose.material.icons.filled.QrCodeScanner
-
-// Project Specific Imports (Ensure your folder is named 'map')
-import com.buslk.utils.OsmMapManager
-import com.buslk.ui.map.QRScanner
-
-// OSMDroid Imports
+import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 
-// Firebase Imports
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import com.buslk.utils.OsmMapManager
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.Text
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.buslk.ui.search.SearchViewModel
+import com.buslk.ui.search.SearchViewModelFactory
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.IconButton
+import com.buslk.ui.theme.BusLKBlue
+import androidx.compose.ui.graphics.Color
 
 /**
  * The main Home Screen Composable containing the interactive Map.
- * 
- * OOD Principle: UI as a Function of State.
- * This function defines *what* the screen looks like. It delegates the complex
- * map initialization to the [OsmMapManager.kt'] Singleton, keeping this function focused solely on rendering.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(onScanClick: () -> Unit = {}) {
+fun HomeScreen(
+    onScanClick: () -> Unit,
+    searchViewModel: SearchViewModel = viewModel(factory = SearchViewModelFactory())
+) {
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
-
-    // --- UI STATE ---
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
+    val searchUiState by searchViewModel.uiState.collectAsState()
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    // Initialize Map Configuration
     OsmMapManager.initialize(context)
-
-    // Maintain the MapView instance across recompositions
     val mapView = remember { MapView(context) }
 
-    // Sync MapView with Android OS Lifecycle (Performance Optimization)
     DisposableEffect(lifecycleOwner, mapView) {
         val lifecycleObserver = LifecycleEventObserver { _, event ->
             when (event) {
@@ -71,57 +81,89 @@ fun HomeScreen(onScanClick: () -> Unit = {}) {
         }
     }
 
-    // --- UI LAYOUT (Z-Index Layering) ---
     Box(modifier = Modifier.fillMaxSize()) {
-
-        // LAYER 1: The Interactive Map
         AndroidView(
             factory = {
                 mapView.apply {
                     setTileSource(TileSourceFactory.MAPNIK)
                     controller.setZoom(15.0)
-                    controller.setCenter(GeoPoint(6.9271, 79.8612)) // Colombo
+                    controller.setCenter(GeoPoint(6.9271, 79.8612))
                     setMultiTouchControls(true)
-
-                    // Hardware acceleration for smoother panning on your Lenovo LOQ
                     setLayerType(android.view.View.LAYER_TYPE_HARDWARE, null)
                     isTilesScaledToDpi = true
                     zoomController.setVisibility(org.osmdroid.views.CustomZoomButtonsController.Visibility.NEVER)
                 }
             },
-            update = { /* Real-time bus markers will be updated here later */ },
             modifier = Modifier.fillMaxSize()
         )
 
-        // LAYER 2: Floating Search Bar (Top)
         SearchBar(
             query = searchQuery,
-            onQueryChange = { searchQuery = it },
-            onSearch = { active = false },
+            onQueryChange = {
+                searchQuery = it
+                searchViewModel.performSearch(it)
+            },
+            onSearch = {
+                searchViewModel.performSearch(it)
+            },
             active = active,
-            onActiveChange = { active = it },
-            placeholder = { Text("Search bus route (e.g. 138)") },
+            onActiveChange = {
+                active = it
+                if (!it) searchViewModel.clearSearch()
+            },
+            placeholder = { Text("Search bus route (e.g. 138) or Bus NO") },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search Icon") },
+            trailingIcon = {
+                if (active) {
+                    IconButton(onClick = {
+                        if (searchQuery.isNotEmpty()) {
+                            searchQuery = ""
+                            searchViewModel.clearSearch()
+                        } else {
+                            active = false
+                            searchViewModel.clearSearch()
+                        }
+                    }) {
+                        Icon(Icons.Default.Clear, contentDescription = "Clear Search")
+                    }
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 24.dp)
+                .padding(horizontal = if (active) 0.dp else 16.dp, vertical = if (active) 0.dp else 24.dp)
                 .align(Alignment.TopCenter),
-            shape = RoundedCornerShape(100.dp)
+            shape = RoundedCornerShape(if (active) 0.dp else 100.dp)
         ) {
-            // Suggestion logic can be added here
+            SearchContent(
+                uiState = searchUiState,
+                onRouteClick = { route ->
+                    active = false
+                    searchQuery = route.routeId
+                },
+                onBusClick = { bus ->
+                    active = false
+                    searchQuery = bus.registrationNumber
+                }
+            )
         }
 
-        // LAYER 3: QR Scanner Toggle (Bottom)
-        FloatingActionButton(
-            onClick = onScanClick,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 40.dp),
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-        ) {
-            Icon(Icons.Default.QrCodeScanner, contentDescription = "Scan QR")
+        // Floating Action Button for QR Scanning
+        if (!active) {
+            FloatingActionButton(
+                onClick = onScanClick,
+                containerColor = BusLKBlue,
+                contentColor = Color.White,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp)
+                    .padding(bottom = 16.dp) // Extra padding to stay above nav bar
+            ) {
+                Icon(
+                    imageVector = Icons.Default.QrCodeScanner,
+                    contentDescription = "Scan QR Code",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
-
     }
 }

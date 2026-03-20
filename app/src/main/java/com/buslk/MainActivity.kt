@@ -9,8 +9,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -64,6 +68,10 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
 
     var currentDestination by rememberSaveable { 
         mutableStateOf(AppDestinations.HOME) 
+    }
+    
+    var scannedBusId by rememberSaveable {
+        mutableStateOf("")
     }
 
     if (currentDestination == AppDestinations.OPENING) {
@@ -143,10 +151,14 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
                             onLogoutSuccess = { currentDestination = AppDestinations.LOGIN }
                         )
                         AppDestinations.SCAN_QR -> com.buslk.ui.screens.ScanQRScreen(
-                            onCheckInSuccess = { _ -> currentDestination = AppDestinations.TRIP_SCREEN },
+                            onCheckInSuccess = { busId -> 
+                                scannedBusId = busId
+                                currentDestination = AppDestinations.TRIP_SCREEN 
+                            },
                             onBack = { currentDestination = AppDestinations.HOME }
                         )
                         AppDestinations.TRIP_SCREEN -> com.buslk.ui.screens.TripScreen(
+                            busId = scannedBusId,
                             onBack = { currentDestination = AppDestinations.HOME }
                         )
                         else -> Greeting(

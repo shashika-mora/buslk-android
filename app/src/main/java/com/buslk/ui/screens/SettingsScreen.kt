@@ -1,5 +1,6 @@
 package com.buslk.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -33,6 +35,76 @@ fun SettingsScreen(
     settingsViewModel: SettingsViewModel,
     onLogoutSuccess: () -> Unit
 ) {
+    val context = LocalContext.current
+    var showEditProfileDialog by remember { mutableStateOf(false) }
+    var showChangePasswordDialog by remember { mutableStateOf(false) }
+
+    if (showEditProfileDialog) {
+        var newName by remember { mutableStateOf("") }
+        AlertDialog(
+            onDismissRequest = { showEditProfileDialog = false },
+            title = { Text(stringResource(R.string.dialog_edit_profile_title)) },
+            text = {
+                OutlinedTextField(
+                    value = newName,
+                    onValueChange = { newName = it },
+                    label = { Text(stringResource(R.string.lbl_new_name)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    authViewModel.updateDisplayName(newName) { result ->
+                        if (result.isSuccess) {
+                            Toast.makeText(context, context.getString(R.string.msg_profile_updated), Toast.LENGTH_SHORT).show()
+                            showEditProfileDialog = false
+                        }
+                    }
+                }) {
+                    Text(stringResource(R.string.action_save))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showEditProfileDialog = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            }
+        )
+    }
+
+    if (showChangePasswordDialog) {
+        var newPassword by remember { mutableStateOf("") }
+        AlertDialog(
+            onDismissRequest = { showChangePasswordDialog = false },
+            title = { Text(stringResource(R.string.dialog_change_password_title)) },
+            text = {
+                OutlinedTextField(
+                    value = newPassword,
+                    onValueChange = { newPassword = it },
+                    label = { Text(stringResource(R.string.lbl_new_password)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    authViewModel.changePassword(newPassword) { result ->
+                        if (result.isSuccess) {
+                            Toast.makeText(context, context.getString(R.string.msg_password_changed), Toast.LENGTH_SHORT).show()
+                            showChangePasswordDialog = false
+                        }
+                    }
+                }) {
+                    Text(stringResource(R.string.action_save))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showChangePasswordDialog = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -59,9 +131,17 @@ fun SettingsScreen(
             // --- Account Control ---
             item {
                 SettingsSection(title = stringResource(R.string.settings_account_control)) {
-                    SettingsRow(icon = Icons.Outlined.Person, title = stringResource(R.string.settings_edit_profile), onClick = {})
+                    SettingsRow(
+                        icon = Icons.Outlined.Person, 
+                        title = stringResource(R.string.settings_edit_profile), 
+                        onClick = { showEditProfileDialog = true }
+                    )
                     HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
-                    SettingsRow(icon = Icons.Outlined.Lock, title = stringResource(R.string.settings_change_password), onClick = {})
+                    SettingsRow(
+                        icon = Icons.Outlined.Lock, 
+                        title = stringResource(R.string.settings_change_password), 
+                        onClick = { showChangePasswordDialog = true }
+                    )
                 }
             }
 
