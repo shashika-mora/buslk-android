@@ -28,6 +28,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 @Composable
 fun TripScreen(
     busId: String,
+    onEndTrip: () -> Unit,
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
@@ -134,7 +135,7 @@ fun TripScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Button(
-                        onClick = onBack,
+                        onClick = onEndTrip,
                         colors = ButtonDefaults.buttonColors(containerColor = UnreadRed),
                         modifier = Modifier
                             .fillMaxWidth()

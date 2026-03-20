@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -115,7 +116,8 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
                     it != AppDestinations.LANGUAGE_SELECT &&
                     it != AppDestinations.SETTINGS &&
                     it != AppDestinations.SCAN_QR &&
-                    it != AppDestinations.TRIP_SCREEN
+                    it != AppDestinations.TRIP_SCREEN &&
+                    it != AppDestinations.FEEDBACK
                 }.forEach {
                     item(
                         icon = { Icon(it.icon, contentDescription = it.label) },
@@ -154,7 +156,12 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
                         )
                         AppDestinations.TRIP_SCREEN -> com.buslk.ui.screens.TripScreen(
                             busId = scannedBusId,
+                            onEndTrip = { currentDestination = AppDestinations.FEEDBACK },
                             onBack = { currentDestination = AppDestinations.HOME }
+                        )
+                        AppDestinations.FEEDBACK -> com.buslk.ui.screens.FeedbackScreen(
+                            busId = scannedBusId,
+                            onBackToHome = { currentDestination = AppDestinations.HOME }
                         )
                         else -> Greeting(
                             name = currentDestination.label,
@@ -182,6 +189,7 @@ enum class AppDestinations(
     SETTINGS("Settings", Icons.Default.Settings),
     SCAN_QR("Scan QR", Icons.Default.Home),
     TRIP_SCREEN("Trip", Icons.Default.Home),
+    FEEDBACK("Feedback", Icons.Default.Star),
 }
 
 @Composable
