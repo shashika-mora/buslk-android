@@ -1,6 +1,5 @@
 package com.buslk.ui.screens
 
-import android.preference.PreferenceManager
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -14,7 +13,7 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.buslk.utils.OsmMapManager
@@ -96,7 +95,7 @@ fun HomeScreen(
             },
             modifier = Modifier.fillMaxSize()
         )
-
+        @Suppress("DEPRECATION")
         SearchBar(
             query = searchQuery,
             onQueryChange = {
