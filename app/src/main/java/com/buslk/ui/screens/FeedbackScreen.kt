@@ -125,8 +125,8 @@ fun FeedbackScreen(
     ) { paddingValues ->
         Column(
             modifier = Modifier
-                .fillMaxSize()
                 .padding(paddingValues)
+                .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
             // --- Blue Header ---
