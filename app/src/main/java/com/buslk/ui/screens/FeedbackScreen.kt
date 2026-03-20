@@ -21,7 +21,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.buslk.data.FeedbackDoc
 import com.buslk.ui.theme.BusLKBlue
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,6 +32,7 @@ fun FeedbackScreen(
     busId: String,
     onBackToHome: () -> Unit
 ) {
+    val context = LocalContext.current
     var overallRating by remember { mutableStateOf(0) }
     var cleanlinessRating by remember { mutableStateOf(0) }
     var comfortRating by remember { mutableStateOf(0) }
@@ -51,7 +55,42 @@ fun FeedbackScreen(
                     Button(
                         onClick = {
                             if (isSubmitEnabled) {
-                                // TODO: Submit logic
+                                val uid = FirebaseAuth.getInstance().currentUser?.uid
+                                if (uid != null) {
+                                    val db = FirebaseFirestore.getInstance()
+                                    val feedbackRef = db.collection("feedbacks").document()
+                                    val ratingsMap = mapOf(
+                                        "overall" to overallRating,
+                                        "cleanliness" to cleanlinessRating,
+                                        "comfort" to comfortRating,
+                                        "driver" to driverRating
+                                    )
+                                    
+                                    val newFeedback = FeedbackDoc(
+                                        id = feedbackRef.id,
+                                        busId = busId,
+                                        routeId = routeName,
+                                        comment = comment,
+                                        ratings = ratingsMap,
+                                        tags = selectedTags.toList(),
+                                        timestamp = com.google.firebase.Timestamp.now()
+                                    )
+                                    
+                                    db.runTransaction { transaction ->
+                                        transaction.set(feedbackRef, newFeedback)
+                                        val userRef = db.collection("users").document(uid)
+                                        val snapshot = transaction.get(userRef)
+                                        val currentPoints = snapshot.getLong("points") ?: 0
+                                        transaction.update(userRef, "points", currentPoints + 15)
+                                    }.addOnSuccessListener {
+                                        Toast.makeText(context, "Feedback submitted! +15 points", Toast.LENGTH_SHORT).show()
+                                        onBackToHome()
+                                    }.addOnFailureListener {
+                                        Toast.makeText(context, "Failed to submit feedback", Toast.LENGTH_SHORT).show()
+                                    }
+                                } else {
+                                    onBackToHome()
+                                }
                             }
                         },
                         colors = ButtonDefaults.buttonColors(
