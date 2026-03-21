@@ -125,17 +125,18 @@ class AuthViewModel(
      * @param email The raw email text from the UI.
      * @param pass The raw password text from the UI.
      */
-    fun signUpWithEmailAndPassword(email: String, pass: String) {
+    fun signUpWithEmailAndPassword(email: String, pass: String, username: String) {
         if (_uiState.value is AuthUiState.Loading) return
 
         val trimmedEmail = email.trim()
         val trimmedPass = pass.trim()
+        val trimmedUsername = username.trim()
 
-        if (!validateInputs(trimmedEmail, trimmedPass)) return
+        if (!validateInputs(trimmedEmail, trimmedPass, trimmedUsername)) return
 
         _uiState.value = AuthUiState.Loading
         viewModelScope.launch {
-            val result = repository.signUpWithEmailAndPassword(trimmedEmail, trimmedPass)
+            val result = repository.signUpWithEmailAndPassword(trimmedEmail, trimmedPass, trimmedUsername)
             _uiState.value = result.fold(
                 onSuccess = { user -> AuthUiState.Success(user) },
                 onFailure = { e   -> AuthUiState.Error(mapErrorToMessage(e)) }
@@ -193,7 +194,11 @@ class AuthViewModel(
      * 
      * @return Boolean true if inputs are clean, false if they violate our rules.
      */
-    private fun validateInputs(email: String, pass: String): Boolean {
+    private fun validateInputs(email: String, pass: String, username: String? = null): Boolean {
+        if (username != null && username.isEmpty()) {
+            _uiState.value = AuthUiState.Error("Username cannot be empty")
+            return false
+        }
         if (email.isEmpty()) {
             _uiState.value = AuthUiState.Error("Email cannot be empty")
             return false
