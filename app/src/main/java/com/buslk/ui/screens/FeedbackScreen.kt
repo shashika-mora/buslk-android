@@ -68,6 +68,7 @@ fun FeedbackScreen(
                                     
                                     val newFeedback = FeedbackDoc(
                                         id = feedbackRef.id,
+                                        userId = uid,
                                         busId = busId,
                                         routeId = routeName,
                                         comment = comment,
