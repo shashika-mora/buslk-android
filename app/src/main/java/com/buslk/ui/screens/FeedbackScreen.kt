@@ -81,8 +81,14 @@ fun FeedbackScreen(
                                         transaction.set(feedbackRef, newFeedback)
                                         val userRef = db.collection("users").document(uid)
                                         val snapshot = transaction.get(userRef)
+                                        
                                         val currentPoints = snapshot.getLong("points") ?: 0
                                         transaction.update(userRef, "points", currentPoints + 15)
+                                        
+                                        // Update the reportsSubmitted inside the stats map
+                                        val currentStats = snapshot.get("stats") as? Map<String, Any>
+                                        val currentReports = (currentStats?.get("reportsSubmitted") as? Long) ?: 0L
+                                        transaction.update(userRef, "stats.reportsSubmitted", currentReports + 1)
                                     }.addOnSuccessListener {
                                         Toast.makeText(context, "Feedback submitted! +15 points", Toast.LENGTH_SHORT).show()
                                         onBackToHome()
