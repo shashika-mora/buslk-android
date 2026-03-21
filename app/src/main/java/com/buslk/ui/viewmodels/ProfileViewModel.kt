@@ -7,7 +7,6 @@ import com.buslk.data.UserStats
 import com.buslk.data.TripDoc
 import com.buslk.data.FeedbackDoc
 import com.buslk.data.AchievementDoc
-import com.buslk.data.AchievementDoc
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
