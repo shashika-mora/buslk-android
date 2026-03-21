@@ -65,6 +65,7 @@ data class TripDoc(
 
 data class FeedbackDoc(
     val id: String = "",
+    val userId: String = "",
     val busId: String = "",
     val routeId: String = "",
     val comment: String = "",

@@ -20,7 +20,7 @@ interface IAuthRepository {
     fun getCurrentUser(): FirebaseUser?
     fun signOut()
     suspend fun signInWithEmailAndPassword(email: String, password: String): Result<FirebaseUser>
-    suspend fun signUpWithEmailAndPassword(email: String, password: String): Result<FirebaseUser>
+    suspend fun signUpWithEmailAndPassword(email: String, password: String, username: String): Result<FirebaseUser>
     suspend fun signInWithGoogle(context: Context): Result<FirebaseUser>
     suspend fun updateDisplayName(newName: String): Result<Unit>
     suspend fun changePassword(newPassword: String): Result<Unit>
@@ -46,11 +46,11 @@ class AuthRepository : IAuthRepository {
         }
     }
 
-    override suspend fun signUpWithEmailAndPassword(email: String, password: String): Result<FirebaseUser> {
+    override suspend fun signUpWithEmailAndPassword(email: String, password: String, username: String): Result<FirebaseUser> {
         return try {
             val authResult = auth.createUserWithEmailAndPassword(email, password).await()
             val user = authResult.user ?: return Result.failure(Exception("Sign-up succeeded but user is null"))
-            syncUserToFirestore(user, isInitialRegistration = true)
+            syncUserToFirestore(user, isInitialRegistration = true, providedUsername = username)
             Result.success(user)
         } catch (e: Exception) {
             Result.failure(e)
@@ -120,7 +120,7 @@ class AuthRepository : IAuthRepository {
         }
     }
 
-    private suspend fun syncUserToFirestore(user: FirebaseUser, isInitialRegistration: Boolean = false) {
+    private suspend fun syncUserToFirestore(user: FirebaseUser, isInitialRegistration: Boolean = false, providedUsername: String? = null) {
         val db = FirebaseFirestore.getInstance()
         val userRef = db.collection("users").document(user.uid)
         
@@ -131,7 +131,7 @@ class AuthRepository : IAuthRepository {
             if (existingUser == null || isInitialRegistration) {
                 val newUserDoc = UserDoc(
                     uid = user.uid,
-                    displayName = user.displayName ?: if (isInitialRegistration) "New User" else "Google User",
+                    displayName = providedUsername ?: user.displayName ?: if (isInitialRegistration) "New User" else "Google User",
                     email = user.email ?: "",
                     photoUrl = user.photoUrl?.toString() ?: "",
                     role = "Passenger"
