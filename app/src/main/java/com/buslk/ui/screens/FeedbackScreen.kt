@@ -78,9 +78,12 @@ fun FeedbackScreen(
                                     )
                                     
                                     db.runTransaction { transaction ->
-                                        transaction.set(feedbackRef, newFeedback)
+                                        // 1. ALL READS FIRST
                                         val userRef = db.collection("users").document(uid)
                                         val snapshot = transaction.get(userRef)
+                                        
+                                        // 2. ALL WRITES SECOND
+                                        transaction.set(feedbackRef, newFeedback)
                                         
                                         val currentPoints = snapshot.getLong("points") ?: 0
                                         transaction.update(userRef, "points", currentPoints + 15)
