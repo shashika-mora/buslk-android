@@ -151,6 +151,8 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
                             mapViewModel = mapViewModel
                         )
                         AppDestinations.SEARCH -> com.buslk.ui.screens.SearchScreen()
+                        AppDestinations.LOST_AND_FOUND -> com.buslk.ui.screens.LostAndFoundScreen()
+                        AppDestinations.SOCIAL -> com.buslk.ui.screens.FriendsScreen(onChatClick = {})
 
                         AppDestinations.PROFILE -> ProfileScreen(
                             authViewModel = authViewModel,
