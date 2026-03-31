@@ -66,7 +66,12 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
         factory = com.buslk.ui.auth.AuthViewModelFactory(authRepository)
     )
 
-    val profileViewModel: ProfileViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    val userRepository = androidx.compose.runtime.remember { com.buslk.data.UserRepository() }
+    val tripRepository = androidx.compose.runtime.remember { com.buslk.data.TripRepository() }
+    val feedbackRepository = androidx.compose.runtime.remember { com.buslk.data.FeedbackRepository() }
+    val profileViewModel: com.buslk.ui.viewmodels.ProfileViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+        factory = com.buslk.ui.viewmodels.ProfileViewModelFactory(userRepository, tripRepository, feedbackRepository)
+    )
 
     // Instantiate Map dependencies
     val liveMapRepository = androidx.compose.runtime.remember { LiveMapRepository() }
@@ -74,6 +79,23 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
         factory = MapViewModelFactory(liveMapRepository)
     )
 
+    // Instantiate Lost & Found dependencies
+    val lostAndFoundRepository = androidx.compose.runtime.remember { com.buslk.data.LostAndFoundRepository() }
+    val lostAndFoundViewModel: com.buslk.ui.viewmodels.LostAndFoundViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+        factory = com.buslk.ui.viewmodels.LostAndFoundViewModelFactory(lostAndFoundRepository, authRepository)
+    )
+
+    // Instantiate Search & Details dependencies
+    val searchRepository = androidx.compose.runtime.remember { com.buslk.data.SearchRepository() }
+    val searchViewModel: com.buslk.ui.search.SearchViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+        factory = com.buslk.ui.search.SearchViewModelFactory(searchRepository)
+    )
+    val routeDetailsViewModel: com.buslk.ui.search.RouteDetailsViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+        factory = com.buslk.ui.search.RouteDetailsViewModelFactory(liveMapRepository, searchRepository)
+    )
+    val busDetailsViewModel: com.buslk.ui.search.BusDetailsViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+        factory = com.buslk.ui.search.BusDetailsViewModelFactory(searchRepository, feedbackRepository, liveMapRepository)
+    )
 
     var currentDestination by rememberSaveable {
         val startDestination = if (authViewModel.isSignedIn()) AppDestinations.HOME else AppDestinations.OPENING
