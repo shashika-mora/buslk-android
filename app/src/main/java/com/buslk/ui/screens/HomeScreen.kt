@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -315,17 +316,38 @@ fun HomeScreen(
                     .align(Alignment.TopCenter),
                 shape = RoundedCornerShape(if (active) 0.dp else 100.dp)
             ) {
-                SearchContent(
-                    uiState = searchUiState,
-                    onRouteClick = { route: RouteDoc ->
-                        active = false
-                        searchQuery = route.routeId
-                    },
-                    onBusClick = { bus: BusDoc ->
-                        active = false
-                        searchQuery = bus.registrationNumber
+                when (val state = searchUiState) {
+                    is com.buslk.ui.search.SearchUiState.Loading -> {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator()
+                        }
                     }
-                )
+                    is com.buslk.ui.search.SearchUiState.Error -> {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Text("Error: ${state.message}", color = MaterialTheme.colorScheme.error)
+                        }
+                    }
+                    is com.buslk.ui.search.SearchUiState.Success -> {
+                        if (state.routes.isEmpty()) {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Text(stringResource(R.string.search_no_results))
+                            }
+                        } else {
+                            LazyColumn {
+                                items(state.routes) { route ->
+                                    androidx.compose.material3.ListItem(
+                                        headlineContent = { Text(route.routeId, fontWeight = FontWeight.Bold) },
+                                        supportingContent = { Text("${route.startLocation} to ${route.endLocation}") },
+                                        modifier = Modifier.clickable {
+                                            active = false
+                                            searchQuery = route.routeId
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }

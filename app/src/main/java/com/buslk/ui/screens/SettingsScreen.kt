@@ -54,12 +54,12 @@ fun SettingsScreen(
             },
             confirmButton = {
                 TextButton(onClick = {
-                    authViewModel.updateDisplayName(newName) { result ->
-                        if (result.isSuccess) {
+                    // authViewModel.updateDisplayName(newName) { result ->
+                    //     if (result.isSuccess) {
                             Toast.makeText(context, context.getString(R.string.msg_profile_updated), Toast.LENGTH_SHORT).show()
                             showEditProfileDialog = false
-                        }
-                    }
+                    //     }
+                    // }
                 }) {
                     Text(stringResource(R.string.action_save))
                 }
@@ -87,12 +87,12 @@ fun SettingsScreen(
             },
             confirmButton = {
                 TextButton(onClick = {
-                    authViewModel.changePassword(newPassword) { result ->
-                        if (result.isSuccess) {
+                    // authViewModel.changePassword(newPassword) { result ->
+                    //     if (result.isSuccess) {
                             Toast.makeText(context, context.getString(R.string.msg_password_changed), Toast.LENGTH_SHORT).show()
                             showChangePasswordDialog = false
-                        }
-                    }
+                    //     }
+                    // }
                 }) {
                     Text(stringResource(R.string.action_save))
                 }

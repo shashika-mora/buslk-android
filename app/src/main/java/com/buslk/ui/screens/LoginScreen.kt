@@ -184,7 +184,7 @@ fun LoginScreen(
                 } else {
                     // Execute Registration (with basic UI-level validation)
                     if (password == confirmPassword) {
-                        authViewModel.signUpWithEmailAndPassword(email, password, username)
+                        authViewModel.signUpWithEmailAndPassword(email, password)
                     } else {
                         Toast.makeText(context, context.getString(R.string.msg_passwords_not_match), Toast.LENGTH_SHORT).show()
                     }
