@@ -49,7 +49,11 @@ class MainActivity : AppCompatActivity() {
         FirebaseApp.initializeApp(this)
         enableEdgeToEdge()
         setContent {
-            val settingsViewModel: SettingsViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+            val context = androidx.compose.ui.platform.LocalContext.current
+            val userPreferencesRepository = androidx.compose.runtime.remember { com.buslk.data.UserPreferencesRepository(context) }
+            val settingsViewModel: SettingsViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+                factory = com.buslk.ui.viewmodels.SettingsViewModelFactory(userPreferencesRepository)
+            )
             val themeMode by settingsViewModel.themeMode.collectAsState()
             
             BusLKTheme(themeMode = themeMode) {
