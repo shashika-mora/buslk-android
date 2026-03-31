@@ -9,3 +9,30 @@ val Pink80 = Color(0xFFEFB8C8)
 val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
+
+// BusLK Brand & UI Colors
+val BusLKBlue = Color(0xFF1A73E8)
+val CrowdGreen = Color(0xFF00C853)
+val CrowdYellow = Color(0xFFFFB300)
+val CrowdRed = Color(0xFFF44336)
+val QuickActionBg = Color(0xFFF8F9FE) // Light purple/blue tint
+val TrendingOrange = Color(0xFFF57C00)
+
+val FriendsPurple = Color(0xFF8A00D4)
+val DarkButtonBg = Color(0xFF0F172A)
+val UnreadRed = Color(0xFFFF3B30)
+val LightGrayBg = Color(0xFFF5F6FA)
+
+// --- Lost & Found Colors ---
+val FoundBlue = Color(0xFF2962FF)
+val LostOrange = Color(0xFFFF6D00)
+val OpenGreen = Color(0xFF00C853)
+val ClaimedYellow = Color(0xFFFFAB00)
+val RoutePillActive = Color(0xFFAB47BC)
+
+// --- Profile Colors ---
+val GoldBadge = Color(0xFFFFB300)
+val PointsOrangeStart = Color(0xFFFFCA28)
+val PointsOrangeEnd = Color(0xFFFF8F00)
+val PointsCardInner = Color(0x33FFFFFF) // Translucent white
+val PositiveGreen = Color(0xFF00E676)
