@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.buslk.data.BusDoc
+import com.buslk.data.ISearchRepository
 import com.buslk.data.RouteDoc
 import com.buslk.data.SearchRepository
 import kotlinx.coroutines.Job
@@ -13,58 +14,78 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+/**
+ * Represents the UI state of the search operation.
+ */
 sealed class SearchUiState {
-    object Idle : SearchUiState()
     object Loading : SearchUiState()
-    data class Success(val routes: List<RouteDoc>, val buses: List<BusDoc>) : SearchUiState()
+    data class Success(val routes: List<RouteDoc>) : SearchUiState()
     data class Error(val message: String) : SearchUiState()
 }
 
-class SearchViewModel(private val repository: SearchRepository = SearchRepository()) : ViewModel() {
+/**
+ * ViewModel managing search state and interactions.
+ * 
+ * Architecture Principle: Model-View-ViewModel (MVVM).
+ * The ViewModel sits between the UI (View) and the Repository (Model). It holds the search logic 
+ * and data state so that if the Android OS destroys and recreates the UI (e.g., screen rotation), 
+ * the ongoing search and its results are safely preserved in memory.
+ */
+class SearchViewModel(
+    private val repository: ISearchRepository = SearchRepository()
+) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<SearchUiState>(SearchUiState.Idle)
+    private val _uiState = MutableStateFlow<SearchUiState>(SearchUiState.Loading)
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
-    private var searchJob: Job? = null
+    private var allRoutes: List<RouteDoc> = emptyList()
 
-    fun performSearch(query: String) {
-        if (query.isBlank()) {
-            _uiState.value = SearchUiState.Idle
-            return
-        }
+    init {
+        loadAllRoutes()
+    }
 
-        _uiState.value = SearchUiState.Loading
-        searchJob?.cancel()
-        searchJob = viewModelScope.launch {
-            delay(300) // Debounce
-            try {
-                val routesResult = repository.searchRoutes(query)
-                val busesResult = repository.searchBuses(query)
-                
-                if (routesResult.isSuccess && busesResult.isSuccess) {
-                    _uiState.value = SearchUiState.Success(
-                        routesResult.getOrDefault(emptyList()),
-                        busesResult.getOrDefault(emptyList())
-                    )
-                } else {
-                    val errorMsg = routesResult.exceptionOrNull()?.message 
-                        ?: busesResult.exceptionOrNull()?.message 
-                        ?: "Failed to fetch search results"
-                    _uiState.value = SearchUiState.Error(errorMsg)
-                }
-            } catch (e: Exception) {
-                _uiState.value = SearchUiState.Error(e.message ?: "An unknown error occurred")
+    private fun loadAllRoutes() {
+        viewModelScope.launch {
+            _uiState.value = SearchUiState.Loading
+            val result = repository.getAllRoutes()
+            if (result.isSuccess) {
+                allRoutes = result.getOrDefault(emptyList())
+                // Ensure routes are reasonably sorted by ID length then alphabetically
+                allRoutes = allRoutes.sortedWith(compareBy({ it.routeId.length }, { it.routeId }))
+                _uiState.value = SearchUiState.Success(allRoutes)
+            } else {
+                _uiState.value = SearchUiState.Error(result.exceptionOrNull()?.message ?: "Failed to load routes")
             }
         }
     }
 
+    fun performSearch(query: String) {
+        val q = query.trim().lowercase()
+        if (q.isEmpty()) {
+            _uiState.value = SearchUiState.Success(allRoutes)
+            return
+        }
+
+        val filtered = allRoutes.filter {
+            it.routeId.lowercase().contains(q) ||
+            it.name.lowercase().contains(q) ||
+            it.startLocation.lowercase().contains(q) ||
+            it.endLocation.lowercase().contains(q)
+        }
+        _uiState.value = SearchUiState.Success(filtered)
+    }
+
     fun clearSearch() {
-        searchJob?.cancel()
-        _uiState.value = SearchUiState.Idle
+        _uiState.value = SearchUiState.Success(allRoutes)
     }
 }
 
-class SearchViewModelFactory(private val repository: SearchRepository = SearchRepository()) : ViewModelProvider.Factory {
+/**
+ * Factory class required by Android to instantiate ViewModels with constructor arguments.
+ */
+class SearchViewModelFactory(
+    private val repository: ISearchRepository = SearchRepository()
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(SearchViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")

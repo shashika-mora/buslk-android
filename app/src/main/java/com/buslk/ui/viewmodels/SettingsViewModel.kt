@@ -1,38 +1,76 @@
 package com.buslk.ui.viewmodels
 
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import androidx.lifecycle.viewModelScope
+import com.buslk.data.UserPreferencesRepository
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
-class SettingsViewModel : ViewModel() {
-    private val _themeMode = MutableStateFlow(0) // 0: System, 1: Light, 2: Dark
-    val themeMode: StateFlow<Int> = _themeMode.asStateFlow()
+/**
+ * ViewModel responsible for Settings and Preferences.
+ * Bridges the UI and the DataStore repository using StateFlows.
+ */
+class SettingsViewModel(
+    private val preferencesRepository: UserPreferencesRepository
+) : ViewModel() {
 
-    private val _appLanguage = MutableStateFlow("en")
-    val appLanguage: StateFlow<String> = _appLanguage.asStateFlow()
+    // --- StateFlows ---
+    // stateIn converts the cold Flow from DataStore into a hot StateFlow that Compose can easily observe.
+    // SharingStarted.WhileSubscribed(5000) keeps the flow active for 5s after the UI disappears, caching it.
+    
+    val themeMode: StateFlow<Int> = preferencesRepository.themeModeFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = 0 // Default to Auto
+        )
 
-    private val _notificationsEnabled = MutableStateFlow(true)
-    val notificationsEnabled: StateFlow<Boolean> = _notificationsEnabled.asStateFlow()
+    val appLanguage: StateFlow<String> = preferencesRepository.appLanguageFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = "en"
+        )
 
-    init {
-        // Initialize from current system state if possible, or leave as defaults
-        _appLanguage.value = AppCompatDelegate.getApplicationLocales()[0]?.language ?: "en"
-    }
+    val notificationsEnabled: StateFlow<Boolean> = preferencesRepository.notificationsEnabledFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = true
+        )
 
+    val defaultRoute: StateFlow<String> = preferencesRepository.defaultRouteFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = "None"
+        )
+
+    // --- User Actions ---
+    
     fun updateThemeMode(mode: Int) {
-        _themeMode.value = mode
+        viewModelScope.launch {
+            preferencesRepository.updateThemeMode(mode)
+        }
     }
 
-    fun updateLanguage(lang: String) {
-        _appLanguage.value = lang
-        val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(lang)
-        AppCompatDelegate.setApplicationLocales(appLocale)
+    fun updateLanguage(languageCode: String) {
+        viewModelScope.launch {
+            preferencesRepository.updateAppLanguage(languageCode)
+        }
     }
 
     fun updateNotificationsEnabled(enabled: Boolean) {
-        _notificationsEnabled.value = enabled
+        viewModelScope.launch {
+            preferencesRepository.updateNotificationsEnabled(enabled)
+        }
+    }
+
+    fun updateDefaultRoute(route: String) {
+        viewModelScope.launch {
+            preferencesRepository.updateDefaultRoute(route)
+        }
     }
 }

@@ -26,9 +26,9 @@ object OsmMapManager {
     fun initialize(context: Context) {
         // If we've already set it up, skip to save CPU cycles.
         if (isInitialized) return
-
+        
         val config = Configuration.getInstance()
-
+        
         // Load the OSM configuration utilizing Android's default SharedPreferences.
         // This is where map tiles are cached to save the user's mobile data.
         config.load(
@@ -42,13 +42,13 @@ object OsmMapManager {
         config.userAgentValue = context.packageName
 
         // --- Performance Optimizations ---
-        // 1. Increase the in-memory tile cache size.
+        // 1. Increase the in-memory tile cache size. 
         // Default is 9. Increasing it holds more tiles in RAM, making panning much smoother,
         // at the cost of using slightly more memory.
         config.cacheMapTileCount = 12
 
         // 2. Increase the tile cache overshoot.
-        // This property controls how many tiles *beyond* the visible edge of the screen
+        // This property controls how many tiles *beyond* the visible edge of the screen 
         // should be kept in memory/pre-loaded. This prevents stuttering when panning to new areas.
         config.cacheMapTileOvershoot = 12
 

@@ -125,65 +125,21 @@ class AuthViewModel(
      * @param email The raw email text from the UI.
      * @param pass The raw password text from the UI.
      */
-    fun signUpWithEmailAndPassword(email: String, pass: String, username: String) {
+    fun signUpWithEmailAndPassword(email: String, pass: String) {
         if (_uiState.value is AuthUiState.Loading) return
 
         val trimmedEmail = email.trim()
         val trimmedPass = pass.trim()
-        val trimmedUsername = username.trim()
 
-        if (!validateInputs(trimmedEmail, trimmedPass, trimmedUsername)) return
+        if (!validateInputs(trimmedEmail, trimmedPass)) return
 
         _uiState.value = AuthUiState.Loading
         viewModelScope.launch {
-            val result = repository.signUpWithEmailAndPassword(trimmedEmail, trimmedPass, trimmedUsername)
+            val result = repository.signUpWithEmailAndPassword(trimmedEmail, trimmedPass)
             _uiState.value = result.fold(
                 onSuccess = { user -> AuthUiState.Success(user) },
                 onFailure = { e   -> AuthUiState.Error(mapErrorToMessage(e)) }
             )
-        }
-    }
-
-    /**
-     * Updates the user's display name.
-     */
-    fun updateDisplayName(newName: String, onComplete: (Result<Unit>) -> Unit) {
-        if (newName.isBlank()) return
-        _uiState.value = AuthUiState.Loading
-        viewModelScope.launch {
-            val result = repository.updateDisplayName(newName)
-            result.onSuccess {
-                val user = repository.getCurrentUser()
-                if (user != null) {
-                    _uiState.value = AuthUiState.Success(user)
-                }
-            }.onFailure { e ->
-                _uiState.value = AuthUiState.Error(mapErrorToMessage(e))
-            }
-            onComplete(result)
-        }
-    }
-
-    /**
-     * Changes the user's password.
-     */
-    fun changePassword(newPass: String, onComplete: (Result<Unit>) -> Unit) {
-        if (newPass.length < 6) {
-            _uiState.value = AuthUiState.Error("Password must be at least 6 characters")
-            return
-        }
-        _uiState.value = AuthUiState.Loading
-        viewModelScope.launch {
-            val result = repository.changePassword(newPass)
-            result.onSuccess {
-                val user = repository.getCurrentUser()
-                if (user != null) {
-                    _uiState.value = AuthUiState.Success(user)
-                }
-            }.onFailure { e ->
-                _uiState.value = AuthUiState.Error(mapErrorToMessage(e))
-            }
-            onComplete(result)
         }
     }
 
@@ -194,11 +150,7 @@ class AuthViewModel(
      * 
      * @return Boolean true if inputs are clean, false if they violate our rules.
      */
-    private fun validateInputs(email: String, pass: String, username: String? = null): Boolean {
-        if (username != null && username.isEmpty()) {
-            _uiState.value = AuthUiState.Error("Username cannot be empty")
-            return false
-        }
+    private fun validateInputs(email: String, pass: String): Boolean {
         if (email.isEmpty()) {
             _uiState.value = AuthUiState.Error("Email cannot be empty")
             return false

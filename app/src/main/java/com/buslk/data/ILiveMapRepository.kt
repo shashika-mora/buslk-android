@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
  * Adheres to Dependency Inversion Principle.
  */
 interface ILiveMapRepository {
-
+    
     /**
      * Subscribes to live GPS updates for all active buses.
      * Emits a new list every time a bus broadcasts a new coordinate.

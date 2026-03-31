@@ -10,10 +10,19 @@ import kotlinx.coroutines.tasks.await
 interface ISearchRepository {
     suspend fun searchRoutes(query: String): Result<List<RouteDoc>>
     suspend fun searchBuses(query: String): Result<List<BusDoc>>
+    suspend fun getAllRoutes(): Result<List<RouteDoc>>
+    suspend fun getBusDetails(busId: String): Result<BusDoc?>
+    suspend fun getBusesByRoute(routeId: String): Result<List<BusDoc>>
 }
 
 /**
  * Concrete implementation using Firestore.
+ * 
+ * Architecture Principle: Repository Pattern.
+ * This class abstracts away *how* the data is fetched (via Firebase API). 
+ * The ViewModel only knows it gets a `Result<List<RouteDoc>>`, meaning later on, we could easily
+ * swap Firestore out for a local SQLite database (Room) or a REST API, and the ViewModel wouldn't 
+ * need to change a single line of code.
  */
 class SearchRepository : ISearchRepository {
     private val db = FirebaseFirestore.getInstance()
@@ -27,15 +36,15 @@ class SearchRepository : ISearchRepository {
             // For MVP, if they type a number we search by routeId exactly.
             // If they type text, we'd ideally need a 3rd party search engine (Algolia/Meilisearch).
             // For now, we will fetch all routes and do local filtering since the total route count in SL is ~1500 (small enough for client-side filtering MVP).
-
+            
             val snapshot = db.collection("routes").get().await()
             val allRoutes = snapshot.documents.mapNotNull { it.toObject(RouteDoc::class.java) }
-
-            val filtered = allRoutes.filter {
-                it.routeId.lowercase().contains(q) ||
-                        it.name.lowercase().contains(q) ||
-                        it.startLocation.lowercase().contains(q) ||
-                        it.endLocation.lowercase().contains(q)
+            
+            val filtered = allRoutes.filter { 
+                it.routeId.lowercase().contains(q) || 
+                it.name.lowercase().contains(q) ||
+                it.startLocation.lowercase().contains(q) ||
+                it.endLocation.lowercase().contains(q)
             }
             Result.success(filtered)
         } catch (e: Exception) {
@@ -51,12 +60,41 @@ class SearchRepository : ISearchRepository {
             // Fetch buses and filter locally for MVP
             val snapshot = db.collection("buses").get().await()
             val allBuses = snapshot.documents.mapNotNull { it.toObject(BusDoc::class.java) }
-
-            val filtered = allBuses.filter {
-                it.registrationNumber.lowercase().contains(q) ||
-                        it.defaultRouteId.lowercase().contains(q)
+            
+            val filtered = allBuses.filter { 
+                it.registrationNumber.lowercase().contains(q) || 
+                it.defaultRouteId.lowercase().contains(q)
             }
             Result.success(filtered)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getAllRoutes(): Result<List<RouteDoc>> {
+        return try {
+            val snapshot = db.collection("routes").get().await()
+            val allRoutes = snapshot.documents.mapNotNull { it.toObject(RouteDoc::class.java) }
+            Result.success(allRoutes)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getBusDetails(busId: String): Result<BusDoc?> {
+        return try {
+            val doc = db.collection("buses").document(busId).get().await()
+            Result.success(doc.toObject(BusDoc::class.java))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getBusesByRoute(routeId: String): Result<List<BusDoc>> {
+        return try {
+            val snapshot = db.collection("buses").whereEqualTo("defaultRouteId", routeId).get().await()
+            val buses = snapshot.documents.mapNotNull { it.toObject(BusDoc::class.java) }
+            Result.success(buses)
         } catch (e: Exception) {
             Result.failure(e)
         }

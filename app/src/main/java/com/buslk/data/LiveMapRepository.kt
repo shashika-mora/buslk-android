@@ -27,19 +27,19 @@ class LiveMapRepository : ILiveMapRepository {
             override fun onDataChange(snapshot: DataSnapshot) {
                 try {
                     val buses = mutableListOf<BusLocation>()
-
+                    
                     // Iterate through every active bus node (e.g. "NA-1234")
                     for (child in snapshot.children) {
                         val busId = child.key ?: continue
                         // Deserialize the JSON payload directly into our Kotlin Domain Model
                         val location = child.getValue(BusLocation::class.java)
-
+                        
                         if (location != null) {
                             // RTDB doesn't store the key inside the object by default, so we inject it
                             buses.add(location.copy(busId = busId))
                         }
                     }
-
+                    
                     // Emit the updated list to the StateFlow collectors (e.g., the MapViewModel)
                     trySend(Result.success(buses))
                 } catch (e: Exception) {

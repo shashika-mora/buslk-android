@@ -30,7 +30,7 @@ class MapViewModel(
 
     // Internal mutable state
     private val _mapState = MutableStateFlow<MapUiState>(MapUiState.Loading)
-
+    
     // Public immutable state for the View to observe
     val mapState: StateFlow<MapUiState> = _mapState.asStateFlow()
 
