@@ -2,7 +2,6 @@ package com.buslk.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -12,11 +11,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.StarRate
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
@@ -29,15 +29,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.buslk.data.AchievementDoc
-import com.buslk.data.FeedbackDoc
-import com.buslk.data.TripDoc
 import com.buslk.ui.auth.AuthViewModel
-import com.buslk.ui.theme.*
-import com.buslk.ui.viewmodels.ProfileUiState
 import com.buslk.ui.viewmodels.ProfileViewModel
+import com.buslk.ui.viewmodels.ProfileUiState
+import com.buslk.data.TripDoc
+import com.buslk.data.FeedbackDoc
+import com.buslk.data.AchievementDoc
+import com.buslk.ui.theme.*
 import java.text.SimpleDateFormat
 import java.util.Locale
+
+// Data classes removed as they are now sourced from com.buslk.data
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,8 +57,12 @@ fun ProfileScreen(
     // Trigger data load when the screen becomes active
     val uid = currentUser?.uid ?: ""
     LaunchedEffect(key1 = uid) {
-        profileViewModel.loadProfileData(uid)
+        if (uid.isNotBlank()) {
+            profileViewModel.loadProfileData(uid)
+        }
     }
+
+
 
     Scaffold(
         containerColor = Color(0xFFF5F6FA) // Light background
@@ -70,8 +76,8 @@ fun ProfileScreen(
             is ProfileUiState.Error -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
-                        text = (uiState as ProfileUiState.Error).message,
-                        color = Color.Red,
+                        text = (uiState as ProfileUiState.Error).message, 
+                        color = Color.Red, 
                         modifier = Modifier.padding(16.dp),
                         textAlign = TextAlign.Center
                     )
@@ -89,187 +95,187 @@ fun ProfileScreen(
                         .fillMaxSize()
                         .padding(paddingValues)
                 ) {
-                    // --- 1. Blue Header ---
-                    Surface(
-                        color = BusLKBlue,
-                        modifier = Modifier.fillMaxWidth()
+            // --- 1. Blue Header ---
+            Surface(
+                color = BusLKBlue,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 48.dp)
+                ) {
+                    // Top User Header Strip
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column(
-                            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 48.dp)
-                        ) {
-                            // Top User Header Strip
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
+                        // User Info (Left aligned)
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                            Surface(
+                                shape = CircleShape,
+                                color = Color.White,
+                                modifier = Modifier.size(48.dp)
                             ) {
-                                // User Info (Left aligned)
-                                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
-                                    Surface(
-                                        shape = CircleShape,
-                                        color = Color.White,
-                                        modifier = Modifier.size(48.dp)
-                                    ) {
-                                        Box(contentAlignment = Alignment.Center) {
-                                            val displayName = userData.displayName.ifBlank { currentUser?.displayName ?: "Unknown User" }
-                                            val initials = displayName.split(" ").mapNotNull { it.firstOrNull()?.uppercase() }.take(2).joinToString("")
-                                            Text(initials.ifBlank { "?" }, color = BusLKBlue, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                                        }
-                                    }
-
-                                    Spacer(modifier = Modifier.width(12.dp))
-
-                                    Column {
-                                        Text(userData.displayName.ifBlank { currentUser?.displayName ?: "Unknown User" }, fontSize = 16.sp, color = Color.White, fontWeight = FontWeight.Bold)
-                                        Text(userData.email.ifBlank { currentUser?.email ?: "" }, color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
-
-                                        Spacer(modifier = Modifier.height(6.dp))
-
-                                        Surface(
-                                            shape = RoundedCornerShape(8.dp),
-                                            color = GoldBadge
-                                        ) {
-                                            Row(
-                                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                                                verticalAlignment = Alignment.CenterVertically
-                                            ) {
-                                                Icon(Icons.Outlined.StarRate, contentDescription = null, tint = Color.White, modifier = Modifier.size(10.dp))
-                                                Spacer(modifier = Modifier.width(2.dp))
-                                                Text(userData.level.ifBlank { "Beginner" }, color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                                            }
-                                        }
-                                    }
-                                }
-
-                                // Settings Button
-                                IconButton(onClick = onSettingsClick) {
-                                    Icon(Icons.Outlined.Settings, contentDescription = "Settings", tint = Color.White)
+                                Box(contentAlignment = Alignment.Center) {
+                                    val displayName = userData.displayName.ifBlank { currentUser?.displayName ?: "Unknown User" }
+                                    val initials = displayName.split(" ").mapNotNull { it.firstOrNull()?.uppercase() }.take(2).joinToString("")
+                                    Text(initials.ifBlank { "?" }, color = BusLKBlue, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                                 }
                             }
-                        }
-                    }
 
-                    // --- 2. Overlapping Orange Points Card ---
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .offset(y = (-40).dp) // Pull it up over the blue header
-                            .padding(horizontal = 16.dp)
-                    ) {
-                        Surface(
-                            shape = RoundedCornerShape(16.dp),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            // Gradient Background
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(
-                                        Brush.verticalGradient(
-                                            colors = listOf(PointsOrangeStart, PointsOrangeEnd)
-                                        )
-                                    )
-                                    .padding(horizontal = 24.dp, vertical = 20.dp)
-                            ) {
-                                Column {
-                                    // Top Row: Points & Trophy Placeholder
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.Top
-                                    ) {
-                                        Column {
-                                            Text("Total Points", color = Color.White.copy(alpha = 0.9f), fontSize = 14.sp)
-                                            Text("${userData.points}", color = Color.White, fontSize = 48.sp, fontWeight = FontWeight.Light)
-                                        }
+                            Spacer(modifier = Modifier.width(12.dp))
 
-                                        // Trophy Icon Placeholder
-                                        Text("🏆", fontSize = 48.sp)
-                                    }
-
-                                    Spacer(modifier = Modifier.height(16.dp))
-
-                                    // Bottom Row: 3 little stat cards
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween
-                                    ) {
-                                        val statModifier = Modifier
-                                            .weight(1f)
-                                            .clip(RoundedCornerShape(8.dp))
-                                            .background(PointsCardInner)
-                                            .padding(vertical = 16.dp)
-
-                                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = statModifier) {
-                                            Text("${userData.stats.totalTrips}", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                                            Text("Trips", color = Color.White.copy(alpha = 0.9f), fontSize = 12.sp)
-                                        }
-                                        Spacer(modifier = Modifier.width(12.dp))
-                                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = statModifier) {
-                                            Text("${feedbacks.size}", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                                            Text("Feedbacks", color = Color.White.copy(alpha = 0.9f), fontSize = 12.sp)
-                                        }
-                                        Spacer(modifier = Modifier.width(12.dp))
-                                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = statModifier) {
-                                            val unlockedBadges = achievementsMap.values.count { it.unlocked }
-                                            Text("$unlockedBadges", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                                            Text("Badges", color = Color.White.copy(alpha = 0.9f), fontSize = 12.sp)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    // Avoid layout shifting due to the offset above by offsetting the following content slightly up
-                    Column(modifier = Modifier.offset(y = (-24).dp).weight(1f)) {
-
-                        // --- 3. Custom Tabs ---
-                        TabRow(
-                            selectedTabIndex = selectedTabIndex,
-                            containerColor = Color.Transparent,
-                            contentColor = Color.Black,
-                            divider = {},
-                            indicator = { tabPositions ->
-                                TabRowDefaults.SecondaryIndicator(
-                                    modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
-                                    color = Color.Transparent
-                                )
-                            },
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-                                .clip(RoundedCornerShape(24.dp))
-                                .background(Color.White.copy(alpha = 0.5f))
-                        ) {
-                            tabs.forEachIndexed { index, title ->
-                                val selected = selectedTabIndex == index
-                                Tab(
-                                    selected = selected,
-                                    onClick = { selectedTabIndex = index },
-                                    modifier = Modifier
-                                        .background(if (selected) Color.White else Color.Transparent)
-                                        .clip(RoundedCornerShape(50))
+                            Column {
+                                Text(userData.displayName.ifBlank { currentUser?.displayName ?: "Unknown User" }, fontSize = 16.sp, color = Color.White, fontWeight = FontWeight.Bold)
+                                Text(userData.email.ifBlank { currentUser?.email ?: "" }, color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
+                                
+                                Spacer(modifier = Modifier.height(6.dp))
+                                
+                                Surface(
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = GoldBadge
                                 ) {
-                                    Text(
-                                        text = title,
-                                        modifier = Modifier.padding(vertical = 12.dp),
-                                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-                                        fontSize = 12.sp // Slightly smaller text to fit 3 tabs
-                                    )
+                                    Row(
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(Icons.Outlined.StarRate, contentDescription = null, tint = Color.White, modifier = Modifier.size(10.dp))
+                                        Spacer(modifier = Modifier.width(2.dp))
+                                        Text(userData.level.ifBlank { "Beginner" }, color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                    }
                                 }
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // --- 4. Tab Content ---
-                        when (selectedTabIndex) {
-                            0 -> TripHistoryList(trips)
-                            1 -> FeedbackList(feedbacks)
-                            2 -> AchievementsGrid(achievementsMap)
+                        // Settings Button
+                        IconButton(onClick = onSettingsClick) {
+                            Icon(Icons.Outlined.Settings, contentDescription = "Settings", tint = Color.White)
                         }
                     }
                 }
+            }
+
+            // --- 2. Overlapping Orange Points Card ---
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .offset(y = (-40).dp) // Pull it up over the blue header
+                    .padding(horizontal = 16.dp)
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    // Gradient Background
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(PointsOrangeStart, PointsOrangeEnd)
+                                )
+                            )
+                            .padding(horizontal = 24.dp, vertical = 20.dp)
+                    ) {
+                        Column {
+                            // Top Row: Points & Trophy Placeholder
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.Top
+                            ) {
+                                Column {
+                                    Text("Total Points", color = Color.White.copy(alpha = 0.9f), fontSize = 14.sp)
+                                    Text("${userData.points}", color = Color.White, fontSize = 48.sp, fontWeight = FontWeight.Light)
+                                }
+                                
+                                // Trophy Icon Placeholder
+                                Text("🏆", fontSize = 48.sp)
+                            }
+                            
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            // Bottom Row: 3 little stat cards
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                val statModifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(PointsCardInner)
+                                    .padding(vertical = 16.dp)
+
+                                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = statModifier) {
+                                    Text("${userData.stats.totalTrips}", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                                    Text("Trips", color = Color.White.copy(alpha = 0.9f), fontSize = 12.sp)
+                                }
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = statModifier) {
+                                    Text("${feedbacks.size}", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                                    Text("Feedbacks", color = Color.White.copy(alpha = 0.9f), fontSize = 12.sp)
+                                }
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = statModifier) {
+                                    val unlockedBadges = achievementsMap.values.count { it.unlocked }
+                                    Text("$unlockedBadges", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                                    Text("Badges", color = Color.White.copy(alpha = 0.9f), fontSize = 12.sp)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Avoid layout shifting due to the offset above by offsetting the following content slightly up
+            Column(modifier = Modifier.offset(y = (-24).dp).weight(1f)) {
+                
+                // --- 3. Custom Tabs ---
+                TabRow(
+                    selectedTabIndex = selectedTabIndex,
+                    containerColor = Color.Transparent,
+                    contentColor = Color.Black,
+                    divider = {},
+                    indicator = { tabPositions ->
+                        TabRowDefaults.SecondaryIndicator(
+                            modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+                            color = Color.Transparent
+                        )
+                    },
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .clip(RoundedCornerShape(24.dp))
+                        .background(Color.White.copy(alpha = 0.5f))
+                ) {
+                    tabs.forEachIndexed { index, title ->
+                        val selected = selectedTabIndex == index
+                        Tab(
+                            selected = selected,
+                            onClick = { selectedTabIndex = index },
+                            modifier = Modifier
+                                .background(if (selected) Color.White else Color.Transparent)
+                                .clip(RoundedCornerShape(50))
+                        ) {
+                            Text(
+                                text = title,
+                                modifier = Modifier.padding(vertical = 12.dp),
+                                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                                fontSize = 12.sp // Slightly smaller text to fit 3 tabs
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // --- 4. Tab Content ---
+                when (selectedTabIndex) {
+                    0 -> TripHistoryList(trips)
+                    1 -> FeedbackList(feedbacks)
+                    2 -> AchievementsGrid(achievementsMap)
+                }
+            }
+        }
             }
         }
     }
@@ -309,7 +315,7 @@ fun TripHistoryList(trips: List<TripDoc>) {
                         Row(verticalAlignment = Alignment.Top) {
                             // Extract just the route number (e.g. from "138-colombo-homagama" -> "138")
                             val routeNumber = trip.routeId.substringBefore("-").ifBlank { "N/A" }
-
+                            
                             // Blue Route Box
                             Surface(
                                 shape = RoundedCornerShape(8.dp),
@@ -321,7 +327,7 @@ fun TripHistoryList(trips: List<TripDoc>) {
                                 }
                             }
                             Spacer(modifier = Modifier.width(12.dp))
-
+                            
                             // Locations & Status
                             Column {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -357,7 +363,7 @@ fun TripHistoryList(trips: List<TripDoc>) {
                                 }
                             }
                         }
-
+                        
                         // Points Pill
                         Surface(
                             shape = RoundedCornerShape(50),
@@ -372,7 +378,7 @@ fun TripHistoryList(trips: List<TripDoc>) {
                             )
                         }
                     }
-
+                    
                     Spacer(modifier = Modifier.height(16.dp))
                     HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f), thickness = 1.dp)
                     Spacer(modifier = Modifier.height(16.dp))
@@ -434,10 +440,8 @@ fun AchievementsGrid(userAchievements: Map<String, AchievementDoc>) {
         // We map over the static definitions to ensure all possible milestones are shown,
         // and pull their live progress from the `userAchievements` map.
         val itemsList = achievementDefinitions.entries.toList()
-
-        items(itemsList) { entry ->
-            val key = entry.key
-            val definition = entry.value
+        
+        items(itemsList) { (key, definition) ->
             val (emoji, title, desc) = definition
             val progressDoc = userAchievements[key]
             val isUnlocked = progressDoc?.unlocked == true
@@ -455,14 +459,14 @@ fun AchievementsGrid(userAchievements: Map<String, AchievementDoc>) {
                     // Emoji / Icon
                     Text(emoji, fontSize = 48.sp)
                     Spacer(modifier = Modifier.height(16.dp))
-
+                    
                     // Texts
                     Text(title, fontWeight = FontWeight.Bold, fontSize = 16.sp, textAlign = TextAlign.Center)
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(desc, color = Color.Gray, fontSize = 12.sp, textAlign = TextAlign.Center)
-
+                    
                     Spacer(modifier = Modifier.weight(1f))
-
+                    
                     // Status Pill
                     if (isUnlocked) {
                         Surface(
@@ -489,6 +493,7 @@ fun AchievementsGrid(userAchievements: Map<String, AchievementDoc>) {
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun FeedbackList(feedbacks: List<FeedbackDoc>) {
     if (feedbacks.isEmpty()) {
@@ -523,7 +528,7 @@ fun FeedbackList(feedbacks: List<FeedbackDoc>) {
                             Text(overall.toString(), fontSize = 32.sp, fontWeight = FontWeight.Bold)
                             Text("/5", fontSize = 16.sp, color = Color.Gray, modifier = Modifier.padding(bottom = 4.dp))
                         }
-
+                        
                         // Stars
                         Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.padding(vertical = 4.dp)) {
                             repeat(5) { index ->
@@ -535,7 +540,7 @@ fun FeedbackList(feedbacks: List<FeedbackDoc>) {
                                 )
                             }
                         }
-
+                        
                         // Tags
                         if (feedback.tags.isNotEmpty()) {
                             Spacer(modifier = Modifier.height(8.dp))
@@ -557,7 +562,7 @@ fun FeedbackList(feedbacks: List<FeedbackDoc>) {
                     }
 
                     Spacer(modifier = Modifier.width(16.dp))
-
+                    
                     // Right Side: Details, Comment, and Breakdown
                     Column(modifier = Modifier.weight(0.7f)) {
                         // Header (Bus ID & Route)
@@ -565,16 +570,16 @@ fun FeedbackList(feedbacks: List<FeedbackDoc>) {
                             Icon(Icons.Outlined.LocationOn, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(12.dp))
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(feedback.busId.ifBlank { "Unknown Bus" }, color = Color.Gray, fontSize = 12.sp)
-
+                            
                             Spacer(modifier = Modifier.width(8.dp))
                             Text("•", color = Color.LightGray, fontSize = 12.sp)
                             Spacer(modifier = Modifier.width(8.dp))
-
+                            
                             Text(feedback.routeId.ifBlank { "General" }, color = Color.Gray, fontSize = 12.sp, maxLines = 1)
                         }
-
+                        
                         Spacer(modifier = Modifier.height(4.dp))
-
+                        
                         // Date/Time
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Outlined.Info, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(12.dp))
@@ -582,9 +587,9 @@ fun FeedbackList(feedbacks: List<FeedbackDoc>) {
                             val dateStr = feedback.timestamp?.toDate()?.let { dateFormat.format(it) } ?: "N/A"
                             Text(dateStr, color = Color.Gray, fontSize = 12.sp)
                         }
-
+                        
                         Spacer(modifier = Modifier.height(12.dp))
-
+                        
                         // Comment Box
                         Surface(
                             shape = RoundedCornerShape(8.dp),
@@ -598,11 +603,11 @@ fun FeedbackList(feedbacks: List<FeedbackDoc>) {
                                 modifier = Modifier.padding(12.dp)
                             )
                         }
-
+                        
                         Spacer(modifier = Modifier.height(12.dp))
                         HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f), thickness = 1.dp)
                         Spacer(modifier = Modifier.height(12.dp))
-
+                        
                         // Ratings Breakdown
                         Row(
                             modifier = Modifier.fillMaxWidth(),
