@@ -28,7 +28,11 @@ import com.buslk.ui.theme.FriendsPurple
 import com.buslk.ui.theme.UnreadRed
 import com.buslk.ui.theme.BusLKBlue
 
-// --- Mock Data ---
+import com.buslk.data.UserRepository
+import com.buslk.data.UserDoc
+import com.google.firebase.auth.FirebaseAuth
+
+// --- State Models ---
 data class FriendState(
     val name: String,
     val initials: String,
@@ -38,24 +42,43 @@ data class FriendState(
     val isOnBus: Boolean = false
 )
 
-val mockOnlineFriends = listOf(
-    FriendState("Nimal Perera", "NP", "Active now", true, 1),
-    FriendState("Maya Rajapaksa", "MR", "Active 5m ago", true, 0)
-)
-
-val mockOtherBusesFriends = listOf(
-    FriendState("Priya Silva", "PS", "On Route 138", true, 2, isOnBus = true),
-    FriendState("Kamal Fernando", "KF", "On Route 138", true, 0, isOnBus = true),
-    FriendState("Saman De Silva", "SD", "Active 10m ago", true, 0, isOnBus = true) // Faked status for variation
-)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FriendsScreen(
     onChatClick: (String) -> Unit
 ) {
+    var users by remember { mutableStateOf<List<UserDoc>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(true) }
+    
+    LaunchedEffect(Unit) {
+        val repo = UserRepository()
+        repo.getAllUsers().onSuccess { fetchedUsers ->
+            // Filter out current user from the friends list
+            val currentUid = FirebaseAuth.getInstance().currentUser?.uid
+            users = fetchedUsers.filter { it.uid != currentUid }
+        }
+        isLoading = false
+    }
+
+    // Map fetched DB users to UI States
+    val friendStates = users.map { user ->
+        val nameParts = user.displayName.split(" ")
+        val initials = nameParts.take(2).joinToString("") { it.take(1).uppercase() }
+        FriendState(
+            name = user.displayName.ifEmpty { "Anonymous User" },
+            initials = initials.ifEmpty { "?" },
+            statusText = "Points: ${user.points} | ${user.role}",
+            isOnline = true, 
+            unreadCount = 0,
+            isOnBus = false
+        )
+    }
+
+    val onlineFriends = friendStates
+    val otherBusesFriends = emptyList<FriendState>()
+
     var selectedTabIndex by remember { mutableIntStateOf(1) } // Default to "Online (2)"
-    val tabs = listOf("On Bus", "Online (2)", "All (6)")
+    val tabs = listOf("On Bus", "Online (${onlineFriends.size})", "All (${onlineFriends.size})")
 
     Scaffold(
         floatingActionButtonPosition = FabPosition.End,
@@ -182,7 +205,19 @@ fun FriendsScreen(
                         }
                     }
 
-                    items(mockOnlineFriends) { friend ->
+                    if (isLoading) {
+                        item {
+                            Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                    } else if (onlineFriends.isEmpty()) {
+                        item {
+                            Text("No friends available yet.", modifier = Modifier.padding(16.dp), color = Color.Gray)
+                        }
+                    }
+
+                    items(onlineFriends) { friend ->
                         FriendCard(friend = friend, onChatClick = { onChatClick(friend.name) })
                         Spacer(modifier = Modifier.height(12.dp))
                     }
@@ -196,7 +231,7 @@ fun FriendsScreen(
                         }
                     }
 
-                    items(mockOtherBusesFriends) { friend ->
+                    items(otherBusesFriends) { friend ->
                         FriendCard(friend = friend, onChatClick = { onChatClick(friend.name) })
                         Spacer(modifier = Modifier.height(12.dp))
                     }

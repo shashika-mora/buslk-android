@@ -50,14 +50,5 @@ fun ScanQRScreen(
             onClose = onBack
         )
 
-        // Debug button for emulator testing 
-        Button(
-            onClick = { handleScan("Route 138-1234") }, // Use mock ID
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 140.dp)
-        ) {
-            Text("Simulate Scan (Emulator)")
-        }
     }
 }

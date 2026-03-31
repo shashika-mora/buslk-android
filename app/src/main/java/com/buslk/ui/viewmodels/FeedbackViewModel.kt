@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.buslk.data.FeedbackDoc
 import com.buslk.data.FeedbackRepository
 import com.buslk.data.IFeedbackRepository
+import com.buslk.data.ISearchRepository
+import com.buslk.data.SearchRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +23,8 @@ sealed class FeedbackUiState {
 }
 
 class FeedbackViewModel(
-    private val feedbackRepository: IFeedbackRepository = FeedbackRepository()
+    private val feedbackRepository: IFeedbackRepository = FeedbackRepository(),
+    private val searchRepository: ISearchRepository = SearchRepository()
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<FeedbackUiState>(FeedbackUiState.Idle)
@@ -52,8 +55,9 @@ class FeedbackViewModel(
                 "driver" to driverRating
             )
 
-            // Resolve generic route mapping for MVP
-            val routeName = if (busId.contains("138")) "Route 138" else busId
+            // Fetch actual route mappings
+            val busDoc = searchRepository.getBusDetails(busId).getOrNull()
+            val routeName = busDoc?.defaultRouteId ?: "Unknown Route"
 
             val feedbackDoc = FeedbackDoc(
                 feedbackId = "", // Firestore auto-id handles this
@@ -81,12 +85,13 @@ class FeedbackViewModel(
 }
 
 class FeedbackViewModelFactory(
-    private val repository: IFeedbackRepository = FeedbackRepository()
+    private val feedbackRepository: IFeedbackRepository = FeedbackRepository(),
+    private val searchRepository: ISearchRepository = SearchRepository()
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(FeedbackViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return FeedbackViewModel(repository) as T
+            return FeedbackViewModel(feedbackRepository, searchRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

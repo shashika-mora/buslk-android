@@ -11,16 +11,21 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+import com.buslk.data.ISearchRepository
+import com.buslk.data.SearchRepository
+import com.buslk.data.BusDoc
+
 sealed class TripUiState {
     object Idle : TripUiState()
     object Loading : TripUiState()
-    data class CheckedIn(val tripId: String, val busId: String) : TripUiState()
+    data class CheckedIn(val tripId: String, val busId: String, val routeName: String = "", val regNum: String = "") : TripUiState()
     object Finished : TripUiState()
     data class Error(val message: String) : TripUiState()
 }
 
 class TripViewModel(
-    private val tripRepository: ITripRepository = TripRepository()
+    private val tripRepository: ITripRepository = TripRepository(),
+    private val searchRepository: ISearchRepository = SearchRepository()
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<TripUiState>(TripUiState.Idle)
@@ -41,7 +46,13 @@ class TripViewModel(
             if (result.isSuccess) {
                 val tripId = result.getOrNull() ?: ""
                 activeTripId = tripId
-                _uiState.value = TripUiState.CheckedIn(tripId = tripId, busId = busId)
+                
+                // Fetch dynamic bus information rather than using mocks
+                val busData = searchRepository.getBusDetails(busId).getOrNull()
+                val routeName = busData?.defaultRouteId ?: "Unknown Route"
+                val regNum = busData?.registrationNumber ?: busId
+                
+                _uiState.value = TripUiState.CheckedIn(tripId = tripId, busId = busId, routeName = routeName, regNum = regNum)
             } else {
                 _uiState.value = TripUiState.Error(result.exceptionOrNull()?.message ?: "Check-in failed")
             }
@@ -77,12 +88,13 @@ class TripViewModel(
 }
 
 class TripViewModelFactory(
-    private val repository: ITripRepository = TripRepository()
+    private val tripRepository: ITripRepository = TripRepository(),
+    private val searchRepository: ISearchRepository = SearchRepository()
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(TripViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return TripViewModel(repository) as T
+            return TripViewModel(tripRepository, searchRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

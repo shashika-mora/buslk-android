@@ -60,8 +60,12 @@ fun FeedbackScreen(
     var comment by remember { mutableStateOf("") }
     val selectedTags = remember { mutableStateListOf<String>() }
 
-    // Mocking route for MVP
-    val routeName = if (busId.contains("138")) "Route 138" else busId
+    var routeName by remember { mutableStateOf("Loading...") }
+    LaunchedEffect(busId) {
+        val repo = com.buslk.data.SearchRepository()
+        val busData = repo.getBusDetails(busId).getOrNull()
+        routeName = busData?.defaultRouteId ?: "Unknown Route"
+    }
 
     Scaffold(
         containerColor = Color(0xFFF5F6FA),

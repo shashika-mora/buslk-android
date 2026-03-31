@@ -34,8 +34,9 @@ fun TripScreen(
     val context = LocalContext.current
     var reportedCrowdLevel by remember { mutableStateOf<String?>(null) }
 
-    // For now, mapping busId to a route or using mock "Route 138"
-    val routeName = if (busId.contains("138")) "Route 138" else "Route 138" // Defaulting to 138 as per screenshot
+    val uiState by tripViewModel.uiState.collectAsState()
+    val routeName = (uiState as? com.buslk.ui.viewmodels.TripUiState.CheckedIn)?.routeName ?: "Loading Route..."
+    val regNum = (uiState as? com.buslk.ui.viewmodels.TripUiState.CheckedIn)?.regNum ?: busId
     
     Scaffold(
         topBar = {

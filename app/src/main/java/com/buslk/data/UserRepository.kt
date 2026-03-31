@@ -10,6 +10,7 @@ import kotlinx.coroutines.tasks.await
  */
 interface IUserRepository {
     suspend fun getUserProfile(uid: String): Result<UserDoc?>
+    suspend fun getAllUsers(): Result<List<UserDoc>>
 }
 
 class UserRepository : IUserRepository {
@@ -22,6 +23,17 @@ class UserRepository : IUserRepository {
             Result.success(user)
         } catch (e: Exception) {
             Log.e("UserRepository", "Error fetching user profile", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getAllUsers(): Result<List<UserDoc>> {
+        return try {
+            val snapshot = firestore.collection("users").get().await()
+            val users = snapshot.documents.mapNotNull { it.toObject(UserDoc::class.java) }
+            Result.success(users)
+        } catch (e: Exception) {
+            Log.e("UserRepository", "Error fetching all users", e)
             Result.failure(e)
         }
     }

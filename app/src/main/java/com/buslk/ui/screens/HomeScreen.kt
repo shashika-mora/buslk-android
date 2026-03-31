@@ -82,22 +82,7 @@ import com.buslk.ui.theme.CrowdGreen
 import com.buslk.ui.theme.CrowdYellow
 import com.buslk.ui.theme.CrowdRed
 
-// --- Mock Data ---
-data class MockBus(
-    val route: String,
-    val reg: String,
-    val time: String,
-    val dist: String,
-    val crowd: String,
-    val crowdColor: Color
-)
-val mockBuses = listOf(
-    MockBus("138", "Bus NA-1234", "2 min", "0.5 km", "LOW", CrowdGreen),
-    MockBus("176", "Bus NB-5678", "5 min", "0.8 km", "MEDIUM", CrowdYellow),
-    MockBus("120", "Bus NC-9012", "8 min", "1.2 km", "HIGH", CrowdRed),
-    MockBus("177", "Bus ND-3456", "12 min", "1.5 km", "LOW", CrowdGreen)
-)
-
+// Removed Mock Data
 /**
  * The main Home Screen Composable containing the interactive Map.
  * 
@@ -173,6 +158,19 @@ fun HomeScreen(
      */
     val scaffoldState = rememberBottomSheetScaffoldState()
 
+    // Lifted logic for mapping buses
+    val mapUiSuccess = mapUiState as? MapUiState.Success
+    val displayBuses = mapUiSuccess?.activeBuses ?: emptyList()
+    val filteredBuses = if (searchQuery.isNotBlank()) {
+        val lowerQuery = searchQuery.lowercase(Locale.getDefault())
+        displayBuses.filter { bus ->
+            bus.routeId.lowercase(Locale.getDefault()) == lowerQuery ||
+            bus.busId.lowercase(Locale.getDefault()).contains(lowerQuery)
+        }
+    } else {
+        displayBuses
+    }
+
     /**
      * BottomSheetScaffold allows building a map base with a sheet that slides up over it.
      */
@@ -235,63 +233,77 @@ fun HomeScreen(
                         Spacer(modifier = Modifier.height(16.dp))
                         
                         // Bus List
-                        LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            items(mockBuses) { bus ->
-                                Card(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                                    border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f)),
-                                    shape = RoundedCornerShape(16.dp)
-                                ) {
-                                    Row(
-                                        modifier = Modifier
-                                            .padding(12.dp)
-                                            .fillMaxWidth(), 
-                                        verticalAlignment = Alignment.CenterVertically
+                        if (mapUiState is MapUiState.Loading) {
+                            Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator()
+                            }
+                        } else if (filteredBuses.isEmpty()) {
+                            Text("No buses found nearby.", color = Color.Gray, modifier = Modifier.padding(16.dp))
+                        } else {
+                            LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                                items(filteredBuses) { bus ->
+                                    val crowdCol = when(bus.crowdLevel.uppercase(Locale.getDefault())) {
+                                        "LOW" -> CrowdGreen
+                                        "MEDIUM" -> CrowdYellow
+                                        "HIGH"-> CrowdRed
+                                        else -> Color.Gray
+                                    }
+                                    Card(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                                        border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f)),
+                                        shape = RoundedCornerShape(16.dp)
                                     ) {
-                                        // Left Col: Route & Dist
-                                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                            Surface(color = BusLKBlue, shape = RoundedCornerShape(12.dp), modifier = Modifier.size(56.dp)) {
-                                                Box(contentAlignment = Alignment.Center) { 
-                                                    Text(bus.route, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp) 
+                                        Row(
+                                            modifier = Modifier
+                                                .padding(12.dp)
+                                                .fillMaxWidth(), 
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            // Left Col: Route & Dist
+                                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                                Surface(color = BusLKBlue, shape = RoundedCornerShape(12.dp), modifier = Modifier.size(56.dp)) {
+                                                    Box(contentAlignment = Alignment.Center) { 
+                                                        Text(bus.routeId, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp) 
+                                                    }
+                                                }
+                                                Spacer(modifier = Modifier.height(6.dp))
+                                                Surface(border = BorderStroke(1.dp, Color.LightGray), shape = RoundedCornerShape(50)) {
+                                                    Text("Live", fontSize = 10.sp, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp), color = Color.DarkGray)
                                                 }
                                             }
-                                            Spacer(modifier = Modifier.height(6.dp))
-                                            Surface(border = BorderStroke(1.dp, Color.LightGray), shape = RoundedCornerShape(50)) {
-                                                Text(bus.dist, fontSize = 10.sp, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp), color = Color.DarkGray)
+                                            Spacer(modifier = Modifier.width(16.dp))
+                                            
+                                            // Mid Col: Reg & Time
+                                            Column(modifier = Modifier.weight(1f)) {
+                                                Text(bus.busId, color = Color.Gray, fontSize = 14.sp)
+                                                Spacer(modifier = Modifier.height(6.dp))
+                                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                                    Icon(Icons.Outlined.LocationOn, contentDescription = null, modifier = Modifier.size(16.dp), tint = CrowdGreen)
+                                                    Spacer(modifier = Modifier.width(4.dp))
+                                                    Text("${bus.speed.toInt()} km/h", fontWeight = FontWeight.Medium, fontSize = 16.sp)
+                                                }
                                             }
-                                        }
-                                        Spacer(modifier = Modifier.width(16.dp))
-                                        
-                                        // Mid Col: Reg & Time
-                                        Column(modifier = Modifier.weight(1f)) {
-                                            Text(bus.reg, color = Color.Gray, fontSize = 14.sp)
-                                            Spacer(modifier = Modifier.height(6.dp))
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Icon(Icons.Outlined.LocationOn, contentDescription = null, modifier = Modifier.size(16.dp), tint = CrowdGreen)
-                                                Spacer(modifier = Modifier.width(4.dp))
-                                                Text(bus.time, fontWeight = FontWeight.Medium, fontSize = 16.sp)
-                                            }
-                                        }
-                                        
-                                        // Right Col: Crowd
-                                        Column(horizontalAlignment = Alignment.End) {
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Icon(Icons.Outlined.Person, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.Gray)
-                                                Spacer(modifier = Modifier.width(4.dp))
-                                                Box(modifier = Modifier
-                                                    .size(10.dp)
-                                                    .background(bus.crowdColor, CircleShape))
-                                            }
-                                            Spacer(modifier = Modifier.height(8.dp))
-                                            Surface(color = bus.crowdColor, shape = RoundedCornerShape(50)) {
-                                                Text(
-                                                    text = bus.crowd, 
-                                                    color = Color.White, 
-                                                    fontSize = 10.sp, 
-                                                    fontWeight = FontWeight.Bold, 
-                                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                                                )
+                                            
+                                            // Right Col: Crowd
+                                            Column(horizontalAlignment = Alignment.End) {
+                                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                                    Icon(Icons.Outlined.Person, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.Gray)
+                                                    Spacer(modifier = Modifier.width(4.dp))
+                                                    Box(modifier = Modifier
+                                                        .size(10.dp)
+                                                        .background(crowdCol, CircleShape))
+                                                }
+                                                Spacer(modifier = Modifier.height(8.dp))
+                                                Surface(color = crowdCol, shape = RoundedCornerShape(50)) {
+                                                    Text(
+                                                        text = bus.crowdLevel.uppercase(Locale.getDefault()), 
+                                                        color = Color.White, 
+                                                        fontSize = 10.sp, 
+                                                        fontWeight = FontWeight.Bold, 
+                                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                                    )
+                                                }
                                             }
                                         }
                                     }
@@ -321,41 +333,26 @@ fun HomeScreen(
                     }
                 },
                 update = { view ->
-                    if (mapUiState is MapUiState.Success) {
-                        val allBuses = (mapUiState as MapUiState.Success).activeBuses
-                        
-                        // Filter Logic: If searchQuery is active, strictly show matching buses
-                        val filteredBuses = if (searchQuery.isNotBlank()) {
-                            val lowerQuery = searchQuery.lowercase(Locale.getDefault())
-                            allBuses.filter { bus ->
-                                bus.routeId.lowercase(Locale.getDefault()) == lowerQuery ||
-                                bus.busId.lowercase(Locale.getDefault()).contains(lowerQuery)
-                            }
-                        } else {
-                            allBuses // Show all if search is empty
+                    // Clear existing markers to prevent ghost trails
+                    view.overlays.clear()
+                    
+                    // Cache the custom red marker drawable to avoid reading disk inside the loop
+                    val redBusIcon = ContextCompat.getDrawable(context, R.drawable.ic_bus_marker_red)
+                    
+                    filteredBuses.forEach { bus ->
+                        val marker = Marker(view).apply {
+                            position = GeoPoint(bus.lat, bus.lng)
+                            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                            rotation = bus.heading
+                            title = "Reg: ${bus.busId} | Crowd: ${bus.crowdLevel}"
+                            subDescription = "Speed: ${bus.speed} km/h | Route: ${bus.routeId}"
+                            icon = redBusIcon  // Apply the custom red Material Vector Graphic
                         }
-                        
-                        // Clear existing markers to prevent ghost trails
-                        view.overlays.clear()
-                        
-                        // Cache the custom red marker drawable to avoid reading disk inside the loop
-                        val redBusIcon = ContextCompat.getDrawable(context, R.drawable.ic_bus_marker_red)
-                        
-                        filteredBuses.forEach { bus ->
-                            val marker = Marker(view).apply {
-                                position = GeoPoint(bus.lat, bus.lng)
-                                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-                                rotation = bus.heading
-                                title = "Reg: ${bus.busId} | Crowd: ${bus.crowdLevel}"
-                                subDescription = "Speed: ${bus.speed} km/h | Route: ${bus.routeId}"
-                                icon = redBusIcon  // Apply the custom red Material Vector Graphic
-                            }
-                            view.overlays.add(marker)
-                        }
-                        
-                        // Force OSM to redraw the canvas with the new pins
-                        view.invalidate()
+                        view.overlays.add(marker)
                     }
+                    
+                    // Force OSM to redraw the canvas with the new pins
+                    view.invalidate()
                 },
                 modifier = Modifier.fillMaxSize()
             )

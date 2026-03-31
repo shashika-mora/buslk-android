@@ -1,0 +1,53 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // USERS COLLECTION
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      
+      // Allow write if it's the user's own document, but prevent point/role spoofing
+      // We allow creation if the document doesn't exist yet
+      allow write: if request.auth != null && request.auth.uid == userId && 
+                   (!exists(/databases/$(database)/documents/users/$(userId)) ||
+                   !request.resource.data.diff(resource.data).affectedKeys().hasAny(['points', 'role']));
+    }
+
+    // ROUTES, BUSES & BROADCASTS COLLECTIONS (Admin Only Writes)
+    match /routes/{document=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "Admin";
+    }
+    match /buses/{document=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "Admin";
+    }
+    match /broadcasts/{document=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "Admin";
+    }
+
+    // TRIPS, FEEDBACK, LOST AND FOUND, SUPPORT (Users can create/update their own)
+    match /trips/{document=**} {
+      allow read, create: if request.auth != null;
+      allow update, delete: if request.auth != null && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "Admin" || resource.data.userId == request.auth.uid);
+    }
+    match /feedback/{document=**} {
+      allow read, create: if request.auth != null;
+      allow update, delete: if request.auth != null && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "Admin" || resource.data.userId == request.auth.uid);
+    }
+    match /lost_and_found/{document=**} {
+      allow read, create: if request.auth != null;
+      allow update, delete: if request.auth != null && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "Admin" || resource.data.userId == request.auth.uid);
+    }
+    match /support_threads/{document=**} {
+      allow read, create: if request.auth != null;
+      allow update, delete: if request.auth != null && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "Admin" || resource.data.userId == request.auth.uid);
+    }
+  }
+}
