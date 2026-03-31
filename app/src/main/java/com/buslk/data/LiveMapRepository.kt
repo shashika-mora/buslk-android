@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.callbackFlow
 class LiveMapRepository : ILiveMapRepository {
 
     // Obtain RTDB singleton reference
-    private val database = FirebaseDatabase.getInstance().reference
+    private val database = FirebaseDatabase.getInstance("https://buslk-app-default-rtdb.asia-southeast1.firebasedatabase.app").reference
 
     override fun getLiveBusLocations(): Flow<Result<List<BusLocation>>> = callbackFlow {
         // Reference to the high-velocity GPS node

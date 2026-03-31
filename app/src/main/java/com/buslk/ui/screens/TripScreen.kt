@@ -21,12 +21,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.buslk.ui.theme.*
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.buslk.ui.viewmodels.TripViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TripScreen(
+    tripViewModel: TripViewModel,
     busId: String,
     onEndTrip: () -> Unit,
     onBack: () -> Unit
@@ -135,7 +135,10 @@ fun TripScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Button(
-                        onClick = onEndTrip,
+                        onClick = {
+                            tripViewModel.endTrip()
+                            onEndTrip()
+                        },
                         colors = ButtonDefaults.buttonColors(containerColor = UnreadRed),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -185,7 +188,7 @@ fun TripScreen(
                         val handleReport: (String) -> Unit = { level ->
                             if (reportedCrowdLevel == null) {
                                 reportedCrowdLevel = level
-                                addPointsForReport()
+                                tripViewModel.reportCrowdLevel(level)
                             }
                         }
 
@@ -268,18 +271,4 @@ fun CrowdReportButton(
     }
 }
 
-private fun addPointsForReport() {
-    val userId = FirebaseAuth.getInstance().currentUser?.uid
-    if (userId != null) {
-        val db = FirebaseFirestore.getInstance()
-        val userRef = db.collection("users").document(userId)
 
-        db.runTransaction { transaction ->
-            val snapshot = transaction.get(userRef)
-            val currentPoints = snapshot.getLong("points") ?: 0
-            transaction.update(userRef, "points", currentPoints + 5)
-        }.addOnFailureListener {
-            // Optional: Handle failure or log
-        }
-    }
-}

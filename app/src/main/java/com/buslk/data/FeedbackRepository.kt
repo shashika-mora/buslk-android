@@ -11,6 +11,7 @@ import kotlinx.coroutines.tasks.await
 interface IFeedbackRepository {
     suspend fun getUserFeedback(userId: String): Result<List<FeedbackDoc>>
     suspend fun getBusFeedback(busId: String): Result<List<FeedbackDoc>>
+    suspend fun submitFeedback(feedback: FeedbackDoc): Result<Unit>
 }
 
 class FeedbackRepository : IFeedbackRepository {
@@ -51,6 +52,34 @@ class FeedbackRepository : IFeedbackRepository {
             Result.success(sorted)
         } catch (e: Exception) {
             Log.e("FeedbackRepository", "Error fetching feedback for bus $busId", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun submitFeedback(feedback: FeedbackDoc): Result<Unit> {
+        return try {
+            val feedbackRef = firestore.collection("feedback").document(feedback.feedbackId.ifBlank { firestore.collection("feedback").document().id })
+            
+            // Execute as an atomic transaction: write feedback doc + increment user points/stats
+            firestore.runTransaction { transaction ->
+                val userRef = firestore.collection("users").document(feedback.userId)
+                val snapshot = transaction.get(userRef)
+                
+                // Write the feedback document securely
+                transaction.set(feedbackRef, feedback.copy(feedbackId = feedbackRef.id))
+                
+                // Award points and increment report stat
+                val currentPoints = snapshot.getLong("points") ?: 0
+                transaction.update(userRef, "points", currentPoints + 15)
+                
+                val currentStats = snapshot.get("stats") as? Map<String, Any>
+                val currentReports = (currentStats?.get("reportsSubmitted") as? Long) ?: 0L
+                transaction.update(userRef, "stats.reportsSubmitted", currentReports + 1)
+                
+            }.await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("FeedbackRepository", "Error submitting feedback", e)
             Result.failure(e)
         }
     }

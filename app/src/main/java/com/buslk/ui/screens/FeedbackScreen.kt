@@ -21,18 +21,38 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.buslk.data.FeedbackDoc
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import com.buslk.ui.theme.BusLKBlue
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.buslk.ui.viewmodels.FeedbackViewModel
+import com.buslk.ui.viewmodels.FeedbackUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FeedbackScreen(
+    feedbackViewModel: FeedbackViewModel,
     busId: String,
     onBackToHome: () -> Unit
 ) {
     val context = LocalContext.current
+    val uiState by feedbackViewModel.uiState.collectAsState()
+
+    LaunchedEffect(uiState) {
+        when (val state = uiState) {
+            is FeedbackUiState.Success -> {
+                Toast.makeText(context, "Feedback submitted! +15 points", Toast.LENGTH_SHORT).show()
+                feedbackViewModel.resetState()
+                onBackToHome()
+            }
+            is FeedbackUiState.Error -> {
+                Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
+                feedbackViewModel.resetState()
+            }
+            else -> {}
+        }
+    }
+
     var overallRating by remember { mutableStateOf(0) }
     var cleanlinessRating by remember { mutableStateOf(0) }
     var comfortRating by remember { mutableStateOf(0) }
@@ -40,8 +60,8 @@ fun FeedbackScreen(
     var comment by remember { mutableStateOf("") }
     val selectedTags = remember { mutableStateListOf<String>() }
 
-    // Mocking route
-    val routeName = if (busId.contains("138")) "Route 138" else "Route 138"
+    // Mocking route for MVP
+    val routeName = if (busId.contains("138")) "Route 138" else busId
 
     Scaffold(
         containerColor = Color(0xFFF5F6FA),
@@ -54,53 +74,16 @@ fun FeedbackScreen(
                     val isSubmitEnabled = overallRating > 0
                     Button(
                         onClick = {
-                            if (isSubmitEnabled) {
-                                val uid = FirebaseAuth.getInstance().currentUser?.uid
-                                if (uid != null) {
-                                    val db = FirebaseFirestore.getInstance()
-                                    val feedbackRef = db.collection("feedbacks").document()
-                                    val ratingsMap = mapOf(
-                                        "overall" to overallRating,
-                                        "cleanliness" to cleanlinessRating,
-                                        "comfort" to comfortRating,
-                                        "driver" to driverRating
-                                    )
-                                    
-                                    val newFeedback = FeedbackDoc(
-                                        feedbackId = feedbackRef.id,
-                                        userId = uid,
-                                        busId = busId,
-                                        routeId = routeName,
-                                        comment = comment,
-                                        ratings = ratingsMap,
-                                        tags = selectedTags.toList(),
-                                        timestamp = com.google.firebase.Timestamp.now()
-                                    )
-                                    
-                                    db.runTransaction { transaction ->
-                                        // 1. ALL READS FIRST
-                                        val userRef = db.collection("users").document(uid)
-                                        val snapshot = transaction.get(userRef)
-                                        
-                                        // 2. ALL WRITES SECOND
-                                        transaction.set(feedbackRef, newFeedback)
-                                        
-                                        val currentPoints = snapshot.getLong("points") ?: 0
-                                        transaction.update(userRef, "points", currentPoints + 15)
-                                        
-                                        // Update the reportsSubmitted inside the stats map
-                                        val currentStats = snapshot.get("stats") as? Map<String, Any>
-                                        val currentReports = (currentStats?.get("reportsSubmitted") as? Long) ?: 0L
-                                        transaction.update(userRef, "stats.reportsSubmitted", currentReports + 1)
-                                    }.addOnSuccessListener {
-                                        Toast.makeText(context, "Feedback submitted! +15 points", Toast.LENGTH_SHORT).show()
-                                        onBackToHome()
-                                    }.addOnFailureListener {
-                                        Toast.makeText(context, "Failed to submit feedback", Toast.LENGTH_SHORT).show()
-                                    }
-                                } else {
-                                    onBackToHome()
-                                }
+                            if (isSubmitEnabled && uiState != FeedbackUiState.Submitting) {
+                                feedbackViewModel.submitFeedback(
+                                    busId = busId,
+                                    overallRating = overallRating,
+                                    cleanlinessRating = cleanlinessRating,
+                                    comfortRating = comfortRating,
+                                    driverRating = driverRating,
+                                    comment = comment,
+                                    tags = selectedTags.toList()
+                                )
                             }
                         },
                         colors = ButtonDefaults.buttonColors(

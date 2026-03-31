@@ -106,6 +106,14 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
         factory = com.buslk.ui.search.BusDetailsViewModelFactory(searchRepository, feedbackRepository, liveMapRepository)
     )
 
+    // Instantiate Trip & Feedback dependencies
+    val tripViewModel: com.buslk.ui.viewmodels.TripViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+        factory = com.buslk.ui.viewmodels.TripViewModelFactory(tripRepository)
+    )
+    val feedbackViewModel: com.buslk.ui.viewmodels.FeedbackViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+        factory = com.buslk.ui.viewmodels.FeedbackViewModelFactory(feedbackRepository)
+    )
+
     var currentDestination by rememberSaveable {
         val startDestination = if (authViewModel.isSignedIn()) AppDestinations.HOME else AppDestinations.OPENING
         // Check if the saved state is empty (e.g., first launch) and if so, use the startDestination
@@ -204,6 +212,7 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
                             onLogoutSuccess = { currentDestination = AppDestinations.LOGIN }
                         )
                         AppDestinations.SCAN_QR -> com.buslk.ui.screens.ScanQRScreen(
+                            tripViewModel = tripViewModel,
                             onCheckInSuccess = { busId ->
                                 scannedBusId = busId
                                 currentDestination = AppDestinations.TRIP_SCREEN
@@ -211,11 +220,13 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
                             onBack = { currentDestination = AppDestinations.HOME }
                         )
                         AppDestinations.TRIP_SCREEN -> com.buslk.ui.screens.TripScreen(
+                            tripViewModel = tripViewModel,
                             busId = scannedBusId,
                             onEndTrip = { currentDestination = AppDestinations.FEEDBACK },
                             onBack = { currentDestination = AppDestinations.HOME }
                         )
                         AppDestinations.FEEDBACK -> com.buslk.ui.screens.FeedbackScreen(
+                            feedbackViewModel = feedbackViewModel,
                             busId = scannedBusId,
                             onBackToHome = { currentDestination = AppDestinations.HOME }
                         )

@@ -11,45 +11,37 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import com.buslk.ui.map.QRScanner
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.buslk.data.TripDoc
+import com.buslk.ui.viewmodels.TripViewModel
+import com.buslk.ui.viewmodels.TripUiState
 
 @Composable
 fun ScanQRScreen(
+    tripViewModel: TripViewModel,
     onCheckInSuccess: (String) -> Unit,
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
+    val uiState by tripViewModel.uiState.collectAsState()
+
+    LaunchedEffect(uiState) {
+        when (val state = uiState) {
+            is TripUiState.CheckedIn -> {
+                Toast.makeText(context, "Checked-in to Bus: ${state.busId}", Toast.LENGTH_SHORT).show()
+                onCheckInSuccess(state.busId)
+            }
+            is TripUiState.Error -> {
+                Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
+            }
+            else -> {}
+        }
+    }
 
     val handleScan: (String) -> Unit = { busId ->
-        // Passenger-as-a-Sensor: Real-time Database Check-in
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
-        if (userId != null) {
-            val db = FirebaseFirestore.getInstance()
-            val tripRef = db.collection("trips").document() // auto-generate ID
-
-            val tripData = TripDoc(
-                tripId = tripRef.id,
-                userId = userId,
-                busId = busId,
-                status = "ACTIVE"
-            )
-
-            tripRef.set(tripData)
-                .addOnSuccessListener {
-                    Toast.makeText(context, "Checked-in to Bus: $busId", Toast.LENGTH_SHORT).show()
-                    onCheckInSuccess(busId)
-                }
-                .addOnFailureListener {
-                    Toast.makeText(context, "Network error. Try again.", Toast.LENGTH_SHORT).show()
-                }
-        } else {
-            Toast.makeText(context, "Testing without auth", Toast.LENGTH_SHORT).show()
-            // Allow emulator testing to proceed even without being logged in
-            onCheckInSuccess(busId)
-        }
+        tripViewModel.checkIn(busId)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
