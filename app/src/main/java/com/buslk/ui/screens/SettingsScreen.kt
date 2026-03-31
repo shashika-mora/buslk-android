@@ -1,6 +1,5 @@
 package com.buslk.ui.screens
 
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -35,76 +33,6 @@ fun SettingsScreen(
     settingsViewModel: SettingsViewModel,
     onLogoutSuccess: () -> Unit
 ) {
-    val context = LocalContext.current
-    var showEditProfileDialog by remember { mutableStateOf(false) }
-    var showChangePasswordDialog by remember { mutableStateOf(false) }
-
-    if (showEditProfileDialog) {
-        var newName by remember { mutableStateOf("") }
-        AlertDialog(
-            onDismissRequest = { showEditProfileDialog = false },
-            title = { Text(stringResource(R.string.dialog_edit_profile_title)) },
-            text = {
-                OutlinedTextField(
-                    value = newName,
-                    onValueChange = { newName = it },
-                    label = { Text(stringResource(R.string.lbl_new_name)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    // authViewModel.updateDisplayName(newName) { result ->
-                    //     if (result.isSuccess) {
-                            Toast.makeText(context, context.getString(R.string.msg_profile_updated), Toast.LENGTH_SHORT).show()
-                            showEditProfileDialog = false
-                    //     }
-                    // }
-                }) {
-                    Text(stringResource(R.string.action_save))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showEditProfileDialog = false }) {
-                    Text(stringResource(R.string.action_cancel))
-                }
-            }
-        )
-    }
-
-    if (showChangePasswordDialog) {
-        var newPassword by remember { mutableStateOf("") }
-        AlertDialog(
-            onDismissRequest = { showChangePasswordDialog = false },
-            title = { Text(stringResource(R.string.dialog_change_password_title)) },
-            text = {
-                OutlinedTextField(
-                    value = newPassword,
-                    onValueChange = { newPassword = it },
-                    label = { Text(stringResource(R.string.lbl_new_password)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    // authViewModel.changePassword(newPassword) { result ->
-                    //     if (result.isSuccess) {
-                            Toast.makeText(context, context.getString(R.string.msg_password_changed), Toast.LENGTH_SHORT).show()
-                            showChangePasswordDialog = false
-                    //     }
-                    // }
-                }) {
-                    Text(stringResource(R.string.action_save))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showChangePasswordDialog = false }) {
-                    Text(stringResource(R.string.action_cancel))
-                }
-            }
-        )
-    }
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -115,11 +43,11 @@ fun SettingsScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent,
+                    containerColor = Color.Transparent, // Often better for Dark Mode
                 )
             )
         },
-        containerColor = LightGrayBg
+        containerColor = LightGrayBg // Replaced hardcoded grey 0xFFF5F6FA
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
@@ -131,17 +59,9 @@ fun SettingsScreen(
             // --- Account Control ---
             item {
                 SettingsSection(title = stringResource(R.string.settings_account_control)) {
-                    SettingsRow(
-                        icon = Icons.Outlined.Person, 
-                        title = stringResource(R.string.settings_edit_profile), 
-                        onClick = { showEditProfileDialog = true }
-                    )
+                    SettingsRow(icon = Icons.Outlined.Person, title = stringResource(R.string.settings_edit_profile), onClick = {})
                     HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
-                    SettingsRow(
-                        icon = Icons.Outlined.Lock, 
-                        title = stringResource(R.string.settings_change_password), 
-                        onClick = { showChangePasswordDialog = true }
-                    )
+                    SettingsRow(icon = Icons.Outlined.Lock, title = stringResource(R.string.settings_change_password), onClick = {})
                 }
             }
 
@@ -157,6 +77,7 @@ fun SettingsScreen(
                         else -> stringResource(R.string.settings_theme_system)
                     }
 
+                    // Theme Dropdown Row
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -193,6 +114,7 @@ fun SettingsScreen(
             // --- Preferences ---
             item {
                 SettingsSection(title = stringResource(R.string.settings_user_preferences)) {
+                    // Default Route is non-functional MVP fallback for now, maybe wired later.
                     SettingsRow(icon = Icons.Outlined.DirectionsBus, title = stringResource(R.string.settings_default_route), subtitle = stringResource(R.string.settings_route_138), onClick = {})
                     HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
                     
@@ -205,6 +127,7 @@ fun SettingsScreen(
                         else -> stringResource(R.string.lang_english)
                     }
 
+                    // Language Dropdown Row
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -268,7 +191,7 @@ fun SettingsScreen(
                         authViewModel.signOut()
                         onLogoutSuccess()
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = UnreadRed),
+                    colors = ButtonDefaults.buttonColors(containerColor = UnreadRed), // Replaced hardcoded Red 0xFFFF3B30
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
@@ -294,6 +217,7 @@ fun SettingsSection(title: String, content: @Composable ColumnScope.() -> Unit) 
         )
         Surface(
             shape = RoundedCornerShape(16.dp),
+            // MaterialTheme handles dark/light automatically via BusLKTheme
             color = MaterialTheme.colorScheme.surfaceVariant,
             modifier = Modifier.fillMaxWidth()
         ) {

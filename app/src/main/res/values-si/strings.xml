@@ -6,10 +6,10 @@
     <string name="lang_english">English</string>
     <string name="lang_sinhala">සිංහල</string>
     <string name="lang_tamil">தமிழ்</string>
-
+    
     <!-- Shared -->
     <string name="back">පසුපසට</string>
-
+    
     <!-- Opening Screen -->
     <string name="opening_subtitle">ඔබගේ ස්මාර්ට් ගමන් සගයා</string>
     <string name="btn_get_started">ආරම්භ කරන්න</string>
@@ -33,7 +33,7 @@
     <string name="nav_home">මුල් පිටුව</string>
     <string name="nav_search">සොයන්න</string>
     <string name="nav_friends">මිතුරන්</string>
-    <string name="nav_lost_found">නැතිවූ සහ හමුවූ</string>
+    <string name="nav_lost_found">නැතිවූ &amp; හමුවූ</string>
     <string name="nav_profile">පැතිකඩ</string>
 
     <!-- Search Screen -->
@@ -46,4 +46,23 @@
     <string name="search_stops">නැවතුම්</string>
     <string name="icon_search">සෙවුම් නිරූපකය</string>
     <string name="icon_clear">සෙවුම අහෝසි කරන්න</string>
+
+    <!-- Actions -->
+    <string name="action_logout">ඉවත් වන්න</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">සැකසුම්</string>
+    <string name="settings_account_control">ගිණුම් පාලනය</string>
+    <string name="settings_edit_profile">පැතිකඩ සංස්කරණය</string>
+    <string name="settings_change_password">මුරපදය වෙනස් කරන්න</string>
+    <string name="settings_ui_control">අතුරුමුහුණත් පාලනය</string>
+    <string name="settings_app_theme">යෙදුම් තේමාව</string>
+    <string name="settings_theme_system">පද්ධති පෙරනිමිය</string>
+    <string name="settings_theme_light">ආලෝක ප්‍රකාරය</string>
+    <string name="settings_theme_dark">අඳුරු ප්‍රකාරය</string>
+    <string name="settings_user_preferences">පරිශීලක මනාප</string>
+    <string name="settings_default_route">පෙරනිමි මාර්ගය</string>
+    <string name="settings_route_138">මාර්ගය 138</string>
+    <string name="settings_language">භාෂාව</string>
+    <string name="settings_push_notifications">දැනුම්දීම්</string>
 </resources>

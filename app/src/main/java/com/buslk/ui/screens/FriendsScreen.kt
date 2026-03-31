@@ -1,31 +1,32 @@
 package com.buslk.ui.screens
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChatBubbleOutline
-import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.*
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.buslk.ui.theme.*
+import com.buslk.ui.theme.DarkButtonBg
+import com.buslk.ui.theme.FriendsPurple
+import com.buslk.ui.theme.UnreadRed
+import com.buslk.ui.theme.BusLKBlue
 
 // --- Mock Data ---
 data class FriendState(
@@ -45,37 +46,25 @@ val mockOnlineFriends = listOf(
 val mockOtherBusesFriends = listOf(
     FriendState("Priya Silva", "PS", "On Route 138", true, 2, isOnBus = true),
     FriendState("Kamal Fernando", "KF", "On Route 138", true, 0, isOnBus = true),
-    FriendState("Saman De Silva", "SD", "Active 10m ago", true, 0, isOnBus = true)
+    FriendState("Saman De Silva", "SD", "Active 10m ago", true, 0, isOnBus = true) // Faked status for variation
 )
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FriendsScreen(
     onChatClick: (String) -> Unit
 ) {
-    var searchQuery by remember { mutableStateOf("") }
-    var selectedTabIndex by remember { mutableStateOf(1) } // Default to "Online"
-    
-    // Tab calculations
-    val onlineCount = mockOnlineFriends.filter { it.name.contains(searchQuery, true) }.size
-    val allCount = (mockOnlineFriends + mockOtherBusesFriends).filter { it.name.contains(searchQuery, true) }.size
-    
-    val tabs = listOf(
-        getLocalizedString("On Bus (0)", "බස් රථයේ (0)", "பேருந்தில் (0)"),
-        getLocalizedString("Online ($onlineCount)", "මාර්ගගත ($onlineCount)", "ஆன்லைன் ($onlineCount)"),
-        getLocalizedString("All ($allCount)", "සියල්ල ($allCount)", "அனைத்தும் ($allCount)")
-    )
+    var selectedTabIndex by remember { mutableIntStateOf(1) } // Default to "Online (2)"
+    val tabs = listOf("On Bus", "Online (2)", "All (6)")
 
     Scaffold(
-        containerColor = LightGrayBg,
         floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { /* TODO: Add Friend */ },
                 shape = CircleShape,
-                containerColor = OpenGreen,
-                contentColor = Color.White,
-                modifier = Modifier.shadow(4.dp, CircleShape)
+                containerColor = Color(0xFF00C853), // Green from UI
+                contentColor = Color.White
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add Friend")
             }
@@ -84,68 +73,55 @@ fun FriendsScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color.White)
                 .padding(paddingValues)
         ) {
-            // --- 1. Top Header & 2. Search Bar ---
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(Color(0xFF310065), FriendsPurple) // Dark purple to light purple
-                        ),
-                        shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
-                    )
-                    .padding(top = 16.dp, bottom = 24.dp, start = 16.dp, end = 16.dp)
+            // --- 1. Blue Header Sequence ---
+            Surface(
+                color = BusLKBlue,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Column {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(Icons.Default.ChatBubbleOutline, contentDescription = "Friends Icon", tint = Color.White, modifier = Modifier.size(20.dp))
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    // Title
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        // We use a local compose icon as placeholder for the group icon
+                        Icon(
+                            imageVector = Icons.Default.ChatBubbleOutline,
+                            contentDescription = "Friends Icon",
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
+                        )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = getLocalizedString("Friends", "යහළුවන්", "நண்பர்கள்"),
-                            style = MaterialTheme.typography.titleLarge,
+                            text = "Friends",
+                            style = MaterialTheme.typography.headlineMedium,
                             color = Color.White,
                             fontWeight = FontWeight.Bold
                         )
-                        
-                        Spacer(modifier = Modifier.weight(1f))
-                        
-                        // Language toggle indicator
-                        Text(
-                            text = currentLanguage.name,
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier
-                                .clickable {
-                                    currentLanguage = when (currentLanguage) {
-                                        AppLanguage.EN -> AppLanguage.SI
-                                        AppLanguage.SI -> AppLanguage.TA
-                                        AppLanguage.TA -> AppLanguage.EN
-                                    }
-                                }
-                                .padding(8.dp)
-                        )
                     }
-                    
+
                     Spacer(modifier = Modifier.height(16.dp))
-                    
+
                     // Search Bar
+                    var text by remember { mutableStateOf("") }
                     OutlinedTextField(
-                        value = searchQuery,
-                        onValueChange = { searchQuery = it },
-                        placeholder = { Text(getLocalizedString("Search friends...", "යහළුවන් සොයන්න...", "நண்பர்களைத் தேடு..."), color = Color(0x99FFFFFF)) },
-                        leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = "Search", tint = Color.White) },
+                        value = text,
+                        onValueChange = { text = it },
+                        placeholder = { 
+                            Text("Search friends...", color = Color.White.copy(alpha = 0.7f)) 
+                        },
+                        leadingIcon = {
+                            Icon(Icons.Outlined.Search, contentDescription = null, tint = Color.White.copy(alpha = 0.7f))
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(52.dp),
-                        shape = CircleShape,
+                        shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor = Color(0x33FFFFFF),
-                            unfocusedContainerColor = Color(0x33FFFFFF),
+                            focusedContainerColor = Color.White.copy(alpha = 0.15f),
+                            unfocusedContainerColor = Color.White.copy(alpha = 0.15f),
                             focusedBorderColor = Color.Transparent,
                             unfocusedBorderColor = Color.Transparent,
                             cursorColor = Color.White,
@@ -157,131 +133,84 @@ fun FriendsScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            // --- 3. Tabs Section ---
-            Surface(
-                color = Color.White,
-                shape = CircleShape,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth()
-                    .height(48.dp),
-                shadowElevation = 1.dp
+            // --- 2. Custom Tabs ---
+            // We use ScrollableTabRow or standard TabRow with custom coloring
+            TabRow(
+                selectedTabIndex = selectedTabIndex,
+                containerColor = Color(0xFFF5F6FA), // Very light gray from UI
+                contentColor = Color.Black,
+                divider = {},
+                indicator = { tabPositions ->
+                    TabRowDefaults.Indicator(
+                        modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+                        color = Color.Transparent // Hide the default bottom line
+                    )
+                },
+                modifier = Modifier.padding(16.dp).clip(RoundedCornerShape(24.dp))
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(4.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    tabs.forEachIndexed { index, title ->
-                        val isSelected = selectedTabIndex == index
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxHeight()
-                                .background(
-                                    color = if (isSelected) FriendsPurple else Color.Transparent,
-                                    shape = CircleShape
-                                )
-                                .clickable { selectedTabIndex = index }
-                                .clip(CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = title,
-                                color = if (isSelected) Color.White else Color.Gray,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                fontSize = 13.sp,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
+                tabs.forEachIndexed { index, title ->
+                    val selected = selectedTabIndex == index
+                    Tab(
+                        selected = selected,
+                        onClick = { selectedTabIndex = index },
+                        modifier = Modifier
+                            .background(if (selected) Color.White else Color.Transparent)
+                            .clip(RoundedCornerShape(50))
+                    ) {
+                        Text(
+                            text = title,
+                            modifier = Modifier.padding(vertical = 12.dp),
+                            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                            fontSize = 14.sp
+                        )
                     }
                 }
             }
-            
-            Spacer(modifier = Modifier.height(16.dp))
 
-            // --- 4. Content List ---
-            AnimatedContent(
-                targetState = selectedTabIndex,
-                transitionSpec = { fadeIn(tween(300)) togetherWith fadeOut(tween(300)) },
-                label = "ListAnimation"
-            ) { tabIndex ->
-                
-                val filteredOnline = mockOnlineFriends.filter { it.name.contains(searchQuery, true) }
-                val filteredOther = mockOtherBusesFriends.filter { it.name.contains(searchQuery, true) }
-                
-                if (tabIndex == 0) {
-                    // On Bus Empty State
-                    Column(
-                        modifier = Modifier.fillMaxSize().padding(top = 48.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(Icons.Default.ChatBubbleOutline, contentDescription = null, modifier = Modifier.size(64.dp), tint = Color.LightGray)
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(getLocalizedString("Not on a bus yet", "තවම බස් රථයක නැත", "இன்னும் பேருந்தில் இல்லை"), color = Color.Gray, fontSize = 16.sp, fontWeight = FontWeight.Medium)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(getLocalizedString("Scan a QR code to see friends on the same bus", "මිතුරන් බැලීමට QR කේතය ස්කෑන් කරන්න", "QR குறியீட்டை ஸ்கேன் செய்யவும்"), color = Color.LightGray, fontSize = 14.sp)
+            // --- 3. Content List ---
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                // Determine which list to show based on tab
+                if (selectedTabIndex == 1 || selectedTabIndex == 2) { // 1 = Online, 2 = All
+                    item {
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 8.dp)) {
+                            Box(modifier = Modifier.size(8.dp).background(BusLKBlue, CircleShape))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Online", style = MaterialTheme.typography.titleMedium, color = Color.DarkGray)
+                        }
                     }
-                } else if (tabIndex == 1 || tabIndex == 2) {
-                    val isAll = tabIndex == 2
-                    
-                    if (filteredOnline.isEmpty() && (!isAll || filteredOther.isEmpty())) {
+
+                    items(mockOnlineFriends) { friend ->
+                        FriendCard(friend = friend, onChatClick = { onChatClick(friend.name) })
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 8.dp)) {
+                            Icon(Icons.Outlined.LocationOn, contentDescription = null, tint = Color.DarkGray, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("On Other Buses", style = MaterialTheme.typography.titleMedium, color = Color.DarkGray)
+                        }
+                    }
+
+                    items(mockOtherBusesFriends) { friend ->
+                        FriendCard(friend = friend, onChatClick = { onChatClick(friend.name) })
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+                } else if (selectedTabIndex == 0) { // On Bus
+                    item {
                         Column(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxWidth().padding(top = 48.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Icon(
-                                Icons.Outlined.Search,
-                                contentDescription = "No Items",
-                                modifier = Modifier.size(64.dp),
-                                tint = Color.LightGray
-                            )
+                            Icon(Icons.Default.ChatBubbleOutline, contentDescription = null, modifier = Modifier.size(64.dp), tint = Color.LightGray)
                             Spacer(modifier = Modifier.height(16.dp))
-                            Text(
-                                getLocalizedString("No friends found", "මිතුරන් හමුවූයේ නැත", "நண்பர்கள் காணப்படவில்லை"),
-                                color = Color.Gray,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-                    } else {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 80.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            if (filteredOnline.isNotEmpty()) {
-                                item {
-                                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 8.dp, top = 8.dp)) {
-                                        Box(modifier = Modifier.size(8.dp).background(BusLKBlue, CircleShape))
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(getLocalizedString("Online", "මාර්ගගත", "ஆன்லைன்"), style = MaterialTheme.typography.titleMedium, color = Color.DarkGray)
-                                    }
-                                }
-                                items(filteredOnline, key = { it.name }) { friend ->
-                                    FriendCardV2(friend = friend, onChatClick = { onChatClick(friend.name) })
-                                }
-                            }
-                            
-                            if (isAll && filteredOther.isNotEmpty()) {
-                                item {
-                                    Spacer(modifier = Modifier.height(12.dp))
-                                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 8.dp)) {
-                                        Icon(Icons.Outlined.LocationOn, contentDescription = null, tint = Color.DarkGray, modifier = Modifier.size(16.dp))
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(getLocalizedString("On Other Buses", "වෙනත් බස්වල", "மற்ற பேருந்துகளில்"), style = MaterialTheme.typography.titleMedium, color = Color.DarkGray)
-                                    }
-                                }
-                                items(filteredOther, key = { it.name }) { friend ->
-                                    FriendCardV2(friend = friend, onChatClick = { onChatClick(friend.name) })
-                                }
-                            }
+                            Text("Not on a bus yet", color = Color.Gray)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text("Scan a QR code to see friends on the same bus", color = Color.LightGray, fontSize = 12.sp)
                         }
                     }
                 }
@@ -291,33 +220,31 @@ fun FriendsScreen(
 }
 
 @Composable
-fun FriendCardV2(friend: FriendState, onChatClick: () -> Unit) {
+fun FriendCard(friend: FriendState, onChatClick: () -> Unit) {
     Surface(
         shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f)),
         color = Color.White,
-        shadowElevation = 4.dp, // Modern card-based soft shadow
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onChatClick() }
-            .animateContentSize()
+        modifier = Modifier.fillMaxWidth()
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Avatar Placeholder
+            // Avatar
             Box(contentAlignment = Alignment.BottomEnd) {
+                // Gradient Circle using solid for simplicity currently
                 Surface(
                     shape = CircleShape,
-                    color = Color(0xFFE8DBFA), // Light purple from UI
-                    modifier = Modifier.size(52.dp)
+                    color = Color(0xFF6B4EE6), // Slightly lighter violet
+                    modifier = Modifier.size(56.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Text(friend.initials, color = FriendsPurple, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        Text(friend.initials, color = Color.White, fontWeight = FontWeight.Bold)
                     }
                 }
-
-                // Active Dot Match
+                
+                // Active Dot
                 if (friend.isOnline) {
                     Box(
                         modifier = Modifier
@@ -325,7 +252,7 @@ fun FriendCardV2(friend: FriendState, onChatClick: () -> Unit) {
                             .background(Color.White, CircleShape)
                             .padding(2.dp)
                             .background(
-                                if (friend.isOnBus) OpenGreen else BusLKBlue,
+                                if (friend.isOnBus) Color(0xFF00C853) else BusLKBlue, // Green if on bus, Blue if online
                                 CircleShape
                             )
                     )
@@ -337,11 +264,11 @@ fun FriendCardV2(friend: FriendState, onChatClick: () -> Unit) {
             // Details
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(friend.name, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1F2937), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(friend.name, fontWeight = FontWeight.Medium, fontSize = 16.sp)
                     if (friend.unreadCount > 0) {
                         Spacer(modifier = Modifier.width(8.dp))
                         Surface(
-                            shape = CircleShape,
+                            shape = RoundedCornerShape(50),
                             color = UnreadRed
                         ) {
                             Text(
@@ -359,24 +286,24 @@ fun FriendCardV2(friend: FriendState, onChatClick: () -> Unit) {
                     if (friend.isOnBus) {
                         Icon(Icons.Outlined.LocationOn, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(12.dp))
                     } else {
+                        // Clock icon
                         Icon(Icons.Default.ChatBubbleOutline, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(12.dp))
                     }
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(friend.statusText, color = Color.Gray, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(friend.statusText, color = Color.Gray, fontSize = 12.sp)
                 }
             }
 
             // Chat Button
             Button(
                 onClick = onChatClick,
+                colors = ButtonDefaults.buttonColors(containerColor = DarkButtonBg),
                 shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = FriendsPurple
-                ),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp),
-                modifier = Modifier.height(32.dp)
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
             ) {
-                Text("Chat", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Icon(Icons.Default.ChatBubbleOutline, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Chat", fontSize = 14.sp)
             }
         }
     }

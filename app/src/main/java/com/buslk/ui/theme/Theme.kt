@@ -21,21 +21,25 @@ private val LightColorScheme = lightColorScheme(
     primary = BusLKBlue,
     secondary = PurpleGrey40,
     tertiary = Pink40
+
+    /* Other default colors to override
+    background = Color(0xFFFFFBFE),
+    surface = Color(0xFFFFFBFE),
+    onPrimary = Color.White,
+    onSecondary = Color.White,
+    onTertiary = Color.White,
+    onBackground = Color(0xFF1C1B1F),
+    onSurface = Color(0xFF1C1B1F),
+    */
 )
 
 @Composable
 fun BusLKTheme(
-    themeMode: Int = 0, // 0: System, 1: Light, 2: Dark
+    darkTheme: Boolean = isSystemInDarkTheme(),
     // Disable dynamic color by default to enforce BusLK Blue branding across all Android versions
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val darkTheme = when (themeMode) {
-        1 -> false
-        2 -> true
-        else -> isSystemInDarkTheme()
-    }
-
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current

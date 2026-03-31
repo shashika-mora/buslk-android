@@ -58,7 +58,7 @@ fun LoginScreen(
     val uiState by authViewModel.uiState.collectAsState()
     
     // Local UI state: 0 represents the "Login" tab, 1 represents the "Sign Up" tab.
-    var selectedTabIndex by remember { mutableStateOf(0) } 
+    var selectedTabIndex by remember { mutableIntStateOf(0) } 
     
     // LaunchedEffect allows us to trigger one-off side effects (like showing a Toast)
     // inside Composable functions. It runs its block whenever the 'key' (uiState) changes.
@@ -153,7 +153,6 @@ fun LoginScreen(
         // --- Email/Password Form State Variables ---
         // We manage form input state locally in the UI layer until the user clicks submit.
         var email by remember { mutableStateOf("") }
-        var username by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }
         var confirmPassword by remember { mutableStateOf("") }
 
@@ -162,8 +161,6 @@ fun LoginScreen(
             isLogin = selectedTabIndex == 0,
             email = email,
             onEmailChange = { email = it },
-            username = username,
-            onUsernameChange = { username = it },
             password = password,
             onPasswordChange = { password = it },
             confirmPassword = confirmPassword,
@@ -308,8 +305,6 @@ fun AuthForm(
     isLogin: Boolean,
     email: String,
     onEmailChange: (String) -> Unit,
-    username: String,
-    onUsernameChange: (String) -> Unit,
     password: String,
     onPasswordChange: (String) -> Unit,
     confirmPassword: String,
@@ -332,35 +327,7 @@ fun AuthForm(
     val isPasswordError = uiState is com.buslk.ui.auth.AuthUiState.Error && 
             (uiState as com.buslk.ui.auth.AuthUiState.Error).message.contains("Password", ignoreCase = true)
 
-    val isUsernameError = uiState is com.buslk.ui.auth.AuthUiState.Error && 
-            (uiState as com.buslk.ui.auth.AuthUiState.Error).message.contains("Username", ignoreCase = true)
-
     Column {
-        // --- Username Input (Only for Sign Up) ---
-        if (!isLogin) {
-            OutlinedTextField(
-                value = username,
-                onValueChange = onUsernameChange,
-                label = { Text("Username") },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                singleLine = true,
-                enabled = !isLoading,
-                isError = isUsernameError,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = androidx.compose.ui.text.input.ImeAction.Next
-                ),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF1E5DE6),
-                    focusedLabelColor = Color(0xFF1E5DE6),
-                    errorBorderColor = Color.Red
-                )
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
         // --- Email Input ---
         OutlinedTextField(
             value = email,
