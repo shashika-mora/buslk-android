@@ -108,8 +108,9 @@ val mockBuses = listOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    searchViewModel: SearchViewModel = viewModel(factory = SearchViewModelFactory()),
-    mapViewModel: MapViewModel
+    searchViewModel: SearchViewModel,
+    mapViewModel: MapViewModel,
+    onScanClick: () -> Unit
 ) {
     // Grab the current Android Context (Activity) needed to initialize native Android Views
     val context = LocalContext.current
@@ -189,7 +190,7 @@ fun HomeScreen(
             ) {
                 // SCAN Button floating above the white sheet
                 FloatingActionButton(
-                    onClick = { /* TODO: Scanner */ },
+                    onClick = onScanClick,
                     shape = CircleShape,
                     containerColor = BusLKBlue,
                     contentColor = Color.White,

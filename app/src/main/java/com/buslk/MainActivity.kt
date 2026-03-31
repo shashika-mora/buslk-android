@@ -55,8 +55,13 @@ class MainActivity : AppCompatActivity() {
                 factory = com.buslk.ui.viewmodels.SettingsViewModelFactory(userPreferencesRepository)
             )
             val themeMode by settingsViewModel.themeMode.collectAsState()
+            val isDarkTheme = when (themeMode) {
+                1 -> false
+                2 -> true
+                else -> androidx.compose.foundation.isSystemInDarkTheme()
+            }
             
-            BusLKTheme(themeMode = themeMode) {
+            BusLKTheme(darkTheme = isDarkTheme) {
                 BusLKApp(settingsViewModel = settingsViewModel)
             }
         }
@@ -173,11 +178,16 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
                 Box(modifier = Modifier.padding(innerPadding)) {
                     when (currentDestination) {
                         AppDestinations.HOME -> com.buslk.ui.screens.HomeScreen(
-                            onScanClick = { currentDestination = AppDestinations.SCAN_QR },
-                            mapViewModel = mapViewModel
+                            mapViewModel = mapViewModel,
+                            searchViewModel = searchViewModel,
+                            onScanClick = { currentDestination = AppDestinations.SCAN_QR }
                         )
-                        AppDestinations.SEARCH -> com.buslk.ui.screens.SearchScreen()
-                        AppDestinations.LOST_AND_FOUND -> com.buslk.ui.screens.LostAndFoundScreen()
+                        AppDestinations.SEARCH -> com.buslk.ui.screens.SearchScreen(
+                            searchViewModel = searchViewModel,
+                            routeDetailsViewModel = routeDetailsViewModel,
+                            busDetailsViewModel = busDetailsViewModel
+                        )
+                        AppDestinations.LOST_AND_FOUND -> com.buslk.ui.screens.LostAndFoundScreen(viewModel = lostAndFoundViewModel)
                         AppDestinations.SOCIAL -> com.buslk.ui.screens.FriendsScreen(onChatClick = {})
 
                         AppDestinations.PROFILE -> ProfileScreen(

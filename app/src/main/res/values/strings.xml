@@ -63,4 +63,10 @@
     <string name="settings_route_138">Route 138</string>
     <string name="settings_language">Language</string>
     <string name="settings_push_notifications">Push Notifications</string>
+
+    <!-- Missing references from main branch -->
+    <string name="nav_scan_qr">Scan QR</string>
+    <string name="nav_trip">Trip</string>
+    <string name="nav_feedback">Feedback</string>
+    <string name="nav_settings">Settings</string>
 </resources>
