@@ -42,6 +42,7 @@ firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
 firebase-database = { group = "com.google.firebase", name = "firebase-database" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
+firebase-appcheck = { group = "com.google.firebase", name = "firebase-appcheck-playintegrity" }
 play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
 credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
 credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }

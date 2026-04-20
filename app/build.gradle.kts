@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.database)
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.appcheck)
     implementation(libs.play.services.auth)
     implementation(libs.credentials)
     implementation(libs.credentials.play.services.auth)

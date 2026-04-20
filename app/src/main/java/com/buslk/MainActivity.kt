@@ -39,6 +39,8 @@ import com.buslk.ui.viewmodels.ProfileViewModel
 import com.buslk.ui.viewmodels.SettingsViewModel
 import com.buslk.ui.theme.BusLKTheme
 import com.google.firebase.FirebaseApp
+import com.google.firebase.appcheck.FirebaseAppCheck
+import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import com.buslk.data.LiveMapRepository
 import com.buslk.ui.viewmodels.MapViewModel
 import com.buslk.ui.viewmodels.MapViewModelFactory
@@ -47,6 +49,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         FirebaseApp.initializeApp(this)
+        FirebaseAppCheck.getInstance().installAppCheckProviderFactory(
+            PlayIntegrityAppCheckProviderFactory.getInstance()
+        )
         enableEdgeToEdge()
         setContent {
             val context = androidx.compose.ui.platform.LocalContext.current
