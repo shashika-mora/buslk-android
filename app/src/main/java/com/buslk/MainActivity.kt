@@ -35,6 +35,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.buslk.ui.screens.LoginScreen
 import com.buslk.ui.screens.ProfileScreen
 import com.buslk.ui.screens.SettingsScreen
+import com.buslk.ui.screens.ChatScreen
 import com.buslk.ui.viewmodels.ProfileViewModel
 import com.buslk.ui.viewmodels.SettingsViewModel
 import com.buslk.ui.theme.BusLKTheme
@@ -129,6 +130,14 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
         mutableStateOf("")
     }
 
+    var chatPartnerName by rememberSaveable {
+        mutableStateOf("")
+    }
+
+    var previousDestination by rememberSaveable {
+        mutableStateOf(AppDestinations.SOCIAL)
+    }
+
     if (currentDestination == AppDestinations.OPENING) {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             Box(modifier = Modifier.padding(innerPadding)) {
@@ -176,7 +185,8 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
                     it != AppDestinations.SETTINGS &&
                     it != AppDestinations.SCAN_QR &&
                     it != AppDestinations.TRIP_SCREEN &&
-                    it != AppDestinations.FEEDBACK
+                    it != AppDestinations.FEEDBACK &&
+                    it != AppDestinations.CHAT
                 }.forEach {
                     item(
                         icon = { Icon(it.icon, contentDescription = stringResource(it.labelResId)) },
@@ -200,8 +210,27 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
                             routeDetailsViewModel = routeDetailsViewModel,
                             busDetailsViewModel = busDetailsViewModel
                         )
-                        AppDestinations.LOST_AND_FOUND -> com.buslk.ui.screens.LostAndFoundScreen(viewModel = lostAndFoundViewModel)
-                        AppDestinations.SOCIAL -> com.buslk.ui.screens.FriendsScreen(onChatClick = {})
+                        AppDestinations.LOST_AND_FOUND -> com.buslk.ui.screens.LostAndFoundScreen(
+                            viewModel = lostAndFoundViewModel,
+                            onContactClick = { reporterName ->
+                                chatPartnerName = reporterName
+                                previousDestination = AppDestinations.LOST_AND_FOUND
+                                currentDestination = AppDestinations.CHAT
+                            }
+                        )
+                        AppDestinations.SOCIAL -> com.buslk.ui.screens.FriendsScreen(
+                            onChatClick = { friendName ->
+                                chatPartnerName = friendName
+                                previousDestination = AppDestinations.SOCIAL
+                                currentDestination = AppDestinations.CHAT
+                            }
+                        )
+                        AppDestinations.CHAT -> ChatScreen(
+                            friendName = chatPartnerName,
+                            onBackClick = {
+                                currentDestination = previousDestination
+                            }
+                        )
 
                         AppDestinations.PROFILE -> ProfileScreen(
                             authViewModel = authViewModel,
@@ -270,6 +299,7 @@ enum class AppDestinations(
     TRIP_SCREEN(R.string.nav_trip, Icons.Default.Home),
     FEEDBACK(R.string.nav_feedback, Icons.Default.Star),
     SETTINGS(R.string.nav_settings, Icons.Default.Settings),
+    CHAT(R.string.nav_chat, Icons.Default.Face),
 }
 
 @Composable

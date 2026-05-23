@@ -32,7 +32,10 @@ import com.buslk.ui.viewmodels.LostAndFoundUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LostAndFoundScreen(viewModel: LostAndFoundViewModel) {
+fun LostAndFoundScreen(
+    viewModel: LostAndFoundViewModel,
+    onContactClick: (String) -> Unit
+) {
     val uiState by viewModel.uiState.collectAsState()
 
     var selectedTabIndex by remember { mutableIntStateOf(0) } 
@@ -248,7 +251,7 @@ fun LostAndFoundScreen(viewModel: LostAndFoundViewModel) {
                             verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             items(displayedItems, key = { it.id }) { item ->
-                                LostFoundCard(item)
+                                LostFoundCard(item, onContactClick = onContactClick)
                             }
                             
                             // Add some empty space at bottom so FAB doesn't cover last item if we had one
@@ -371,7 +374,10 @@ fun NewItemForm(onDismiss: () -> Unit, onSubmit: (String, String, String, String
 }
 
 @Composable
-fun LostFoundCard(item: LostFoundItemUiStore) {
+fun LostFoundCard(
+    item: LostFoundItemUiStore,
+    onContactClick: (String) -> Unit
+) {
     Surface(
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f)),
@@ -497,7 +503,7 @@ fun LostFoundCard(item: LostFoundItemUiStore) {
                 // Outlined Button
                 if (!item.isClosed) {
                     OutlinedButton(
-                        onClick = { /* TODO */ },
+                        onClick = { onContactClick(item.reporterName) },
                         shape = RoundedCornerShape(8.dp),
                         border = BorderStroke(1.dp, Color.LightGray),
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black),
