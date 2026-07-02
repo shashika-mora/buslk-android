@@ -27,18 +27,26 @@ interface ISearchRepository {
 class SearchRepository : ISearchRepository {
     private val db = FirebaseFirestore.getInstance()
 
+    // OOD Principle (Optimization & Performance):
+    // In-memory cache of static metadata (Routes and Bus profiles).
+    // Because routes and registered buses are mostly static, downloading the entire
+    // collection once per app lifecycle and filtering locally prevents billions of
+    // Firestore read operations under a 100,000+ user load.
+    private var cachedRoutes: List<RouteDoc>? = null
+    private var cachedBuses: List<BusDoc>? = null
+
     override suspend fun searchRoutes(query: String): Result<List<RouteDoc>> {
         return try {
             val q = query.trim().lowercase()
             if (q.isEmpty()) return Result.success(emptyList())
 
-            // Firestore doesn't support native "LIKE %query%" string matching easily.
-            // For MVP, if they type a number we search by routeId exactly.
-            // If they type text, we'd ideally need a 3rd party search engine (Algolia/Meilisearch).
-            // For now, we will fetch all routes and do local filtering since the total route count in SL is ~1500 (small enough for client-side filtering MVP).
-            
-            val snapshot = db.collection("routes").get().await()
-            val allRoutes = snapshot.documents.mapNotNull { it.toObject(RouteDoc::class.java) }
+            // Fetch from Firestore only if the local cache is empty
+            val allRoutes = cachedRoutes ?: run {
+                val snapshot = db.collection("routes").get().await()
+                val routes = snapshot.documents.mapNotNull { it.toObject(RouteDoc::class.java) }
+                cachedRoutes = routes
+                routes
+            }
             
             val filtered = allRoutes.filter { 
                 it.routeId.lowercase().contains(q) || 
@@ -57,9 +65,13 @@ class SearchRepository : ISearchRepository {
             val q = query.trim().lowercase()
             if (q.isEmpty()) return Result.success(emptyList())
 
-            // Fetch buses and filter locally for MVP
-            val snapshot = db.collection("buses").get().await()
-            val allBuses = snapshot.documents.mapNotNull { it.toObject(BusDoc::class.java) }
+            // Fetch from Firestore only if the local cache is empty
+            val allBuses = cachedBuses ?: run {
+                val snapshot = db.collection("buses").get().await()
+                val buses = snapshot.documents.mapNotNull { it.toObject(BusDoc::class.java) }
+                cachedBuses = buses
+                buses
+            }
             
             val filtered = allBuses.filter { 
                 it.registrationNumber.lowercase().contains(q) || 
@@ -73,8 +85,12 @@ class SearchRepository : ISearchRepository {
 
     override suspend fun getAllRoutes(): Result<List<RouteDoc>> {
         return try {
-            val snapshot = db.collection("routes").get().await()
-            val allRoutes = snapshot.documents.mapNotNull { it.toObject(RouteDoc::class.java) }
+            val allRoutes = cachedRoutes ?: run {
+                val snapshot = db.collection("routes").get().await()
+                val routes = snapshot.documents.mapNotNull { it.toObject(RouteDoc::class.java) }
+                cachedRoutes = routes
+                routes
+            }
             Result.success(allRoutes)
         } catch (e: Exception) {
             Result.failure(e)
