@@ -1,6 +1,7 @@
 package com.buslk.data
 
 import android.util.Log
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
@@ -61,7 +62,7 @@ class TripRepository : ITripRepository {
             // Complete the trip. (Metrics calculation normally happens server-side with Cloud Functions, but mocked here)
             tripRef.update(
                 "status", "COMPLETED",
-                "endTime", com.google.firebase.firestore.FieldValue.serverTimestamp()
+                "endTime", FieldValue.serverTimestamp()
             ).await()
             Result.success(Unit)
         } catch (e: Exception) {
@@ -72,18 +73,23 @@ class TripRepository : ITripRepository {
 
     override suspend fun reportCrowdLevel(userId: String, level: String): Result<Unit> {
         return try {
-            // Give user +5 points for reporting crowd level as an incentive!
             val userRef = firestore.collection("users").document(userId)
-            firestore.runTransaction { transaction ->
-                val snapshot = transaction.get(userRef)
-                val currentPoints = snapshot.getLong("points") ?: 0
-                // Just incrementing points for Gamification MVP
-                transaction.update(userRef, "points", currentPoints + 5)
-            }.await()
+
+            // OOD Principle (Encapsulation): FieldValue.increment() is an atomic,
+            // server-side operation. It removes the need for a read-then-write
+            // transaction entirely, eliminating the race condition where two
+            // concurrent updates could overwrite each other.
+            //
+            // Gamification note (gamification.md §1): SUBMIT_REPORT = +15 XP.
+            // Using +5 here as a lightweight MVP client-side incentive for crowd
+            // level reporting. Full point logic will move to Cloud Functions post-MVP.
+            userRef.update("points", FieldValue.increment(5)).await()
+
             Result.success(Unit)
         } catch (e: Exception) {
-            Log.e("TripRepository", "Error updating crowd level points", e)
+            Log.e("TripRepository", "Error updating crowd level points for user $userId", e)
             Result.failure(e)
         }
     }
 }
+
