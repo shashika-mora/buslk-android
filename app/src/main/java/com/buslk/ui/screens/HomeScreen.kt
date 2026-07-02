@@ -340,15 +340,22 @@ fun HomeScreen(
                     val redBusIcon = ContextCompat.getDrawable(context, R.drawable.ic_bus_marker_red)
                     
                     filteredBuses.forEach { bus ->
-                        val marker = Marker(view).apply {
-                            position = GeoPoint(bus.lat, bus.lng)
-                            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-                            rotation = bus.heading
-                            title = "Reg: ${bus.busId} | Crowd: ${bus.crowdLevel}"
-                            subDescription = "Speed: ${bus.speed} km/h | Route: ${bus.routeId}"
-                            icon = redBusIcon  // Apply the custom red Material Vector Graphic
+                        val point = GeoPoint(bus.lat, bus.lng)
+                        
+                        // Viewport Spatial Filtering (High-Scale UI Optimization):
+                        // Only construct and draw markers that are currently visible on the screen.
+                        // This prevents mobile CPU and GPU thrashing from rendering off-screen markers.
+                        if (view.boundingBox != null && view.boundingBox.contains(point)) {
+                            val marker = Marker(view).apply {
+                                position = point
+                                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                                rotation = bus.heading
+                                title = "Reg: ${bus.busId} | Crowd: ${bus.crowdLevel}"
+                                subDescription = "Speed: ${bus.speed} km/h | Route: ${bus.routeId}"
+                                icon = redBusIcon
+                            }
+                            view.overlays.add(marker)
                         }
-                        view.overlays.add(marker)
                     }
                     
                     // Force OSM to redraw the canvas with the new pins
@@ -363,14 +370,21 @@ fun HomeScreen(
                 onQueryChange = { 
                     searchQuery = it 
                     searchViewModel.performSearch(it)
+                    // High-Scale DB Query Optimization:
+                    // Filter the RTDB listener node dynamically based on search query
+                    mapViewModel.setRouteFilter(if (it.isBlank()) null else it)
                 },
                 onSearch = { 
                     searchViewModel.performSearch(it)
+                    mapViewModel.setRouteFilter(if (it.isBlank()) null else it)
                 },
                 active = active,
                 onActiveChange = { 
                     active = it 
-                    if (!it) searchViewModel.clearSearch()
+                    if (!it) {
+                        searchViewModel.clearSearch()
+                        mapViewModel.setRouteFilter(null)
+                    }
                 },
                 colors = SearchBarDefaults.colors(containerColor = Color.White),
                 placeholder = { Text(stringResource(R.string.search_placeholder)) },
@@ -381,9 +395,11 @@ fun HomeScreen(
                             if (searchQuery.isNotEmpty()) {
                                 searchQuery = ""
                                 searchViewModel.clearSearch()
+                                mapViewModel.setRouteFilter(null)
                             } else {
                                 active = false
                                 searchViewModel.clearSearch()
+                                mapViewModel.setRouteFilter(null)
                             }
                         }) {
                             Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.icon_clear))

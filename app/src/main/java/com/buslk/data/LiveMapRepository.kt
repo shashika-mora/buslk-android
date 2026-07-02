@@ -19,9 +19,16 @@ class LiveMapRepository : ILiveMapRepository {
     // Obtain RTDB singleton reference
     private val database = FirebaseDatabase.getInstance("https://buslk-app-default-rtdb.asia-southeast1.firebasedatabase.app").reference
 
-    override fun getLiveBusLocations(): Flow<Result<List<BusLocation>>> = callbackFlow {
-        // Reference to the high-velocity GPS node
-        val locationsRef = database.child("bus_locations")
+    override fun getLiveBusLocations(routeId: String?): Flow<Result<List<BusLocation>>> = callbackFlow {
+        // High-Scale Optimization:
+        // 1. If routeId is provided, perform database-level query filtering.
+        // 2. If no routeId is provided, limit the query to the 100 most active buses.
+        // This prevents unbounded database egress and stops data-plan flooding for passengers.
+        val locationsRef = if (!routeId.isNullOrBlank()) {
+            database.child("bus_locations").orderByChild("routeId").equalTo(routeId)
+        } else {
+            database.child("bus_locations").limitToLast(100)
+        }
 
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {

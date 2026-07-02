@@ -34,15 +34,29 @@ class MapViewModel(
     // Public immutable state for the View to observe
     val mapState: StateFlow<MapUiState> = _mapState.asStateFlow()
 
+    // Track the active location tracking coroutine job so we can cancel and restart
+    // it dynamically when the route filter changes.
+    private var observeJob: kotlinx.coroutines.Job? = null
+
     init {
-        // Automatically start listening to the GPS stream upon creation
-        observeBusLocations()
+        // Automatically start listening to the GPS stream upon creation (no filter)
+        observeBusLocations(null)
     }
 
-    private fun observeBusLocations() {
+    /**
+     * Updates the route filter and restarts the location listener.
+     */
+    fun setRouteFilter(routeId: String?) {
+        observeBusLocations(routeId)
+    }
+
+    private fun observeBusLocations(routeId: String?) {
+        // Cancel the previous listener job to prevent duplicate connections and memory leaks
+        observeJob?.cancel()
+        
         // viewModelScope ensures this coroutine dies immediately when the ViewModel is destroyed
-        viewModelScope.launch {
-            liveMapRepository.getLiveBusLocations().collect { result ->
+        observeJob = viewModelScope.launch {
+            liveMapRepository.getLiveBusLocations(routeId).collect { result ->
                 result.fold(
                     onSuccess = { buses ->
                         // The repository decoded the RTDB perfectly, update the UI with new markers

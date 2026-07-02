@@ -10,8 +10,9 @@ import kotlinx.coroutines.flow.Flow
 interface ILiveMapRepository {
     
     /**
-     * Subscribes to live GPS updates for all active buses.
-     * Emits a new list every time a bus broadcasts a new coordinate.
+     * Subscribes to live GPS updates.
+     * High-Scale Optimization: If [routeId] is provided, filters updates at the DB query level.
+     * Emits a new list every time a matching bus broadcasts a new coordinate.
      */
-    fun getLiveBusLocations(): Flow<Result<List<BusLocation>>>
+    fun getLiveBusLocations(routeId: String? = null): Flow<Result<List<BusLocation>>>
 }
