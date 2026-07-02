@@ -6,6 +6,11 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- Required to call startForeground() for the GPS TrackingService (gps.md §3.2) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- Required on Android 14+ (API 34) for a foreground service that accesses location.
+         Without this the OS throws SecurityException and the TrackingService crashes. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
