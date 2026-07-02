@@ -7,11 +7,20 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if request.auth != null;
       
-      // Allow write if it's the user's own document, but prevent point/role spoofing
-      // We allow creation if the document doesn't exist yet
+      // Allow write if it's the user's own document, but prevent spoofing of
+      // privileged fields. Clients MUST NOT be able to self-assign a role or
+      // inflate their own gamification points.
+      //
+      // Security Note: 'role' changes are blocked entirely (RBAC protection).
+      // 'points' changes are blocked here; point awards MUST go through
+      // TripRepository.reportCrowdLevel() → FieldValue.increment() on the server,
+      // or via Cloud Functions post-MVP. A malicious client cannot set points=99999.
+      //
+      // We allow creation (when the document doesn't exist yet) so that
+      // AuthRepository.syncUserToFirestore() can write the initial user profile.
       allow write: if request.auth != null && request.auth.uid == userId && 
                    (!exists(/databases/$(database)/documents/users/$(userId)) ||
-                   !request.resource.data.diff(resource.data).affectedKeys().hasAny(['points', 'role']));
+                   !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'points']));
     }
 
     // ROUTES, BUSES & BROADCASTS COLLECTIONS (Admin Only Writes)

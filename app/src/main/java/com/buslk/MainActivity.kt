@@ -113,8 +113,12 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
     )
 
     // Instantiate Trip & Feedback dependencies
+    // OOD Principle (DI / Dependency Inversion): TripViewModel needs SearchRepository to
+    // resolve bus metadata (route name, reg number) after a successful QR check-in.
+    // We pass the SAME shared searchRepository instance created above so the ViewModel
+    // reuses an existing Firestore connection rather than opening a duplicate one.
     val tripViewModel: com.buslk.ui.viewmodels.TripViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
-        factory = com.buslk.ui.viewmodels.TripViewModelFactory(tripRepository)
+        factory = com.buslk.ui.viewmodels.TripViewModelFactory(tripRepository, searchRepository)
     )
     val feedbackViewModel: com.buslk.ui.viewmodels.FeedbackViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
         factory = com.buslk.ui.viewmodels.FeedbackViewModelFactory(feedbackRepository)
