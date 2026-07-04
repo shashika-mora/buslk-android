@@ -18,6 +18,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import com.buslk.R
 import com.buslk.ui.auth.AuthViewModel
 import com.buslk.ui.viewmodels.SettingsViewModel
@@ -152,9 +154,30 @@ fun SettingsScreen(
                                 expanded = langDropdownExpanded,
                                 onDismissRequest = { langDropdownExpanded = false }
                             ) {
-                                DropdownMenuItem(text = { Text(stringResource(R.string.lang_english)) }, onClick = { settingsViewModel.updateLanguage("en"); langDropdownExpanded = false })
-                                DropdownMenuItem(text = { Text(stringResource(R.string.lang_sinhala)) }, onClick = { settingsViewModel.updateLanguage("si"); langDropdownExpanded = false })
-                                DropdownMenuItem(text = { Text(stringResource(R.string.lang_tamil)) }, onClick = { settingsViewModel.updateLanguage("ta"); langDropdownExpanded = false })
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.lang_english)) },
+                                    onClick = {
+                                        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("en"))
+                                        settingsViewModel.updateLanguage("en")
+                                        langDropdownExpanded = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.lang_sinhala)) },
+                                    onClick = {
+                                        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("si"))
+                                        settingsViewModel.updateLanguage("si")
+                                        langDropdownExpanded = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.lang_tamil)) },
+                                    onClick = {
+                                        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("ta"))
+                                        settingsViewModel.updateLanguage("ta")
+                                        langDropdownExpanded = false
+                                    }
+                                )
                             }
                         }
                     }

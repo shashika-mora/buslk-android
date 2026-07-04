@@ -65,4 +65,11 @@
     <string name="settings_route_138">பாதை 138</string>
     <string name="settings_language">மொழி</string>
     <string name="settings_push_notifications">புஷ் அறிவிப்புகள்</string>
+
+    <!-- Missing references from main branch -->
+    <string name="nav_scan_qr">QR ஸ்கேன்</string>
+    <string name="nav_trip">பயணம்</string>
+    <string name="nav_feedback">கருத்து</string>
+    <string name="nav_settings">அமைப்புகள்</string>
+    <string name="nav_chat">அரட்டை</string>
 </resources>

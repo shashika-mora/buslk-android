@@ -65,4 +65,11 @@
     <string name="settings_route_138">මාර්ගය 138</string>
     <string name="settings_language">භාෂාව</string>
     <string name="settings_push_notifications">දැනුම්දීම්</string>
+
+    <!-- Missing references from main branch -->
+    <string name="nav_scan_qr">QR පරිලෝකනය</string>
+    <string name="nav_trip">ගමන</string>
+    <string name="nav_feedback">ප්‍රතිචාර</string>
+    <string name="nav_settings">සැකසුම්</string>
+    <string name="nav_chat">සංවාද</string>
 </resources>
