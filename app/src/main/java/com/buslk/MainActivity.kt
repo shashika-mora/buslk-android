@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -118,7 +119,7 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
     // We pass the SAME shared searchRepository instance created above so the ViewModel
     // reuses an existing Firestore connection rather than opening a duplicate one.
     val tripViewModel: com.buslk.ui.viewmodels.TripViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
-        factory = com.buslk.ui.viewmodels.TripViewModelFactory(tripRepository, searchRepository)
+        factory = com.buslk.ui.viewmodels.TripViewModelFactory(tripRepository, searchRepository, feedbackRepository)
     )
     val feedbackViewModel: com.buslk.ui.viewmodels.FeedbackViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
         factory = com.buslk.ui.viewmodels.FeedbackViewModelFactory(feedbackRepository)
@@ -132,6 +133,23 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
     
     var scannedBusId by rememberSaveable {
         mutableStateOf("")
+    }
+
+    val isUserSignedIn = authViewModel.isSignedIn()
+    LaunchedEffect(isUserSignedIn) {
+        if (isUserSignedIn) {
+            tripViewModel.checkActiveTripState()
+        }
+    }
+
+    val tripUiState by tripViewModel.uiState.collectAsState()
+    LaunchedEffect(tripUiState) {
+        if (tripUiState is com.buslk.ui.viewmodels.TripUiState.CheckedIn) {
+            if (currentDestination != AppDestinations.FEEDBACK) {
+                currentDestination = AppDestinations.TRIP_SCREEN
+                scannedBusId = (tripUiState as com.buslk.ui.viewmodels.TripUiState.CheckedIn).busId
+            }
+        }
     }
 
     var chatPartnerName by rememberSaveable {
@@ -247,7 +265,11 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
                             onBack = { currentDestination = AppDestinations.PROFILE },
                             authViewModel = authViewModel,
                             settingsViewModel = settingsViewModel,
-                            onLogoutSuccess = { currentDestination = AppDestinations.LOGIN }
+                            onLogoutSuccess = {
+                                profileViewModel.resetState()
+                                tripViewModel.resetState()
+                                currentDestination = AppDestinations.LOGIN
+                            }
                         )
                         AppDestinations.SCAN_QR -> com.buslk.ui.screens.ScanQRScreen(
                             tripViewModel = tripViewModel,
