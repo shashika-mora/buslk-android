@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "876323453331",
+    "firebase_url": "https://buslk-app-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "buslk-app",
+    "storage_bucket": "buslk-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:876323453331:android:aef17da292b7c8129fd066",
+        "android_client_info": {
+          "package_name": "com.buslk"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "876323453331-o8085e70pfh1nnehj1ejssb40n6nqe50.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCv9luejGDTzjLy697Mue0NWRiv59fN16k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "876323453331-o8085e70pfh1nnehj1ejssb40n6nqe50.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
