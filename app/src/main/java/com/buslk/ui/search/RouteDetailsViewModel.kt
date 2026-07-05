@@ -63,13 +63,13 @@ class RouteDetailsViewModel(
                 result.fold(
                     onSuccess = { allLiveBuses ->
                         // Convert to a map for O(1) lookups
-                        val liveBusMap = allLiveBuses.associateBy { it.busId }
+                        val liveBusMap = allLiveBuses.associateBy { normalizeBusId(it.busId) }
                         
                         // Merge static documents with realtime telemetry
                         val mergedList = staticBuses.map { bus ->
                             RouteBusItem(
                                 busDoc = bus,
-                                liveLocation = liveBusMap[bus.registrationNumber]
+                                liveLocation = liveBusMap[normalizeBusId(bus.registrationNumber)]
                             )
                         }
                         _uiState.value = RouteDetailsUiState.Success(mergedList)
@@ -80,6 +80,10 @@ class RouteDetailsViewModel(
                 )
             }
         }
+    }
+
+    private fun normalizeBusId(id: String): String {
+        return id.lowercase().replace(Regex("[^a-z0-9]"), "")
     }
 
     fun clear() {
