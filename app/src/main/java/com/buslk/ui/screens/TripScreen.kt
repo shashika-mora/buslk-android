@@ -2,9 +2,13 @@ package com.buslk.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.Info
@@ -22,6 +26,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.buslk.ui.theme.*
 import com.buslk.ui.viewmodels.TripViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,10 +40,19 @@ fun TripScreen(
 ) {
     val context = LocalContext.current
     var reportedCrowdLevel by remember { mutableStateOf<String?>(null) }
+    var reportCooldownSeconds by remember { mutableStateOf(0) }
 
     val uiState by tripViewModel.uiState.collectAsState()
-    val routeName = (uiState as? com.buslk.ui.viewmodels.TripUiState.CheckedIn)?.routeName ?: "Loading Route..."
-    val regNum = (uiState as? com.buslk.ui.viewmodels.TripUiState.CheckedIn)?.regNum ?: busId
+    val checkedInState = uiState as? com.buslk.ui.viewmodels.TripUiState.CheckedIn
+    val routeName = checkedInState?.routeName ?: "Loading Route..."
+    val regNum = checkedInState?.regNum ?: busId
+    val type = checkedInState?.type ?: "Standard"
+    val capacity = checkedInState?.capacity ?: 40
+    val owner = checkedInState?.owner ?: "Loading..."
+    val overallRating = checkedInState?.overallRating ?: 4.5
+    val recentComment = checkedInState?.recentComment ?: "No feedback yet."
+    val recentUser = checkedInState?.recentUser ?: "User"
+    val feedbacks = checkedInState?.feedbacks ?: emptyList()
     
     Scaffold(
         topBar = {
@@ -75,6 +91,7 @@ fun TripScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
         ) {
             // --- 1. Blue Status Header ---
             Surface(
@@ -119,6 +136,56 @@ fun TripScreen(
 
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                         Text("Next: Dehiwala", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
+                    }
+                }
+            }
+
+            // --- 1.5 Bus Details Card ---
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                shape = RoundedCornerShape(16.dp),
+                color = Color.White
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text("Active Journey Bus", color = Color.Gray, fontSize = 12.sp)
+                            Text(regNum, fontWeight = FontWeight.Bold, fontSize = 22.sp, color = BusLKBlue)
+                        }
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = BusLKBlue.copy(alpha = 0.1f)
+                        ) {
+                            Text(
+                                type,
+                                color = BusLKBlue,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
+                    }
+                    
+                    HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f), modifier = Modifier.padding(vertical = 12.dp))
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column {
+                            Text("Bus Owner / Operator", color = Color.Gray, fontSize = 11.sp)
+                            Text(owner, fontWeight = FontWeight.Medium, fontSize = 14.sp)
+                        }
+                        Column(horizontalAlignment = Alignment.End) {
+                            Text("Seating Capacity", color = Color.Gray, fontSize = 11.sp)
+                            Text("$capacity Seats", fontWeight = FontWeight.Medium, fontSize = 14.sp)
+                        }
                     }
                 }
             }
@@ -182,14 +249,25 @@ fun TripScreen(
                     Text("Report Crowd Level:", color = Color.Gray, fontSize = 12.sp)
                     Spacer(modifier = Modifier.height(8.dp))
 
+                    val scope = rememberCoroutineScope()
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         val handleReport: (String) -> Unit = { level ->
-                            if (reportedCrowdLevel == null) {
+                            if (reportCooldownSeconds == 0) {
                                 reportedCrowdLevel = level
                                 tripViewModel.reportCrowdLevel(level)
+                                
+                                // Reset after 1 minute (60 seconds) with countdown
+                                scope.launch {
+                                    reportCooldownSeconds = 60
+                                    while (reportCooldownSeconds > 0) {
+                                        delay(1000)
+                                        reportCooldownSeconds--
+                                    }
+                                    reportedCrowdLevel = null
+                                }
                             }
                         }
 
@@ -216,24 +294,81 @@ fun TripScreen(
                         )
                     }
 
-                    if (reportedCrowdLevel != null) {
+                    // Cooldown / Success status text
+                    if (reportCooldownSeconds > 0) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                            Text("✓ Crowd level reported! Resubmit in ${reportCooldownSeconds}s", color = PositiveGreen, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        }
+                    } else if (reportedCrowdLevel != null) {
                         Spacer(modifier = Modifier.height(16.dp))
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                             Text("✓ Crowd level reported! +5 points", color = PositiveGreen, fontSize = 12.sp)
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f), modifier = Modifier.padding(vertical = 20.dp))
 
-                    OutlinedButton(
-                        onClick = { /* Report safety */ },
+                    // --- Passenger Reviews & Ratings ---
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        contentPadding = PaddingValues(16.dp)
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Icon(Icons.Outlined.Security, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Report Safety Concern", color = Color.Black)
+                        Text("Passenger Reviews", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Filled.Star, contentDescription = "Rating", tint = Color(0xFFFFB300), modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(String.format(Locale.getDefault(), "%.1f / 5.0", overallRating), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    if (feedbacks.isEmpty()) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.3f))
+                        ) {
+                            Box(modifier = Modifier.padding(16.dp), contentAlignment = Alignment.Center) {
+                                Text("No reviews submitted for this bus yet.", fontSize = 12.sp, color = Color.Gray)
+                            }
+                        }
+                    } else {
+                        feedbacks.forEach { feedback ->
+                            val userMasked = feedback.userId.take(6).ifEmpty { "User12" }
+                            val commentText = feedback.comment.ifEmpty { "Punctual bus, comfortable ride!" }
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp),
+                                colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
+                                shape = RoundedCornerShape(12.dp),
+                                border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.3f))
+                            ) {
+                                Column(modifier = Modifier.padding(12.dp)) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Surface(shape = RoundedCornerShape(50), color = BusLKBlue.copy(alpha = 0.1f), modifier = Modifier.size(24.dp)) {
+                                            Box(contentAlignment = Alignment.Center) {
+                                                Text(userMasked.firstOrNull()?.toString()?.uppercase(Locale.getDefault()) ?: "U", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = BusLKBlue)
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(userMasked, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = Color.DarkGray)
+                                        Spacer(modifier = Modifier.weight(1f))
+                                        Text("Verified Rider", fontSize = 10.sp, color = Color.Gray)
+                                    }
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(
+                                        commentText,
+                                        fontSize = 12.sp,
+                                        color = Color.Black
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
