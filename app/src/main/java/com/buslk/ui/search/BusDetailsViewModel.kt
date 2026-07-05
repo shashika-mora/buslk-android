@@ -93,7 +93,7 @@ class BusDetailsViewModel(
         rtdbJob = viewModelScope.launch {
             liveMapRepository.getLiveBusLocations().collect { result ->
                 result.onSuccess { allBuses ->
-                    val myBusLive = allBuses.find { it.busId == busId }
+                    val myBusLive = allBuses.find { normalizeBusId(it.busId) == normalizeBusId(busId) }
                     if (staticBusDoc != null && _uiState.value is BusDetailsUiState.Success) {
                         _uiState.value = BusDetailsUiState.Success(
                             busDoc = staticBusDoc!!,
@@ -105,6 +105,10 @@ class BusDetailsViewModel(
                 }
             }
         }
+    }
+
+    private fun normalizeBusId(id: String): String {
+        return id.lowercase().replace(Regex("[^a-z0-9]"), "")
     }
 
     fun clear() {
