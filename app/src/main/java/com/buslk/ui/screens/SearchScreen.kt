@@ -1,11 +1,15 @@
 package com.buslk.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DirectionsBus
@@ -41,6 +45,20 @@ fun SearchScreen(
     busDetailsViewModel: BusDetailsViewModel
 ) {
     var searchDestination by rememberSaveable { mutableStateOf(SearchDestination.ROUTE_LIST) }
+
+    BackHandler(enabled = searchDestination != SearchDestination.ROUTE_LIST) {
+        searchDestination = when (searchDestination) {
+            SearchDestination.BUS_DETAILS -> {
+                busDetailsViewModel.clear()
+                SearchDestination.ROUTE_DETAILS
+            }
+            SearchDestination.ROUTE_DETAILS -> {
+                routeDetailsViewModel.clear()
+                SearchDestination.ROUTE_LIST
+            }
+            else -> SearchDestination.ROUTE_LIST
+        }
+    }
 
     Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
@@ -213,27 +231,80 @@ fun RouteDetailsView(
                             val bus = item.busDoc
                             val loc = item.liveLocation
                             Card(
-                                modifier = Modifier.fillMaxWidth().clickable { onBusSelected(bus.registrationNumber) },
-                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { onBusSelected(bus.registrationNumber) },
+                                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                                colors = CardDefaults.cardColors(containerColor = Color.White),
+                                shape = RoundedCornerShape(12.dp),
+                                border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.3f))
                             ) {
                                 Row(
-                                    modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                                    modifier = Modifier.padding(12.dp).fillMaxWidth(),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Icon(
-                                        Icons.Filled.DirectionsBus, 
-                                        contentDescription = null, 
-                                        tint = if (loc != null) Color(0xFF4CAF50) else Color.Gray, 
+                                    Surface(
+                                        shape = CircleShape,
+                                        color = if (loc != null) Color(0xFFE8F5E9) else Color(0xFFF5F5F5),
                                         modifier = Modifier.size(40.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(16.dp))
-                                    Column {
-                                        Text(bus.registrationNumber, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                                    ) {
+                                        Box(contentAlignment = Alignment.Center) {
+                                            Icon(
+                                                Icons.Filled.DirectionsBus, 
+                                                contentDescription = null, 
+                                                tint = if (loc != null) Color(0xFF4CAF50) else Color.Gray, 
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                        }
+                                    }
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            modifier = Modifier.fillMaxWidth()
+                                        ) {
+                                            Text(
+                                                bus.registrationNumber, 
+                                                fontWeight = FontWeight.Bold, 
+                                                fontSize = 14.sp, 
+                                                color = Color.Black
+                                            )
+                                            Surface(
+                                                shape = RoundedCornerShape(6.dp),
+                                                color = if (loc != null) Color(0xFFE8F5E9) else Color(0xFFECEFF1),
+                                                modifier = Modifier.padding(start = 4.dp)
+                                            ) {
+                                                Text(
+                                                    if (loc != null) "LIVE" else "OFFLINE",
+                                                    color = if (loc != null) Color(0xFF2E7D32) else Color(0xFF546E7A),
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = 9.sp,
+                                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                                )
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        
+                                        Text(
+                                            text = "Type: ${bus.type} • Capacity: ${bus.capacity} seats",
+                                            fontSize = 11.sp,
+                                            color = Color.Gray
+                                        )
+                                        Text(
+                                            text = "Operator: ${bus.owner}",
+                                            fontSize = 11.sp,
+                                            color = Color.Gray
+                                        )
+                                        
                                         if (loc != null) {
-                                            Text("Live • Speed: ${loc.speed} km/h • Crowd: ${loc.crowdLevel}", style = MaterialTheme.typography.bodyMedium, color = Color(0xFF4CAF50))
-                                        } else {
-                                            Text("Offline", style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            Text(
+                                                text = "Speed: ${loc.speed} km/h • Crowd: ${loc.crowdLevel}",
+                                                fontSize = 11.sp,
+                                                fontWeight = FontWeight.Medium,
+                                                color = Color(0xFF2E7D32)
+                                            )
                                         }
                                     }
                                 }
