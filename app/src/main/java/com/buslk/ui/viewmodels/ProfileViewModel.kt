@@ -59,4 +59,8 @@ class ProfileViewModel(
             }
         }
     }
+
+    fun resetState() {
+        _uiState.value = ProfileUiState.Idle
+    }
 }
