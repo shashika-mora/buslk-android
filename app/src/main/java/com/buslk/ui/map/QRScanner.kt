@@ -47,32 +47,28 @@ import java.util.concurrent.Executors
 fun QRScanner(onQrScanned: (String) -> Unit, onClose: () -> Unit) {
     val cameraPermissionState = rememberPermissionState(android.Manifest.permission.CAMERA)
 
-    LaunchedEffect(Unit) {
-        if (!cameraPermissionState.status.isGranted) {
-            cameraPermissionState.launchPermissionRequest()
-        }
+    if (!cameraPermissionState.status.isGranted) {
+        AlertDialog(
+            onDismissRequest = onClose,
+            title = { Text("Camera Permission Required") },
+            text = { Text("This app requires camera access to scan QR codes. Please grant permission manually to continue.") },
+            confirmButton = {
+                Button(onClick = { cameraPermissionState.launchPermissionRequest() }) {
+                    Text("Grant Permission")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onClose) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
         if (cameraPermissionState.status.isGranted) {
             CameraPreview(onQrScanned = onQrScanned)
             QROverlay()
-        } else {
-            Column(
-                modifier = Modifier.fillMaxSize().padding(32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    "Camera permission is required to scan QR codes.",
-                    color = Color.White,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Button(onClick = { cameraPermissionState.launchPermissionRequest() }) {
-                    Text("Grant Permission")
-                }
-            }
         }
 
         // Top Controls
