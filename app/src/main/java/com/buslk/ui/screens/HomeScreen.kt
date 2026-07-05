@@ -113,6 +113,11 @@ fun HomeScreen(
     val searchUiState by searchViewModel.uiState.collectAsState()
     val mapUiState by mapViewModel.mapState.collectAsState()
 
+    // Refresh the bus locations listener when entering the HomeScreen
+    androidx.compose.runtime.LaunchedEffect(mapViewModel) {
+        mapViewModel.refreshBusLocations()
+    }
+
     // Grab the current LifecycleOwner (usually the Activity or Navigation BackStackEntry)
     // We need this to know when the app goes into the background or foreground.
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -132,8 +137,11 @@ fun HomeScreen(
         // Create an observer that listens for Android OS events (like switching apps)
         val lifecycleObserver = LifecycleEventObserver { _, event ->
             when (event) {
-                // App came to the foreground
-                Lifecycle.Event.ON_RESUME -> mapView.onResume()
+                // App came to the foreground (Resume map and refresh the live locations listener)
+                Lifecycle.Event.ON_RESUME -> {
+                    mapView.onResume()
+                    mapViewModel.refreshBusLocations()
+                }
                 // App went to the background (Pause the map so it stops draining memory/battery)
                 Lifecycle.Event.ON_PAUSE -> mapView.onPause()
                 // Activity is being destroyed
