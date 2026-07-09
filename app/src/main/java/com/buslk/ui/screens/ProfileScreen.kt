@@ -74,13 +74,21 @@ fun ProfileScreen(
                 }
             }
             is ProfileUiState.Error -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Text(
                         text = (uiState as ProfileUiState.Error).message, 
                         color = Color.Red, 
                         modifier = Modifier.padding(16.dp),
                         textAlign = TextAlign.Center
                     )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(onClick = { if (uid.isNotBlank()) profileViewModel.loadProfileData(uid) }) {
+                        Text("Retry")
+                    }
                 }
             }
             is ProfileUiState.Success -> {

@@ -145,8 +145,16 @@ fun RouteSelectionView(
                 }
             }
             is SearchUiState.Error -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Error: ${state.message}", color = MaterialTheme.colorScheme.error)
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("Error: ${state.message}", color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(onClick = { searchViewModel.refreshRoutes() }) {
+                        Text("Retry")
+                    }
                 }
             }
             is SearchUiState.Success -> {

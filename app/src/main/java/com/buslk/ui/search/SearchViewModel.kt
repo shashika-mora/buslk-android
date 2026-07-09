@@ -59,6 +59,10 @@ class SearchViewModel(
         }
     }
 
+    fun refreshRoutes() {
+        loadAllRoutes()
+    }
+
     fun performSearch(query: String) {
         val q = query.trim().lowercase()
         if (q.isEmpty()) {

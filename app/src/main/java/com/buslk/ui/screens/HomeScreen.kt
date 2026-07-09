@@ -47,6 +47,7 @@ import org.osmdroid.views.overlay.Marker
 import androidx.core.content.ContextCompat
 import java.util.Locale
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Button
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -244,6 +245,17 @@ fun HomeScreen(
                         if (mapUiState is MapUiState.Loading) {
                             Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
                                 CircularProgressIndicator()
+                            }
+                        } else if (mapUiState is MapUiState.Error) {
+                            Column(
+                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text("Failed to fetch live locations.", color = Color.Gray)
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Button(onClick = { mapViewModel.refreshBusLocations() }) {
+                                    Text("Retry")
+                                }
                             }
                         } else if (filteredBuses.isEmpty()) {
                             Text("No buses found nearby.", color = Color.Gray, modifier = Modifier.padding(16.dp))
