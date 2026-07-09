@@ -71,7 +71,7 @@ fun ProfileScreen(
 
 
     Scaffold(
-        containerColor = Color(0xFFF5F6FA) // Light background
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         when (uiState) {
             is ProfileUiState.Idle, is ProfileUiState.Loading -> {
@@ -256,7 +256,7 @@ fun ProfileScreen(
                 TabRow(
                     selectedTabIndex = selectedTabIndex,
                     containerColor = Color.Transparent,
-                    contentColor = Color.Black,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
                     divider = {},
                     indicator = { tabPositions ->
                         TabRowDefaults.SecondaryIndicator(
@@ -267,7 +267,7 @@ fun ProfileScreen(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .clip(RoundedCornerShape(24.dp))
-                        .background(Color.White.copy(alpha = 0.5f))
+                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
                 ) {
                     tabs.forEachIndexed { index, title ->
                         val selected = selectedTabIndex == index
@@ -275,7 +275,7 @@ fun ProfileScreen(
                             selected = selected,
                             onClick = { selectedTabIndex = index },
                             modifier = Modifier
-                                .background(if (selected) Color.White else Color.Transparent)
+                                .background(if (selected) MaterialTheme.colorScheme.surface else Color.Transparent)
                                 .clip(RoundedCornerShape(50))
                         ) {
                             Text(
@@ -324,7 +324,7 @@ fun TripHistoryList(trips: List<TripDoc>) {
         items(trips) { trip ->
             Surface(
                 shape = RoundedCornerShape(16.dp),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.surface,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -411,8 +411,8 @@ fun TripHistoryList(trips: List<TripDoc>) {
                         modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(stringResource(id = R.string.profile_distance_fmt, trip.distanceKm), color = Color.DarkGray, fontSize = 12.sp)
-                        Text(stringResource(id = R.string.profile_fare_fmt, trip.totalFare), color = Color.DarkGray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(id = R.string.profile_distance_fmt, trip.distanceKm), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+                        Text(stringResource(id = R.string.profile_fare_fmt, trip.totalFare), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     }
 
                     // Bottom Metadata (Date & Time)
@@ -471,7 +471,7 @@ fun AchievementsGrid(userAchievements: Map<String, AchievementDoc>) {
 
             Surface(
                 shape = RoundedCornerShape(16.dp),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.surface,
                 modifier = Modifier.fillMaxWidth().aspectRatio(0.85f) // Slightly taller than wide
             ) {
                 Column(
@@ -502,8 +502,8 @@ fun AchievementsGrid(userAchievements: Map<String, AchievementDoc>) {
                         val progressDetails = if (progressDoc != null) "${progressDoc.progress}/${progressDoc.target}" else ""
                         Surface(
                             shape = RoundedCornerShape(8.dp),
-                            color = Color.White,
-                            border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray)
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
                         ) {
                             Text(stringResource(id = R.string.profile_locked_prefix, progressDetails), color = Color.Gray, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp))
                         }
@@ -536,7 +536,7 @@ fun FeedbackList(feedbacks: List<FeedbackDoc>) {
         items(feedbacks) { feedback ->
             Surface(
                 shape = RoundedCornerShape(16.dp),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.surface,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(modifier = Modifier.padding(16.dp)) {
@@ -616,7 +616,7 @@ fun FeedbackList(feedbacks: List<FeedbackDoc>) {
                         // Comment Box
                         Surface(
                             shape = RoundedCornerShape(8.dp),
-                            color = Color(0xFFF9F9F9),
+                            color = MaterialTheme.colorScheme.surfaceVariant,
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(

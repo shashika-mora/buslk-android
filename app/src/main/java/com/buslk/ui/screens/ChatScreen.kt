@@ -39,7 +39,7 @@ fun ChatScreen(
         },
         bottomBar = {
             BottomAppBar(
-                containerColor = Color.White,
+                containerColor = MaterialTheme.colorScheme.surface,
                 tonalElevation = 8.dp
             ) {
                 var message by remember { mutableStateOf("") }
@@ -61,7 +61,7 @@ fun ChatScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF5F6FA)) // Light background
+                .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center

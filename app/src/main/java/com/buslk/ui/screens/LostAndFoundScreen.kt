@@ -82,7 +82,7 @@ fun LostAndFoundScreen(
     )
 
     Scaffold(
-        containerColor = Color.White
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -195,8 +195,8 @@ fun LostAndFoundScreen(
             // --- 3. Custom Tabs ---
             TabRow(
                 selectedTabIndex = selectedTabIndex,
-                containerColor = Color(0xFFF5F6FA), // Very light gray
-                contentColor = Color.Black,
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                contentColor = MaterialTheme.colorScheme.onSurface,
                 divider = {},
                 indicator = { tabPositions ->
                     TabRowDefaults.Indicator(
@@ -214,7 +214,7 @@ fun LostAndFoundScreen(
                         selected = selected,
                         onClick = { selectedTabIndex = index },
                         modifier = Modifier
-                            .background(if (selected) Color.White else Color.Transparent)
+                            .background(if (selected) MaterialTheme.colorScheme.surface else Color.Transparent)
                             .clip(RoundedCornerShape(50))
                     ) {
                         Text(
@@ -275,7 +275,7 @@ fun LostAndFoundScreen(
             ModalBottomSheet(
                 onDismissRequest = { showBottomSheet = false },
                 sheetState = sheetState,
-                containerColor = Color.White
+                containerColor = MaterialTheme.colorScheme.surface
             ) {
                 NewItemForm(
                     onDismiss = { showBottomSheet = false },
@@ -389,7 +389,7 @@ fun LostFoundCard(
     Surface(
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f)),
-        color = Color.White,
+        color = MaterialTheme.colorScheme.surface,
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -425,11 +425,11 @@ fun LostFoundCard(
                     Surface(
                         shape = RoundedCornerShape(8.dp),
                         border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f)),
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.surfaceVariant
                     ) {
                         Text(
                             text = item.route,
-                            color = Color.DarkGray,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontWeight = FontWeight.Medium,
                             fontSize = 12.sp,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
