@@ -34,10 +34,11 @@
 - [x] **Data Integrity:** Fully aligned `UserDoc` DTO with the `db.md` schema (Points, Levels, Preferences).
 - [x] **Defensive UX:** Strict input validation and robust error mapping for Firebase exceptions.
 
-### Phase 3: Core Features (In Progress)
-- [ ] Language Selection & Localization.
-- [ ] Map Integration & Live Bus Tracking.
-- [ ] QR Code Scanning & Automated Ticketing.
+### Phase 3: Core Features (Complete)
+- [x] **Trilingual Localization:** Multi-language interface support (`English`, `Sinhala`, `Tamil`) for all application screens and search queries.
+- [x] **Geospatial Map Integration:** Interactive map using OpenStreetMap / `osmdroid` displaying live active bus locations.
+- [x] **Smart QR Check-In & Ticketing:** CameraX/ML Kit QR code payload checking, automatic fare collection, and active trip tracking.
+- [x] **Default Route Preference Filtering:** Set a default route in settings to automatically filter map markers and nearby listings to quickly access preferred routes.
 
 ## 📐 OOP & OOD Principles in BusLK
 
