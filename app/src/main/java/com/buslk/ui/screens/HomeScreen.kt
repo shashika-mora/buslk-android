@@ -86,6 +86,10 @@ import com.buslk.ui.viewmodels.SettingsViewModel
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
+import androidx.compose.ui.unit.Dp
+import androidx.compose.runtime.CompositionLocalProvider
 
 // Removed Mock Data
 /**
@@ -401,7 +405,8 @@ fun HomeScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = if (active) 0.dp else 16.dp, vertical = if (active) 0.dp else 24.dp)
+                    .statusBarsPadding()
+                    .padding(horizontal = if (active) 0.dp else 16.dp, vertical = if (active) 0.dp else 12.dp)
                     .align(Alignment.TopCenter),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -484,33 +489,37 @@ fun HomeScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxHeight()
-                                .padding(horizontal = 12.dp),
+                                .padding(horizontal = 16.dp),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Column(
                                 verticalArrangement = Arrangement.Center,
-                                modifier = Modifier.padding(vertical = 4.dp)
+                                horizontalAlignment = Alignment.Start
                             ) {
                                 Text(
                                     text = stringResource(R.string.settings_default_route),
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.Gray
+                                    color = Color.Gray,
+                                    maxLines = 1
                                 )
                                 Text(
                                     text = if (currentDefaultRoute == "None") stringResource(R.string.lbl_none) else currentDefaultRoute,
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = if (currentDefaultRoute == "None") Color.Gray else BusLKBlue
+                                    color = if (currentDefaultRoute == "None") Color.Gray else BusLKBlue,
+                                    maxLines = 1
                                 )
                             }
-                            Checkbox(
-                                checked = defaultRouteFilterEnabled,
-                                onCheckedChange = { defaultRouteFilterEnabled = it },
-                                enabled = currentDefaultRoute != "None",
-                                colors = CheckboxDefaults.colors(checkedColor = BusLKBlue)
-                            )
+                            CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides Dp.Unspecified) {
+                                Checkbox(
+                                    checked = defaultRouteFilterEnabled,
+                                    onCheckedChange = { defaultRouteFilterEnabled = it },
+                                    enabled = currentDefaultRoute != "None",
+                                    colors = CheckboxDefaults.colors(checkedColor = BusLKBlue)
+                                )
+                            }
                         }
                     }
                 }
