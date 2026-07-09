@@ -121,4 +121,30 @@
     <string name="friends_scan_qr_prompt">එකම බස් රථයේ සිටින මිතුරන් දැකීමට QR කේතය ස්කෑන් කරන්න</string>
     <string name="friends_btn_chat">කතාබස්</string>
     <string name="friends_status_fmt">ලකුණු: %1$d | %2$s</string>
+
+    <!-- Lost and Found Screen -->
+    <string name="lf_title">නැතිවූ &amp; හමුවූ</string>
+    <string name="lf_all_routes">සියලුම මාර්ග</string>
+    <string name="lf_search_placeholder">භාණ්ඩ සොයන්න…</string>
+    <string name="lf_btn_post_new">නව වාර්තාවක් දමන්න</string>
+    <string name="lf_no_items">කිසිදු භාණ්ඩයක් හමු නොවීය.</string>
+    <string name="lf_form_title">භාණ්ඩයක් වාර්තා කරන්න</string>
+    <string name="lf_form_i_lost">මට මෙය නැති විය</string>
+    <string name="lf_form_i_found">මට මෙය හමු විය</string>
+    <string name="lf_form_label_title">එය කුමක්ද? (උදා: කළු කුඩය)</string>
+    <string name="lf_form_label_desc">විස්තරය සහ පෙනුම</string>
+    <string name="lf_form_label_route">මාර්ගය</string>
+    <string name="lf_form_label_location">ස්ථානය</string>
+    <string name="lf_form_btn_submit">වාර්තාව ඉදිරිපත් කරන්න</string>
+    <string name="lf_badge_found">හමු විය</string>
+    <string name="lf_badge_lost">නැති විය</string>
+    <string name="lf_badge_claimed">භාර දෙන ලදී</string>
+    <string name="lf_badge_open">විවෘතයි</string>
+    <string name="lf_reported_by_fmt">වාර්තා කළේ: %1$s</string>
+    <string name="lf_btn_contact">සම්බන්ධ වන්න</string>
+    <string name="lf_btn_i_found_this_excl">මට මෙය හමු විය!</string>
+    <string name="lf_tab_all_fmt">සියල්ල (%1$d)</string>
+    <string name="lf_tab_found_fmt">හමුවූ (%1$d)</string>
+    <string name="lf_tab_lost_fmt">නැතිවූ (%1$d)</string>
+    <string name="lf_icon_desc">නැතිවූ සහ හමුවූ නිරූපකය</string>
 </resources>

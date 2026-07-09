@@ -20,6 +20,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
+import com.buslk.R
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -73,7 +75,11 @@ fun LostAndFoundScreen(
     val allCount = routedItems.size
     val foundCount = routedItems.count { it.isFound }
     val lostCount = routedItems.count { !it.isFound }
-    val tabs = listOf("All ($allCount)", "Found ($foundCount)", "Lost ($lostCount)")
+    val tabs = listOf(
+        stringResource(id = R.string.lf_tab_all_fmt, allCount),
+        stringResource(id = R.string.lf_tab_found_fmt, foundCount),
+        stringResource(id = R.string.lf_tab_lost_fmt, lostCount)
+    )
 
     Scaffold(
         containerColor = Color.White
@@ -96,13 +102,13 @@ fun LostAndFoundScreen(
                         // Placeholder icon looking somewhat like a box
                         Icon(
                             imageVector = Icons.Outlined.Search, // Can use a box if we find one, sticking to standard outlined
-                            contentDescription = "Lost and Found Icon",
+                            contentDescription = stringResource(id = R.string.lf_icon_desc),
                             tint = Color.White,
                             modifier = Modifier.size(24.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Lost & Found",
+                            text = stringResource(id = R.string.lf_title),
                             style = MaterialTheme.typography.headlineMedium,
                             color = Color.White,
                             fontWeight = FontWeight.Bold
@@ -116,7 +122,7 @@ fun LostAndFoundScreen(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
                         placeholder = { 
-                            Text("Search items...", color = Color.White.copy(alpha = 0.7f)) 
+                            Text(stringResource(id = R.string.lf_search_placeholder), color = Color.White.copy(alpha = 0.7f)) 
                         },
                         leadingIcon = {
                             Icon(Icons.Outlined.Search, contentDescription = null, tint = Color.White.copy(alpha = 0.7f))
@@ -141,6 +147,7 @@ fun LostAndFoundScreen(
                     
                     // Route Filters (Scrollable Row)
                     val routes = listOf("All Routes", "Route 138", "Route 176", "Route 120", "Route 177")
+                    val allRoutesStr = stringResource(id = R.string.lf_all_routes)
                     
                     Row(
                         modifier = Modifier.horizontalScroll(rememberScrollState()),
@@ -148,6 +155,7 @@ fun LostAndFoundScreen(
                     ) {
                         routes.forEach { route ->
                             val isSelected = route == selectedRoute
+                            val displayRoute = if (route == "All Routes") allRoutesStr else route
                             Surface(
                                 shape = RoundedCornerShape(8.dp),
                                 color = if (isSelected) Color.White else RoutePillActive,
@@ -155,7 +163,7 @@ fun LostAndFoundScreen(
                                     .clickable { selectedRoute = route }
                             ) {
                                 Text(
-                                    text = route,
+                                    text = displayRoute,
                                     color = if (isSelected) FriendsPurple else Color.White,
                                     fontWeight = FontWeight.Medium,
                                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
@@ -180,7 +188,7 @@ fun LostAndFoundScreen(
                 ) {
                     Icon(Icons.Default.CameraAlt, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Post New Item", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(id = R.string.lf_btn_post_new), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 }
             }
 
@@ -241,7 +249,7 @@ fun LostAndFoundScreen(
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text("📭", fontSize = 48.sp)
                                 Spacer(modifier = Modifier.height(16.dp))
-                                Text("No items found matching criteria.", color = Color.Gray)
+                                Text(stringResource(id = R.string.lf_no_items), color = Color.Gray)
                             }
                         }
                     } else {
@@ -301,7 +309,7 @@ fun NewItemForm(onDismiss: () -> Unit, onSubmit: (String, String, String, String
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text("Report an Item", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+        Text(stringResource(id = R.string.lf_form_title), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
 
         // Type Segment
         Row(modifier = Modifier.fillMaxWidth()) {
@@ -313,7 +321,7 @@ fun NewItemForm(onDismiss: () -> Unit, onSubmit: (String, String, String, String
                     contentColor = if (type == "LOST") LostOrange else Color.Gray
                 ),
                 border = BorderStroke(1.dp, if (type == "LOST") LostOrange else Color.LightGray)
-            ) { Text("I Lost This") }
+            ) { Text(stringResource(id = R.string.lf_form_i_lost)) }
             Spacer(modifier = Modifier.width(8.dp))
             OutlinedButton(
                 onClick = { type = "FOUND" },
@@ -323,13 +331,13 @@ fun NewItemForm(onDismiss: () -> Unit, onSubmit: (String, String, String, String
                     contentColor = if (type == "FOUND") FoundBlue else Color.Gray
                 ),
                 border = BorderStroke(1.dp, if (type == "FOUND") FoundBlue else Color.LightGray)
-            ) { Text("I Found This") }
+            ) { Text(stringResource(id = R.string.lf_form_i_found)) }
         }
 
         OutlinedTextField(
             value = title,
             onValueChange = { title = it },
-            label = { Text("What is it? (e.g., Black Umbrella)") },
+            label = { Text(stringResource(id = R.string.lf_form_label_title)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
@@ -337,7 +345,7 @@ fun NewItemForm(onDismiss: () -> Unit, onSubmit: (String, String, String, String
         OutlinedTextField(
             value = description,
             onValueChange = { description = it },
-            label = { Text("Description & Appearance") },
+            label = { Text(stringResource(id = R.string.lf_form_label_desc)) },
             modifier = Modifier.fillMaxWidth().height(100.dp)
         )
 
@@ -345,14 +353,14 @@ fun NewItemForm(onDismiss: () -> Unit, onSubmit: (String, String, String, String
             OutlinedTextField(
                 value = route,
                 onValueChange = { route = it },
-                label = { Text("Route") },
+                label = { Text(stringResource(id = R.string.lf_form_label_route)) },
                 modifier = Modifier.weight(1f),
                 singleLine = true
             )
             OutlinedTextField(
                 value = location,
                 onValueChange = { location = it },
-                label = { Text("Location context") },
+                label = { Text(stringResource(id = R.string.lf_form_label_location)) },
                 modifier = Modifier.weight(2f),
                 singleLine = true
             )
@@ -366,7 +374,7 @@ fun NewItemForm(onDismiss: () -> Unit, onSubmit: (String, String, String, String
             colors = ButtonDefaults.buttonColors(containerColor = FriendsPurple),
             enabled = title.isNotBlank() && description.isNotBlank() && location.isNotBlank()
         ) {
-            Text("Submit Report", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(id = R.string.lf_form_btn_submit), fontSize = 16.sp, fontWeight = FontWeight.Bold)
         }
         
         Spacer(modifier = Modifier.height(24.dp))
@@ -405,7 +413,7 @@ fun LostFoundCard(
                             Text(if (item.isFound) "📦" else "🔍", fontSize = 12.sp)
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = if (item.isFound) "Found" else "Lost",
+                                text = if (item.isFound) stringResource(id = R.string.lf_badge_found) else stringResource(id = R.string.lf_badge_lost),
                                 color = Color.White,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 12.sp
@@ -435,7 +443,7 @@ fun LostFoundCard(
                     color = if (item.isClosed) ClaimedYellow else OpenGreen
                 ) {
                     Text(
-                        text = if (item.isClosed) "Claimed" else "Open",
+                        text = if (item.isClosed) stringResource(id = R.string.lf_badge_claimed) else stringResource(id = R.string.lf_badge_open),
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
                         fontSize = 12.sp,
@@ -495,7 +503,7 @@ fun LostFoundCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Reported by ${item.reporterName}",
+                    text = stringResource(id = R.string.lf_reported_by_fmt, item.reporterName),
                     color = Color.Gray,
                     fontSize = 12.sp
                 )
@@ -510,7 +518,7 @@ fun LostFoundCard(
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp)
                     ) {
                         Text(
-                            text = if (item.isFound) "Contact" else "I Found This!",
+                            text = if (item.isFound) stringResource(id = R.string.lf_btn_contact) else stringResource(id = R.string.lf_btn_i_found_this_excl),
                             fontWeight = FontWeight.Medium
                         )
                     }

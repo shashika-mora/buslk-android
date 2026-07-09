@@ -121,4 +121,30 @@
     <string name="friends_scan_qr_prompt">ஒரே பேருந்தில் உள்ள நண்பர்களைப் பார்க்க QR குறியீட்டை ஸ்கேன் செய்யவும்</string>
     <string name="friends_btn_chat">அரட்டை</string>
     <string name="friends_status_fmt">புள்ளிகள்: %1$d | %2$s</string>
+
+    <!-- Lost and Found Screen -->
+    <string name="lf_title">இழந்து &amp; கண்டுபிடித்தது</string>
+    <string name="lf_all_routes">அனைத்து பாதைகளும்</string>
+    <string name="lf_search_placeholder">பொருட்களைத் தேடுங்கள்…</string>
+    <string name="lf_btn_post_new">புதிய பொருளைப் பதிவிடவும்</string>
+    <string name="lf_no_items">பொருந்தும் பொருட்கள் எதுவும் கிடைக்கவில்லை.</string>
+    <string name="lf_form_title">பொருளைப் பற்றி புகாரளிக்கவும்</string>
+    <string name="lf_form_i_lost">இதை நான் தொலைத்துவிட்டேன்</string>
+    <string name="lf_form_i_found">இதை நான் கண்டெடுத்தேன்</string>
+    <string name="lf_form_label_title">அது என்ன பொருள்? (உ-ம்: கருப்பு குடை)</string>
+    <string name="lf_form_label_desc">விளக்கம் &amp; தோற்றம்</string>
+    <string name="lf_form_label_route">பாதை</string>
+    <string name="lf_form_label_location">இட விவரம்</string>
+    <string name="lf_form_btn_submit">புகாரைச் சமர்ப்பிக்கவும்</string>
+    <string name="lf_badge_found">கண்டெடுக்கப்பட்டது</string>
+    <string name="lf_badge_lost">தொலைந்தது</string>
+    <string name="lf_badge_claimed">பெறப்பட்டது</string>
+    <string name="lf_badge_open">திறந்துள்ளது</string>
+    <string name="lf_reported_by_fmt">புகாரளித்தவர்: %1$s</string>
+    <string name="lf_btn_contact">தொடர்பு கொள்ளவும்</string>
+    <string name="lf_btn_i_found_this_excl">இதை நான் கண்டெடுத்தேன்!</string>
+    <string name="lf_tab_all_fmt">அனைத்தும் (%1$d)</string>
+    <string name="lf_tab_found_fmt">கண்டெடுக்கப்பட்டது (%1$d)</string>
+    <string name="lf_tab_lost_fmt">தொலைந்தது (%1$d)</string>
+    <string name="lf_icon_desc">இழந்தது மற்றும் கண்டெடுத்தது ஐகான்</string>
 </resources>

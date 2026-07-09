@@ -126,4 +126,30 @@
     <string name="friends_scan_qr_prompt">Scan a QR code to see friends on the same bus</string>
     <string name="friends_btn_chat">Chat</string>
     <string name="friends_status_fmt">Points: %1$d | %2$s</string>
+
+    <!-- Lost and Found Screen -->
+    <string name="lf_title">Lost &amp; Found</string>
+    <string name="lf_all_routes">All Routes</string>
+    <string name="lf_search_placeholder">Search items…</string>
+    <string name="lf_btn_post_new">Post New Item</string>
+    <string name="lf_no_items">No items found matching criteria.</string>
+    <string name="lf_form_title">Report an Item</string>
+    <string name="lf_form_i_lost">I Lost This</string>
+    <string name="lf_form_i_found">I Found This</string>
+    <string name="lf_form_label_title">What is it? (e.g., Black Umbrella)</string>
+    <string name="lf_form_label_desc">Description &amp; Appearance</string>
+    <string name="lf_form_label_route">Route</string>
+    <string name="lf_form_label_location">Location context</string>
+    <string name="lf_form_btn_submit">Submit Report</string>
+    <string name="lf_badge_found">Found</string>
+    <string name="lf_badge_lost">Lost</string>
+    <string name="lf_badge_claimed">Claimed</string>
+    <string name="lf_badge_open">Open</string>
+    <string name="lf_reported_by_fmt">Reported by %1$s</string>
+    <string name="lf_btn_contact">Contact</string>
+    <string name="lf_btn_i_found_this_excl">I Found This!</string>
+    <string name="lf_tab_all_fmt">All (%1$d)</string>
+    <string name="lf_tab_found_fmt">Found (%1$d)</string>
+    <string name="lf_tab_lost_fmt">Lost (%1$d)</string>
+    <string name="lf_icon_desc">Lost and Found Icon</string>
 </resources>
