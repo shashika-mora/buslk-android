@@ -577,7 +577,7 @@ fun FeedbackList(feedbacks: List<FeedbackDoc>) {
                                         color = Color(0xFFF5F5F5),
                                         modifier = Modifier.padding(2.dp)
                                     ) {
-                                        Text(tag.lowercase(), fontSize = 10.sp, color = Color.DarkGray, modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp))
+                                        Text(getLocalizedTag(tag), fontSize = 10.sp, color = Color.DarkGray, modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp))
                                     }
                                 }
                             }
@@ -658,5 +658,20 @@ fun FeedbackList(feedbacks: List<FeedbackDoc>) {
             }
         }
         item { Spacer(modifier = Modifier.height(64.dp)) }
+    }
+}
+
+@Composable
+private fun getLocalizedTag(tagKey: String): String {
+    return when (tagKey.trim().lowercase()) {
+        "clean_bus", "✨ clean bus" -> stringResource(id = R.string.fb_tag_clean_bus)
+        "comfortable", "🛋️ comfortable" -> stringResource(id = R.string.fb_tag_comfortable)
+        "on_time", "⏰ on time" -> stringResource(id = R.string.fb_tag_on_time)
+        "safe_driving", "🛡️ safe driving" -> stringResource(id = R.string.fb_tag_safe_driving)
+        "friendly_staff", "😃 friendly staff" -> stringResource(id = R.string.fb_tag_friendly_staff)
+        "too_crowded", "👥 too crowded" -> stringResource(id = R.string.fb_tag_too_crowded)
+        "delayed", "⏱️ delayed" -> stringResource(id = R.string.fb_tag_delayed)
+        "rough_driving", "⚠️ rough driving" -> stringResource(id = R.string.fb_tag_rough_driving)
+        else -> tagKey
     }
 }

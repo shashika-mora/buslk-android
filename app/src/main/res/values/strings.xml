@@ -152,4 +152,45 @@
     <string name="lf_tab_found_fmt">Found (%1$d)</string>
     <string name="lf_tab_lost_fmt">Lost (%1$d)</string>
     <string name="lf_icon_desc">Lost and Found Icon</string>
+
+    <!-- Chat Screen -->
+    <string name="chat_type_message_placeholder">Type a message…</string>
+    <string name="chat_send_desc">Send</string>
+    <string name="chatting_with_fmt">Chatting with %1$s</string>
+    <string name="chat_placeholder_desc">This is a placeholder for the instant chat.</string>
+
+    <!-- Feedback Screen -->
+    <string name="fb_toast_submitted">Feedback submitted! +15 points</string>
+    <string name="fb_btn_submit">👍 Submit Feedback &amp; Earn +15 Points</string>
+    <string name="fb_btn_skip">Skip for now</string>
+    <string name="fb_submit_prompt">Please provide at least an overall rating to submit</string>
+    <string name="fb_header_title">How was your trip?</string>
+    <string name="fb_header_subtitle_fmt">%1$s • Private Bus</string>
+    <string name="fb_section_overall">Overall Experience</string>
+    <string name="fb_rating_1">😔 Needs improvement</string>
+    <string name="fb_rating_2">😐 Could be better</string>
+    <string name="fb_rating_3">👍 Good</string>
+    <string name="fb_rating_4">😊 Great!</string>
+    <string name="fb_rating_5">🌟 Excellent!</string>
+    <string name="fb_section_rate_exp">Rate Your Experience</string>
+    <string name="fb_row_cleanliness">✨ Cleanliness</string>
+    <string name="fb_row_comfort">💨 Comfort</string>
+    <string name="fb_row_driver">👥 Driver Behavior</string>
+    <string name="fb_section_tell_more">Tell us more (optional)</string>
+    <string name="fb_tag_clean_bus">✨ Clean Bus</string>
+    <string name="fb_tag_comfortable">🛋️ Comfortable</string>
+    <string name="fb_tag_on_time">⏰ On Time</string>
+    <string name="fb_tag_safe_driving">🛡️ Safe Driving</string>
+    <string name="fb_tag_friendly_staff">😃 Friendly Staff</string>
+    <string name="fb_tag_too_crowded">👥 Too Crowded</string>
+    <string name="fb_tag_delayed">⏱️ Delayed</string>
+    <string name="fb_tag_rough_driving">⚠️ Rough Driving</string>
+    <string name="fb_section_comments">Additional Comments (optional)</string>
+    <string name="fb_comments_placeholder">Share your experience to help us improve…</string>
+    <string name="fb_char_count_fmt">%1$d/500 characters</string>
+    <string name="fb_star_desc">Star %1$d</string>
+    <string name="fb_rated_fmt">%1$d Rated</string>
+    <string name="fb_not_rated">Not rated</string>
+    <string name="fb_loading">Loading…</string>
+    <string name="fb_unknown_route">Unknown Route</string>
 </resources>

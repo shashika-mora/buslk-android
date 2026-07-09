@@ -31,6 +31,8 @@ import com.buslk.ui.search.SearchUiState
 import com.buslk.ui.search.SearchViewModel
 import com.buslk.ui.theme.BusLKBlue
 import com.buslk.ui.theme.FriendsPurple
+import androidx.compose.ui.res.stringResource
+import com.buslk.R
 
 enum class SearchDestination {
     ROUTE_LIST,
@@ -426,7 +428,7 @@ fun BusDetailsView(
                                                 modifier = Modifier.height(24.dp)
                                             ) {
                                                 Box(modifier = Modifier.padding(horizontal = 8.dp), contentAlignment = Alignment.Center) {
-                                                    Text(tag, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                                                    Text(getLocalizedTag(tag), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
                                                 }
                                             }
                                         }
@@ -438,5 +440,20 @@ fun BusDetailsView(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun getLocalizedTag(tagKey: String): String {
+    return when (tagKey.trim().lowercase()) {
+        "clean_bus", "✨ clean bus" -> stringResource(id = R.string.fb_tag_clean_bus)
+        "comfortable", "🛋️ comfortable" -> stringResource(id = R.string.fb_tag_comfortable)
+        "on_time", "⏰ on time" -> stringResource(id = R.string.fb_tag_on_time)
+        "safe_driving", "🛡️ safe driving" -> stringResource(id = R.string.fb_tag_safe_driving)
+        "friendly_staff", "😃 friendly staff" -> stringResource(id = R.string.fb_tag_friendly_staff)
+        "too_crowded", "👥 too crowded" -> stringResource(id = R.string.fb_tag_too_crowded)
+        "delayed", "⏱️ delayed" -> stringResource(id = R.string.fb_tag_delayed)
+        "rough_driving", "⚠️ rough driving" -> stringResource(id = R.string.fb_tag_rough_driving)
+        else -> tagKey
     }
 }

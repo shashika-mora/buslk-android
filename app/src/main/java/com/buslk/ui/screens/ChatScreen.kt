@@ -14,6 +14,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.buslk.ui.theme.BusLKBlue
+import androidx.compose.ui.res.stringResource
+import com.buslk.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,7 +29,7 @@ fun ChatScreen(
                 title = { Text(friendName, fontWeight = FontWeight.Bold, color = Color.White) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(id = R.string.back), tint = Color.White)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -44,14 +46,14 @@ fun ChatScreen(
                 OutlinedTextField(
                     value = message,
                     onValueChange = { message = it },
-                    placeholder = { Text("Type a message...") },
+                    placeholder = { Text(stringResource(id = R.string.chat_type_message_placeholder)) },
                     modifier = Modifier
                         .weight(1f)
                         .padding(horizontal = 8.dp),
                     shape = RoundedCornerShape(24.dp)
                 )
                 IconButton(onClick = { message = "" }) {
-                    Icon(Icons.Default.Send, contentDescription = "Send", tint = BusLKBlue)
+                    Icon(Icons.Default.Send, contentDescription = stringResource(id = R.string.chat_send_desc), tint = BusLKBlue)
                 }
             }
         }
@@ -65,13 +67,13 @@ fun ChatScreen(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                "Chatting with $friendName",
+                stringResource(id = R.string.chatting_with_fmt, friendName),
                 style = MaterialTheme.typography.titleMedium,
                 color = Color.Gray
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "This is a placeholder for the instant chat.",
+                stringResource(id = R.string.chat_placeholder_desc),
                 color = Color.LightGray
             )
         }

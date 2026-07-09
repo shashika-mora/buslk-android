@@ -25,6 +25,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
 import com.buslk.ui.theme.BusLKBlue
+import androidx.compose.ui.res.stringResource
+import com.buslk.R
 import com.buslk.ui.viewmodels.FeedbackViewModel
 import com.buslk.ui.viewmodels.FeedbackUiState
 
@@ -41,7 +43,7 @@ fun FeedbackScreen(
     LaunchedEffect(uiState) {
         when (val state = uiState) {
             is FeedbackUiState.Success -> {
-                Toast.makeText(context, "Feedback submitted! +15 points", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.fb_toast_submitted), Toast.LENGTH_SHORT).show()
                 feedbackViewModel.resetState()
                 onBackToHome()
             }
@@ -60,11 +62,13 @@ fun FeedbackScreen(
     var comment by remember { mutableStateOf("") }
     val selectedTags = remember { mutableStateListOf<String>() }
 
-    var routeName by remember { mutableStateOf("Loading...") }
+    val loadingStr = context.getString(R.string.fb_loading)
+    val unknownRouteStr = context.getString(R.string.fb_unknown_route)
+    var routeName by remember { mutableStateOf(loadingStr) }
     LaunchedEffect(busId) {
         val repo = com.buslk.data.SearchRepository()
         val busData = repo.getBusDetails(busId).getOrNull()
-        routeName = busData?.defaultRouteId ?: "Unknown Route"
+        routeName = busData?.defaultRouteId ?: unknownRouteStr
     }
 
     Scaffold(
@@ -97,13 +101,13 @@ fun FeedbackScreen(
                         shape = RoundedCornerShape(8.dp),
                         enabled = isSubmitEnabled
                     ) {
-                        Text("👍 Submit Feedback & Earn +15 Points", color = Color.White)
+                        Text(stringResource(id = R.string.fb_btn_submit), color = Color.White)
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        "Skip for now",
+                        stringResource(id = R.string.fb_btn_skip),
                         color = Color.DarkGray,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.clickable { onBackToHome() }.padding(8.dp)
@@ -112,7 +116,7 @@ fun FeedbackScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        "Please provide at least an overall rating to submit",
+                        stringResource(id = R.string.fb_submit_prompt),
                         color = Color.Gray,
                         fontSize = 12.sp
                     )
@@ -137,9 +141,9 @@ fun FeedbackScreen(
                 ) {
                     Text("✨", fontSize = 32.sp)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("How was your trip?", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(id = R.string.fb_header_title), color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text("$routeName • Private Bus", color = Color.White.copy(alpha = 0.8f), fontSize = 14.sp)
+                    Text(stringResource(id = R.string.fb_header_subtitle_fmt, routeName), color = Color.White.copy(alpha = 0.8f), fontSize = 14.sp)
                 }
             }
 
@@ -155,16 +159,16 @@ fun FeedbackScreen(
                         modifier = Modifier.padding(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("Overall Experience", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Text(stringResource(id = R.string.fb_section_overall), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         Spacer(modifier = Modifier.height(16.dp))
                         RatingStars(currentRating = overallRating, onRatingChanged = { overallRating = it }, starSize = 48.dp)
                         
                         val ratingText = when (overallRating) {
-                            1 -> "😔 Needs improvement"
-                            2 -> "😐 Could be better"
-                            3 -> "👍 Good"
-                            4 -> "😊 Great!"
-                            5 -> "🌟 Excellent!"
+                            1 -> stringResource(id = R.string.fb_rating_1)
+                            2 -> stringResource(id = R.string.fb_rating_2)
+                            3 -> stringResource(id = R.string.fb_rating_3)
+                            4 -> stringResource(id = R.string.fb_rating_4)
+                            5 -> stringResource(id = R.string.fb_rating_5)
                             else -> null
                         }
                         
@@ -182,16 +186,16 @@ fun FeedbackScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Rate Your Experience", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Text(stringResource(id = R.string.fb_section_rate_exp), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         Spacer(modifier = Modifier.height(24.dp))
 
-                        DetailedRatingRow(title = "✨ Cleanliness", currentRating = cleanlinessRating, onRatingChanged = { cleanlinessRating = it })
+                        DetailedRatingRow(title = stringResource(id = R.string.fb_row_cleanliness), currentRating = cleanlinessRating, onRatingChanged = { cleanlinessRating = it })
                         Spacer(modifier = Modifier.height(16.dp))
                         
-                        DetailedRatingRow(title = "💨 Comfort", currentRating = comfortRating, onRatingChanged = { comfortRating = it })
+                        DetailedRatingRow(title = stringResource(id = R.string.fb_row_comfort), currentRating = comfortRating, onRatingChanged = { comfortRating = it })
                         Spacer(modifier = Modifier.height(16.dp))
                         
-                        DetailedRatingRow(title = "👥 Driver Behavior", currentRating = driverRating, onRatingChanged = { driverRating = it })
+                        DetailedRatingRow(title = stringResource(id = R.string.fb_row_driver), currentRating = driverRating, onRatingChanged = { driverRating = it })
                     }
                 }
 
@@ -202,13 +206,25 @@ fun FeedbackScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Tell us more (optional)", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Text(stringResource(id = R.string.fb_section_tell_more), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         Spacer(modifier = Modifier.height(16.dp))
 
+                        data class TagInfo(val dbKey: String, val resId: Int)
                         val chunkedTags = listOf(
-                            listOf("✨ Clean Bus", "🛋️ Comfortable", "⏰ On Time"),
-                            listOf("🛡️ Safe Driving", "😃 Friendly Staff", "👥 Too Crowded"),
-                            listOf("⏱️ Delayed", "⚠️ Rough Driving")
+                            listOf(
+                                TagInfo("clean_bus", R.string.fb_tag_clean_bus),
+                                TagInfo("comfortable", R.string.fb_tag_comfortable),
+                                TagInfo("on_time", R.string.fb_tag_on_time)
+                            ),
+                            listOf(
+                                TagInfo("safe_driving", R.string.fb_tag_safe_driving),
+                                TagInfo("friendly_staff", R.string.fb_tag_friendly_staff),
+                                TagInfo("too_crowded", R.string.fb_tag_too_crowded)
+                            ),
+                            listOf(
+                                TagInfo("delayed", R.string.fb_tag_delayed),
+                                TagInfo("rough_driving", R.string.fb_tag_rough_driving)
+                            )
                         )
                         
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
@@ -217,18 +233,18 @@ fun FeedbackScreen(
                                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    rowTags.forEach { tag ->
-                                        val isSelected = selectedTags.contains(tag)
+                                    rowTags.forEach { tagInfo ->
+                                        val isSelected = selectedTags.contains(tagInfo.dbKey)
                                         Surface(
                                             shape = RoundedCornerShape(8.dp),
                                             border = androidx.compose.foundation.BorderStroke(1.dp, if (isSelected) BusLKBlue else Color.LightGray.copy(alpha = 0.5f)),
                                             color = if (isSelected) BusLKBlue.copy(alpha = 0.1f) else Color.White,
                                             modifier = Modifier.clickable {
-                                                if (isSelected) selectedTags.remove(tag) else selectedTags.add(tag)
+                                                if (isSelected) selectedTags.remove(tagInfo.dbKey) else selectedTags.add(tagInfo.dbKey)
                                             }
                                         ) {
                                             Text(
-                                                text = tag,
+                                                text = stringResource(id = tagInfo.resId),
                                                 fontSize = 12.sp,
                                                 fontWeight = FontWeight.Medium,
                                                 color = if (isSelected) BusLKBlue else Color.DarkGray,
@@ -249,13 +265,13 @@ fun FeedbackScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Additional Comments (optional)", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Text(stringResource(id = R.string.fb_section_comments), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         Spacer(modifier = Modifier.height(16.dp))
 
                         OutlinedTextField(
                             value = comment,
                             onValueChange = { if (it.length <= 500) comment = it },
-                            placeholder = { Text("Share your experience to help us improve...", color = Color.LightGray) },
+                            placeholder = { Text(stringResource(id = R.string.fb_comments_placeholder), color = Color.LightGray) },
                             modifier = Modifier.fillMaxWidth().height(120.dp),
                             colors = OutlinedTextFieldDefaults.colors(
                                 unfocusedBorderColor = Color.Transparent,
@@ -267,7 +283,7 @@ fun FeedbackScreen(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            "${comment.length}/500 characters",
+                            stringResource(id = R.string.fb_char_count_fmt, comment.length),
                             color = Color.Gray,
                             fontSize = 10.sp,
                             modifier = Modifier.align(Alignment.End)
@@ -286,7 +302,7 @@ fun RatingStars(currentRating: Int, onRatingChanged: (Int) -> Unit, starSize: an
         for (i in 1..5) {
             Icon(
                 imageVector = if (i <= currentRating) Icons.Filled.Star else Icons.Outlined.StarBorder,
-                contentDescription = "Star $i",
+                contentDescription = stringResource(id = R.string.fb_star_desc, i),
                 tint = if (i <= currentRating) Color(0xFFFFC107) else Color.LightGray,
                 modifier = Modifier
                     .size(starSize)
@@ -315,7 +331,7 @@ fun DetailedRatingRow(title: String, currentRating: Int, onRatingChanged: (Int) 
             color = Color.White
         ) {
             Text(
-                if (currentRating > 0) "$currentRating Rated" else "Not rated",
+                if (currentRating > 0) stringResource(id = R.string.fb_rated_fmt, currentRating) else stringResource(id = R.string.fb_not_rated),
                 fontSize = 10.sp,
                 color = if (currentRating > 0) BusLKBlue else Color.Gray,
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)

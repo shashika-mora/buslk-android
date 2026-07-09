@@ -147,4 +147,45 @@
     <string name="lf_tab_found_fmt">හමුවූ (%1$d)</string>
     <string name="lf_tab_lost_fmt">නැතිවූ (%1$d)</string>
     <string name="lf_icon_desc">නැතිවූ සහ හමුවූ නිරූපකය</string>
+
+    <!-- Chat Screen -->
+    <string name="chat_type_message_placeholder">පණිවිඩයක් ලියන්න…</string>
+    <string name="chat_send_desc">යවන්න</string>
+    <string name="chatting_with_fmt">%1$s සමඟ කතාබස් කරයි</string>
+    <string name="chat_placeholder_desc">මෙය ක්ෂණික කතාබස් සඳහා වන තාවකාලික ඉඩකි.</string>
+
+    <!-- Feedback Screen -->
+    <string name="fb_toast_submitted">ප්‍රතිපෝෂණය ඉදිරිපත් කරන ලදී! +ලකුණු 15</string>
+    <string name="fb_btn_submit">👍 ප්‍රතිපෝෂණ ලබාදී ලකුණු +15ක් උපයන්න</string>
+    <string name="fb_btn_skip">දැනට මඟහරින්න</string>
+    <string name="fb_submit_prompt">ඉදිරිපත් කිරීමට කරුණාකර අවම වශයෙන් සමස්ත ශ්‍රේණිගත කිරීමක් ලබා දෙන්න</string>
+    <string name="fb_header_title">ඔබේ ගමන කෙබඳුද?</string>
+    <string name="fb_header_subtitle_fmt">%1$s • පෞද්ගලික බස් රථය</string>
+    <string name="fb_section_overall">සමස්ත අත්දැකීම</string>
+    <string name="fb_rating_1">😔 වැඩිදියුණු විය යුතුය</string>
+    <string name="fb_rating_2">😐 මීට වඩා හොඳ විය හැක</string>
+    <string name="fb_rating_3">👍 හොඳයි</string>
+    <string name="fb_rating_4">😊 ඉතා හොඳයි!</string>
+    <string name="fb_rating_5">🌟 විශිෂ්ටයි!</string>
+    <string name="fb_section_rate_exp">ඔබේ අත්දැකීම ශ්‍රේණිගත කරන්න</string>
+    <string name="fb_row_cleanliness">✨ පිරිසිදුකම</string>
+    <string name="fb_row_comfort">💨 සුවපහසුව</string>
+    <string name="fb_row_driver">👥 රියදුරු හැසිරීම</string>
+    <string name="fb_section_tell_more">වැඩි විස්තර (විකල්ප)</string>
+    <string name="fb_tag_clean_bus">✨ පිරිසිදු බස් රථය</string>
+    <string name="fb_tag_comfortable">🛋️ සුවපහසුයි</string>
+    <string name="fb_tag_on_time">⏰ වේලාවට</string>
+    <string name="fb_tag_safe_driving">🛡️ ආරක්ෂිත රිය පැදවීම</string>
+    <string name="fb_tag_friendly_staff">😃 සුහද කාර්ය මණ්ඩලය</string>
+    <string name="fb_tag_too_crowded">👥 අධික සෙනඟ</string>
+    <string name="fb_tag_delayed">⏱️ ප්‍රමාදයි</string>
+    <string name="fb_tag_rough_driving">⚠️ නොසැලكيලිමත් රිය පැදවීම</string>
+    <string name="fb_section_comments">අමතර අදහස් (විකල්ප)</string>
+    <string name="fb_comments_placeholder">අපගේ සේවාව වැඩිදියුණු කිරීමට ඔබේ අත්දැකීම බෙදා ගන්න…</string>
+    <string name="fb_char_count_fmt">අක්ෂර %1$d/500</string>
+    <string name="fb_star_desc">තරු %1$d</string>
+    <string name="fb_rated_fmt">ශ්‍රේණිගත කිරීම %1$d</string>
+    <string name="fb_not_rated">තවමත් ශ්‍රේණිගත කර නැත</string>
+    <string name="fb_loading">පූරණය වෙමින්…</string>
+    <string name="fb_unknown_route">නොදන්නා මාර්ගය</string>
 </resources>
