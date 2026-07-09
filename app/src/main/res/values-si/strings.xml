@@ -188,4 +188,31 @@
     <string name="fb_not_rated">තවමත් ශ්‍රේණිගත කර නැත</string>
     <string name="fb_loading">පූරණය වෙමින්…</string>
     <string name="fb_unknown_route">නොදන්නා මාර්ගය</string>
+
+    <!-- Search Screen -->
+    <string name="search_select_route">මාර්ගය තෝරන්න</string>
+    <string name="search_bar_placeholder">මාර්ග අංකය හෝ නම සොයන්න</string>
+    <string name="search_error_fmt">දෝෂයකි: %1$s</string>
+    <string name="search_retry">නැවත උත්සාහ කරන්න</string>
+    <string name="search_no_routes">මාර්ග කිසිවක් හමු නොවීය.</string>
+    <string name="search_route_id_fmt">මාර්ගය %1$s</string>
+    <string name="search_active_buses_title">ක්‍රියාකාරී බස් රථ</string>
+    <string name="search_no_buses">මෙම මාර්ගයේ ලියාපදිංචි බස් රථ නොමැත.</string>
+    <string name="search_status_live">සජීවී</string>
+    <string name="search_status_offline">අක්‍රියයි</string>
+    <string name="search_bus_specs_fmt">වර්ගය: %1$s • ධාරිතාව: ආසන %2$d</string>
+    <string name="search_bus_operator_fmt">ක්‍රියාකරු: %1$s</string>
+    <string name="search_bus_telemetry_fmt">වේගය: පැයට කි.මී. %1$.1f • සෙනඟ: %2$s</string>
+    <string name="search_bus_details_title">බස් රථයේ තොරතුරු</string>
+    <string name="search_detail_type_fmt">වර්ගය: %1$s</string>
+    <string name="search_detail_capacity_fmt">ධාරිතාව: ආසන %1$d</string>
+    <string name="search_detail_owner_fmt">හිමිකරු: %1$s</string>
+    <string name="search_live_status">සජීවී තත්ත්වය</string>
+    <string name="search_live_speed_fmt">වත්මන් වේගය: පැයට කි.මී. %1$.1f</string>
+    <string name="search_live_crowd_fmt">සෙනඟ මට්ටම: %1$s</string>
+    <string name="search_live_passengers_fmt">මගීන් ගණන: %1$d</string>
+    <string name="search_ratings_header">ශ්‍රේණිගත කිරීම්</string>
+    <string name="search_no_ratings">ශ්‍රේණිගත කිරීම් නොමැත</string>
+    <string name="search_recent_feedback">මෑතකාලීන ප්‍රතිපෝෂණ</string>
+    <string name="search_no_comment">අදහස් දක්වා නොමැත.</string>
 </resources>

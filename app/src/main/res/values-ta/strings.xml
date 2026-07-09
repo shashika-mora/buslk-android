@@ -188,4 +188,31 @@
     <string name="fb_not_rated">மதிப்பிடப்படவில்லை</string>
     <string name="fb_loading">ஏற்றப்படுகிறது…</string>
     <string name="fb_unknown_route">அறியப்படாத பாதை</string>
+
+    <!-- Search Screen -->
+    <string name="search_select_route">பாதையைத் தேர்ந்தெடுக்கவும்</string>
+    <string name="search_bar_placeholder">பாதை எண் அல்லது பெயரைத் தேடுங்கள்</string>
+    <string name="search_error_fmt">பிழை: %1$s</string>
+    <string name="search_retry">மீண்டும் முயற்சி செய்க</string>
+    <string name="search_no_routes">பாதைகள் எதுவும் கிடைக்கவில்லை.</string>
+    <string name="search_route_id_fmt">பாதை %1$s</string>
+    <string name="search_active_buses_title">இயங்கும் பேருந்துகள்</string>
+    <string name="search_no_buses">இந்த பாதையில் பேருந்துகள் எதுவும் பதிவு செய்யப்படவில்லை.</string>
+    <string name="search_status_live">சஜீவி</string>
+    <string name="search_status_offline">ஆஃப்லைன்</string>
+    <string name="search_bus_specs_fmt">வகை: %1$s • கொள்ளளவு: %2$d இருக்கைகள்</string>
+    <string name="search_bus_operator_fmt">இயக்குநர்: %1$s</string>
+    <string name="search_bus_telemetry_fmt">வேகம்: %1$.1f கிமீ/மணி • கூட்டம்: %2$s</string>
+    <string name="search_bus_details_title">பேருந்து விவரங்கள்</string>
+    <string name="search_detail_type_fmt">வகை: %1$s</string>
+    <string name="search_detail_capacity_fmt">கொள்ளளவு: %1$d இருக்கைகள்</string>
+    <string name="search_detail_owner_fmt">உரிமையாளர்: %1$s</string>
+    <string name="search_live_status">நேரடி நிலை</string>
+    <string name="search_live_speed_fmt">தற்போதைய வேகம்: %1$.1f கிமீ/மணி</string>
+    <string name="search_live_crowd_fmt">கூட்டத்தின் அளவு: %1$s</string>
+    <string name="search_live_passengers_fmt">பயணிகள்: %1$d</string>
+    <string name="search_ratings_header">மதிப்பீடுகள்</string>
+    <string name="search_no_ratings">மதிப்பீடுகள் இல்லை</string>
+    <string name="search_recent_feedback">சமீபத்திய கருத்துகள்</string>
+    <string name="search_no_comment">கருத்துகள் எதுவும் வழங்கப்படவில்லை.</string>
 </resources>

@@ -115,7 +115,7 @@ fun RouteSelectionView(
         // Header & Search Bar
         Surface(color = FriendsPurple, modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text("Select Route", style = MaterialTheme.typography.headlineMedium, color = Color.White, fontWeight = FontWeight.Bold)
+                Text(stringResource(id = R.string.search_select_route), style = MaterialTheme.typography.headlineMedium, color = Color.White, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(16.dp))
                 OutlinedTextField(
                     value = searchQuery,
@@ -123,7 +123,7 @@ fun RouteSelectionView(
                         searchQuery = it
                         searchViewModel.performSearch(it)
                     },
-                    placeholder = { Text("Search by Route No or Name", color = Color.Gray) },
+                    placeholder = { Text(stringResource(id = R.string.search_bar_placeholder), color = Color.Gray) },
                     leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = null, tint = Color.Gray) },
                     modifier = Modifier.fillMaxWidth().height(56.dp),
                     shape = RoundedCornerShape(12.dp),
@@ -152,17 +152,17 @@ fun RouteSelectionView(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Error: ${state.message}", color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(16.dp))
+                    Text(stringResource(id = R.string.search_error_fmt, state.message), color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(16.dp))
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(onClick = { searchViewModel.refreshRoutes() }) {
-                        Text("Retry")
+                        Text(stringResource(id = R.string.search_retry))
                     }
                 }
             }
             is SearchUiState.Success -> {
                 if (state.routes.isEmpty()) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("No routes found.", color = Color.Gray)
+                        Text(stringResource(id = R.string.search_no_routes), color = Color.Gray)
                     }
                 } else {
                     LazyColumn(
@@ -177,7 +177,7 @@ fun RouteSelectionView(
                                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
-                                    Text("Route ${route.routeId}", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                                    Text(stringResource(id = R.string.search_route_id_fmt, route.routeId), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text("${route.startLocation} ⇄ ${route.endLocation}", style = MaterialTheme.typography.bodyMedium, color = Color.DarkGray)
                                 }
@@ -201,10 +201,10 @@ fun RouteDetailsView(
 
     Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         TopAppBar(
-            title = { Text("Active Buses on Route", fontWeight = FontWeight.Bold) },
+            title = { Text(stringResource(id = R.string.search_active_buses_title), fontWeight = FontWeight.Bold) },
             navigationIcon = {
                 IconButton(onClick = onBackClicked) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(id = R.string.back))
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
@@ -223,13 +223,13 @@ fun RouteDetailsView(
             }
             is RouteDetailsUiState.Error -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Error: ${state.message}", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(id = R.string.search_error_fmt, state.message), color = MaterialTheme.colorScheme.error)
                 }
             }
             is RouteDetailsUiState.Success -> {
                 if (state.buses.isEmpty()) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("No buses registered on this route.", color = Color.Gray)
+                        Text(stringResource(id = R.string.search_no_buses), color = Color.Gray)
                     }
                 } else {
                     LazyColumn(
@@ -286,7 +286,7 @@ fun RouteDetailsView(
                                                 modifier = Modifier.padding(start = 4.dp)
                                             ) {
                                                 Text(
-                                                    if (loc != null) "LIVE" else "OFFLINE",
+                                                    if (loc != null) stringResource(id = R.string.search_status_live) else stringResource(id = R.string.search_status_offline),
                                                     color = if (loc != null) Color(0xFF2E7D32) else Color(0xFF546E7A),
                                                     fontWeight = FontWeight.Bold,
                                                     fontSize = 9.sp,
@@ -297,12 +297,12 @@ fun RouteDetailsView(
                                         Spacer(modifier = Modifier.height(2.dp))
                                         
                                         Text(
-                                            text = "Type: ${bus.type} • Capacity: ${bus.capacity} seats",
+                                            text = stringResource(id = R.string.search_bus_specs_fmt, bus.type, bus.capacity),
                                             fontSize = 11.sp,
                                             color = Color.Gray
                                         )
                                         Text(
-                                            text = "Operator: ${bus.owner}",
+                                            text = stringResource(id = R.string.search_bus_operator_fmt, bus.owner),
                                             fontSize = 11.sp,
                                             color = Color.Gray
                                         )
@@ -310,7 +310,7 @@ fun RouteDetailsView(
                                         if (loc != null) {
                                             Spacer(modifier = Modifier.height(4.dp))
                                             Text(
-                                                text = "Speed: ${loc.speed} km/h • Crowd: ${loc.crowdLevel}",
+                                                text = stringResource(id = R.string.search_bus_telemetry_fmt, loc.speed, loc.crowdLevel),
                                                 fontSize = 11.sp,
                                                 fontWeight = FontWeight.Medium,
                                                 color = Color(0xFF2E7D32)
@@ -337,10 +337,10 @@ fun BusDetailsView(
 
     Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         TopAppBar(
-            title = { Text("Bus Details", fontWeight = FontWeight.Bold) },
+            title = { Text(stringResource(id = R.string.search_bus_details_title), fontWeight = FontWeight.Bold) },
             navigationIcon = {
                 IconButton(onClick = onBackClicked) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(id = R.string.back))
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
@@ -358,7 +358,7 @@ fun BusDetailsView(
             }
             is BusDetailsUiState.Error -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Error: ${state.message}", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(id = R.string.search_error_fmt, state.message), color = MaterialTheme.colorScheme.error)
                 }
             }
             is BusDetailsUiState.Success -> {
@@ -368,9 +368,9 @@ fun BusDetailsView(
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(state.busDoc.registrationNumber, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                             Spacer(modifier = Modifier.height(8.dp))
-                            Text("Type: ${state.busDoc.type}", style = MaterialTheme.typography.bodyMedium)
-                            Text("Capacity: ${state.busDoc.capacity} Seats", style = MaterialTheme.typography.bodyMedium)
-                            Text("Owner: ${state.busDoc.owner}", style = MaterialTheme.typography.bodyMedium)
+                            Text(stringResource(id = R.string.search_detail_type_fmt, state.busDoc.type), style = MaterialTheme.typography.bodyMedium)
+                            Text(stringResource(id = R.string.search_detail_capacity_fmt, state.busDoc.capacity), style = MaterialTheme.typography.bodyMedium)
+                            Text(stringResource(id = R.string.search_detail_owner_fmt, state.busDoc.owner), style = MaterialTheme.typography.bodyMedium)
                         }
                     }
 
@@ -380,11 +380,11 @@ fun BusDetailsView(
                     if (state.liveLocation != null) {
                         Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) {
                             Column(modifier = Modifier.padding(16.dp)) {
-                                Text("Live Status", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                                Text(stringResource(id = R.string.search_live_status), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                                 Spacer(modifier = Modifier.height(8.dp))
-                                Text("Current Speed: ${state.liveLocation.speed} km/h", style = MaterialTheme.typography.bodyMedium)
-                                Text("Crowd Level: ${state.liveLocation.crowdLevel}", style = MaterialTheme.typography.bodyMedium)
-                                Text("Passengers: ${state.liveLocation.activePassengerCount}", style = MaterialTheme.typography.bodyMedium)
+                                Text(stringResource(id = R.string.search_live_speed_fmt, state.liveLocation.speed), style = MaterialTheme.typography.bodyMedium)
+                                Text(stringResource(id = R.string.search_live_crowd_fmt, state.liveLocation.crowdLevel), style = MaterialTheme.typography.bodyMedium)
+                                Text(stringResource(id = R.string.search_live_passengers_fmt, state.liveLocation.activePassengerCount), style = MaterialTheme.typography.bodyMedium)
                             }
                         }
                         Spacer(modifier = Modifier.height(16.dp))
@@ -394,12 +394,12 @@ fun BusDetailsView(
                     Card(modifier = Modifier.fillMaxWidth()) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text("Ratings", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                                Text(stringResource(id = R.string.search_ratings_header), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                                 Spacer(modifier = Modifier.weight(1f))
                                 Icon(Icons.Filled.Star, contentDescription = null, tint = Color(0xFFFFC107))
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = if (state.averageRating > 0) String.format("%.1f", state.averageRating) else "No Ratings",
+                                    text = if (state.averageRating > 0) String.format("%.1f", state.averageRating) else stringResource(id = R.string.search_no_ratings),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -410,11 +410,11 @@ fun BusDetailsView(
                             
                             if (state.feedbacks.isNotEmpty()) {
                                 Spacer(modifier = Modifier.height(8.dp))
-                                Text("Recent Feedback", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = BusLKBlue)
+                                Text(stringResource(id = R.string.search_recent_feedback), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = BusLKBlue)
                                 state.feedbacks.take(3).forEach { feedback ->
                                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = Color.LightGray.copy(alpha = 0.5f))
                                     Text(
-                                        text = "\"${feedback.comment.ifEmpty { "No comment provided." }}\"", 
+                                        text = "\"${feedback.comment.ifEmpty { stringResource(id = R.string.search_no_comment) }}\"", 
                                         style = MaterialTheme.typography.bodyMedium, 
                                         fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
                                         color = Color.DarkGray

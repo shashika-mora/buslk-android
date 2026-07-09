@@ -193,4 +193,31 @@
     <string name="fb_not_rated">Not rated</string>
     <string name="fb_loading">Loading…</string>
     <string name="fb_unknown_route">Unknown Route</string>
+
+    <!-- Search Screen -->
+    <string name="search_select_route">Select Route</string>
+    <string name="search_bar_placeholder">Search by Route No or Name</string>
+    <string name="search_error_fmt">Error: %1$s</string>
+    <string name="search_retry">Retry</string>
+    <string name="search_no_routes">No routes found.</string>
+    <string name="search_route_id_fmt">Route %1$s</string>
+    <string name="search_active_buses_title">Active Buses on Route</string>
+    <string name="search_no_buses">No buses registered on this route.</string>
+    <string name="search_status_live">LIVE</string>
+    <string name="search_status_offline">OFFLINE</string>
+    <string name="search_bus_specs_fmt">Type: %1$s • Capacity: %2$d seats</string>
+    <string name="search_bus_operator_fmt">Operator: %1$s</string>
+    <string name="search_bus_telemetry_fmt">Speed: %1$.1f km/h • Crowd: %2$s</string>
+    <string name="search_bus_details_title">Bus Details</string>
+    <string name="search_detail_type_fmt">Type: %1$s</string>
+    <string name="search_detail_capacity_fmt">Capacity: %1$d Seats</string>
+    <string name="search_detail_owner_fmt">Owner: %1$s</string>
+    <string name="search_live_status">Live Status</string>
+    <string name="search_live_speed_fmt">Current Speed: %1$.1f km/h</string>
+    <string name="search_live_crowd_fmt">Crowd Level: %1$s</string>
+    <string name="search_live_passengers_fmt">Passengers: %1$d</string>
+    <string name="search_ratings_header">Ratings</string>
+    <string name="search_no_ratings">No Ratings</string>
+    <string name="search_recent_feedback">Recent Feedback</string>
+    <string name="search_no_comment">No comment provided.</string>
 </resources>
