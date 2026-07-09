@@ -58,8 +58,9 @@ class MainActivity : AppCompatActivity() {
         setContent {
             val context = androidx.compose.ui.platform.LocalContext.current
             val userPreferencesRepository = androidx.compose.runtime.remember { com.buslk.data.UserPreferencesRepository(context) }
+            val searchRepository = androidx.compose.runtime.remember { com.buslk.data.SearchRepository() }
             val settingsViewModel: SettingsViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
-                factory = com.buslk.ui.viewmodels.SettingsViewModelFactory(userPreferencesRepository)
+                factory = com.buslk.ui.viewmodels.SettingsViewModelFactory(userPreferencesRepository, searchRepository)
             )
             val themeMode by settingsViewModel.themeMode.collectAsState()
             val isDarkTheme = when (themeMode) {
@@ -69,14 +70,14 @@ class MainActivity : AppCompatActivity() {
             }
             
             BusLKTheme(darkTheme = isDarkTheme) {
-                BusLKApp(settingsViewModel = settingsViewModel)
+                BusLKApp(settingsViewModel = settingsViewModel, searchRepository = searchRepository)
             }
         }
     }
 }
 
 @Composable
-fun BusLKApp(settingsViewModel: SettingsViewModel) {
+fun BusLKApp(settingsViewModel: SettingsViewModel, searchRepository: com.buslk.data.SearchRepository) {
     val authRepository = androidx.compose.runtime.remember { com.buslk.data.AuthRepository() }
     val authViewModel: com.buslk.ui.auth.AuthViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
         factory = com.buslk.ui.auth.AuthViewModelFactory(authRepository)
@@ -102,7 +103,6 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
     )
 
     // Instantiate Search & Details dependencies
-    val searchRepository = androidx.compose.runtime.remember { com.buslk.data.SearchRepository() }
     val searchViewModel: com.buslk.ui.search.SearchViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
         factory = com.buslk.ui.search.SearchViewModelFactory(searchRepository)
     )
@@ -225,6 +225,7 @@ fun BusLKApp(settingsViewModel: SettingsViewModel) {
                         AppDestinations.HOME -> com.buslk.ui.screens.HomeScreen(
                             mapViewModel = mapViewModel,
                             searchViewModel = searchViewModel,
+                            settingsViewModel = settingsViewModel,
                             onScanClick = { currentDestination = AppDestinations.SCAN_QR }
                         )
                         AppDestinations.SEARCH -> com.buslk.ui.screens.SearchScreen(

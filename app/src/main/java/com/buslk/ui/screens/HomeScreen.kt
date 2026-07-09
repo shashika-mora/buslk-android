@@ -82,6 +82,10 @@ import com.buslk.ui.theme.BusLKBlue
 import com.buslk.ui.theme.CrowdGreen
 import com.buslk.ui.theme.CrowdYellow
 import com.buslk.ui.theme.CrowdRed
+import com.buslk.ui.viewmodels.SettingsViewModel
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.foundation.layout.fillMaxHeight
 
 // Removed Mock Data
 /**
@@ -96,6 +100,7 @@ import com.buslk.ui.theme.CrowdRed
 fun HomeScreen(
     searchViewModel: SearchViewModel,
     mapViewModel: MapViewModel,
+    settingsViewModel: SettingsViewModel,
     onScanClick: () -> Unit
 ) {
     // Grab the current Android Context (Activity) needed to initialize native Android Views
@@ -106,6 +111,13 @@ fun HomeScreen(
     // kills the app to save memory, their typed search query won't be erased.
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
+
+    val currentDefaultRoute by settingsViewModel.defaultRoute.collectAsState()
+    var defaultRouteFilterEnabled by rememberSaveable { mutableStateOf(false) }
+
+    if (currentDefaultRoute == "None" && defaultRouteFilterEnabled) {
+        defaultRouteFilterEnabled = false
+    }
     
     // Observe Business Logic State
     // 'collectAsState()' transforms the ViewModel's Kotlin Flow into Compose State.
@@ -170,14 +182,23 @@ fun HomeScreen(
     // Lifted logic for mapping buses
     val mapUiSuccess = mapUiState as? MapUiState.Success
     val displayBuses = mapUiSuccess?.activeBuses ?: emptyList()
+    
+    val baseBuses = if (defaultRouteFilterEnabled && currentDefaultRoute != "None") {
+        displayBuses.filter { bus ->
+            bus.routeId.lowercase(Locale.getDefault()) == currentDefaultRoute.lowercase(Locale.getDefault())
+        }
+    } else {
+        displayBuses
+    }
+
     val filteredBuses = if (searchQuery.isNotBlank()) {
         val lowerQuery = searchQuery.lowercase(Locale.getDefault())
-        displayBuses.filter { bus ->
+        baseBuses.filter { bus ->
             bus.routeId.lowercase(Locale.getDefault()) == lowerQuery ||
             bus.busId.lowercase(Locale.getDefault()).contains(lowerQuery)
         }
     } else {
-        displayBuses
+        baseBuses
     }
 
     /**
@@ -377,68 +398,119 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxSize()
             )
 
-            @Suppress("DEPRECATION")
-            SearchBar(
-                query = searchQuery,
-                onQueryChange = { 
-                    searchQuery = it 
-                    searchViewModel.performSearch(it)
-                },
-                onSearch = { 
-                    searchViewModel.performSearch(it)
-                },
-                active = active,
-                onActiveChange = { 
-                    active = it 
-                    if (!it) searchViewModel.clearSearch()
-                },
-                colors = SearchBarDefaults.colors(containerColor = Color.White),
-                placeholder = { Text(stringResource(R.string.search_placeholder)) },
-                leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = stringResource(R.string.icon_search)) },
-                trailingIcon = {
-                    if (active) {
-                        IconButton(onClick = { 
-                            if (searchQuery.isNotEmpty()) {
-                                searchQuery = ""
-                                searchViewModel.clearSearch()
-                            } else {
-                                active = false
-                                searchViewModel.clearSearch()
-                            }
-                        }) {
-                            Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.icon_clear))
-                        }
-                    }
-                },
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = if (active) 0.dp else 16.dp, vertical = if (active) 0.dp else 24.dp)
                     .align(Alignment.TopCenter),
-                shape = RoundedCornerShape(if (active) 0.dp else 100.dp)
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                when (val state = searchUiState) {
-                    is com.buslk.ui.search.SearchUiState.Loading -> {
-                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator()
+                @Suppress("DEPRECATION")
+                SearchBar(
+                    query = searchQuery,
+                    onQueryChange = { 
+                        searchQuery = it 
+                        searchViewModel.performSearch(it)
+                    },
+                    onSearch = { 
+                        searchViewModel.performSearch(it)
+                    },
+                    active = active,
+                    onActiveChange = { 
+                        active = it 
+                        if (!it) searchViewModel.clearSearch()
+                    },
+                    colors = SearchBarDefaults.colors(containerColor = Color.White),
+                    placeholder = { Text(stringResource(R.string.search_placeholder)) },
+                    leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = stringResource(R.string.icon_search)) },
+                    trailingIcon = {
+                        if (active) {
+                            IconButton(onClick = { 
+                                if (searchQuery.isNotEmpty()) {
+                                    searchQuery = ""
+                                    searchViewModel.clearSearch()
+                                } else {
+                                    active = false
+                                    searchViewModel.clearSearch()
+                                }
+                            }) {
+                                Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.icon_clear))
+                            }
+                        }
+                    },
+                    modifier = if (active) Modifier.fillMaxWidth() else Modifier.weight(1f),
+                    shape = RoundedCornerShape(if (active) 0.dp else 100.dp)
+                ) {
+                    when (val state = searchUiState) {
+                        is com.buslk.ui.search.SearchUiState.Loading -> {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                        is com.buslk.ui.search.SearchUiState.Error -> {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Text(stringResource(id = R.string.home_error_fmt, state.message), color = MaterialTheme.colorScheme.error)
+                            }
+                        }
+                        is com.buslk.ui.search.SearchUiState.Success -> {
+                            LazyColumn {
+                                items(state.routes) { route ->
+                                    androidx.compose.material3.ListItem(
+                                        headlineContent = { Text(route.routeId) },
+                                        supportingContent = { Text(stringResource(id = R.string.home_route_span_fmt, route.startLocation, route.endLocation)) },
+                                        modifier = Modifier.clickable {
+                                            active = false
+                                            searchQuery = route.routeId
+                                        }
+                                    )
+                                }
+                            }
                         }
                     }
-                    is com.buslk.ui.search.SearchUiState.Error -> {
-                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text(stringResource(id = R.string.home_error_fmt, state.message), color = MaterialTheme.colorScheme.error)
-                        }
-                    }
-                    is com.buslk.ui.search.SearchUiState.Success -> {
-                        LazyColumn {
-                            items(state.routes) { route ->
-                                androidx.compose.material3.ListItem(
-                                    headlineContent = { Text(route.routeId) },
-                                    supportingContent = { Text(stringResource(id = R.string.home_route_span_fmt, route.startLocation, route.endLocation)) },
-                                    modifier = Modifier.clickable {
-                                        active = false
-                                        searchQuery = route.routeId
-                                    }
+                }
+
+                if (!active) {
+                    Card(
+                        modifier = Modifier
+                            .height(56.dp)
+                            .clickable(enabled = currentDefaultRoute != "None") {
+                                defaultRouteFilterEnabled = !defaultRouteFilterEnabled
+                            },
+                        shape = RoundedCornerShape(28.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .padding(horizontal = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Column(
+                                verticalArrangement = Arrangement.Center,
+                                modifier = Modifier.padding(vertical = 4.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.settings_default_route),
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Gray
+                                )
+                                Text(
+                                    text = if (currentDefaultRoute == "None") stringResource(R.string.lbl_none) else currentDefaultRoute,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (currentDefaultRoute == "None") Color.Gray else BusLKBlue
                                 )
                             }
+                            Checkbox(
+                                checked = defaultRouteFilterEnabled,
+                                onCheckedChange = { defaultRouteFilterEnabled = it },
+                                enabled = currentDefaultRoute != "None",
+                                colors = CheckboxDefaults.colors(checkedColor = BusLKBlue)
+                            )
                         }
                     }
                 }

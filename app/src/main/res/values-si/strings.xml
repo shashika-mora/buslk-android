@@ -9,6 +9,7 @@
     
     <!-- Shared -->
     <string name="back">පසුපසට</string>
+    <string name="lbl_none">කිසිවක් නැත</string>
     
     <!-- Opening Screen -->
     <string name="opening_subtitle">ඔබගේ ස්මාර්ට් ගමන් සගයා</string>
@@ -37,7 +38,7 @@
     <string name="nav_profile">පැතිකඩ</string>
 
     <!-- Search Screen -->
-    <string name="search_placeholder">බස් මාර්ගයක්/බස් අංකයක්/බස් නැවතුමක් සොයන්න</string>
+    <string name="search_placeholder">සොයන්න</string>
     <string name="search_prompt">බස් මාර්ගයක්/බස් අංකයක්/බස් නැවතුමක් සොයන්න</string>
     <string name="search_no_results">ප්‍රතිඵල හමුවූයේ නැත.</string>
     <string name="search_routes">මාර්ග</string>

@@ -3,6 +3,10 @@ package com.buslk.ui.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.buslk.data.UserPreferencesRepository
+import com.buslk.data.ISearchRepository
+import com.buslk.data.RouteDoc
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -13,8 +17,24 @@ import kotlinx.coroutines.launch
  * Bridges the UI and the DataStore repository using StateFlows.
  */
 class SettingsViewModel(
-    private val preferencesRepository: UserPreferencesRepository
+    private val preferencesRepository: UserPreferencesRepository,
+    private val searchRepository: ISearchRepository
 ) : ViewModel() {
+
+    private val _registeredRoutes = MutableStateFlow<List<RouteDoc>>(emptyList())
+    val registeredRoutes: StateFlow<List<RouteDoc>> = _registeredRoutes.asStateFlow()
+
+    init {
+        loadRegisteredRoutes()
+    }
+
+    private fun loadRegisteredRoutes() {
+        viewModelScope.launch {
+            searchRepository.getAllRoutes().onSuccess { routes ->
+                _registeredRoutes.value = routes.sortedWith(compareBy({ it.routeId.length }, { it.routeId }))
+            }
+        }
+    }
 
     // --- StateFlows ---
     // stateIn converts the cold Flow from DataStore into a hot StateFlow that Compose can easily observe.

@@ -8,6 +8,7 @@
     
     <!-- Shared -->
     <string name="back">Back</string>
+    <string name="lbl_none">None</string>
     
     <!-- Opening Screen -->
     <string name="opening_subtitle">Your Smart Travel Companion</string>
@@ -36,7 +37,7 @@
     <string name="nav_profile">Profile</string>
 
     <!-- Search Screen -->
-    <string name="search_placeholder">Search Buses/Routes/Bus-Stops</string>
+    <string name="search_placeholder">Search</string>
     <string name="search_prompt">Search Buses/Routes/Bus-Stops</string>
     <string name="search_no_results">No results found.</string>
     <string name="search_routes">Routes</string>

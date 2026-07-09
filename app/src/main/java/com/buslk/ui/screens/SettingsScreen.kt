@@ -116,8 +116,57 @@ fun SettingsScreen(
             // --- Preferences ---
             item {
                 SettingsSection(title = stringResource(R.string.settings_user_preferences)) {
-                    // Default Route is non-functional MVP fallback for now, maybe wired later.
-                    SettingsRow(icon = Icons.Outlined.DirectionsBus, title = stringResource(R.string.settings_default_route), subtitle = stringResource(R.string.settings_route_138), onClick = {})
+                    val registeredRoutes by settingsViewModel.registeredRoutes.collectAsState()
+                    val currentDefaultRoute by settingsViewModel.defaultRoute.collectAsState()
+                    var routeDropdownExpanded by remember { mutableStateOf(false) }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { routeDropdownExpanded = true }
+                            .padding(horizontal = 16.dp, vertical = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Outlined.DirectionsBus, contentDescription = null, tint = BusLKBlue)
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Text(stringResource(R.string.settings_default_route), fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                        }
+                        
+                        Box {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = if (currentDefaultRoute == "None") stringResource(R.string.lbl_none) else currentDefaultRoute,
+                                    color = Color.Gray,
+                                    fontSize = 14.sp
+                                )
+                                Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Color.LightGray)
+                            }
+
+                            DropdownMenu(
+                                expanded = routeDropdownExpanded,
+                                onDismissRequest = { routeDropdownExpanded = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.lbl_none)) },
+                                    onClick = {
+                                        settingsViewModel.updateDefaultRoute("None")
+                                        routeDropdownExpanded = false
+                                    }
+                                )
+                                registeredRoutes.forEach { route ->
+                                    DropdownMenuItem(
+                                        text = { Text("${route.routeId} (${route.startLocation} ⇄ ${route.endLocation})") },
+                                        onClick = {
+                                            settingsViewModel.updateDefaultRoute(route.routeId)
+                                            routeDropdownExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
                     HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
                     
                     val currentLanguage by settingsViewModel.appLanguage.collectAsState()

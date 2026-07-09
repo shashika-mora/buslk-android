@@ -9,6 +9,7 @@
     
     <!-- Shared -->
     <string name="back">பின்னே</string>
+    <string name="lbl_none">ஒன்றுமில்லை</string>
     
     <!-- Opening Screen -->
     <string name="opening_subtitle">உங்கள் திறமையான பயணத் துணை</string>
@@ -37,7 +38,7 @@
     <string name="nav_profile">சுயவிவரம்</string>
 
     <!-- Search Screen -->
-    <string name="search_placeholder">பஸ் பாதை (உ-ம்: 138) அல்லது பஸ் எண்ணைத் தேடவும்</string>
+    <string name="search_placeholder">தேடு</string>
     <string name="search_prompt">ஒரு பாதை எண் (உதாரணமாக 138) அல்லது பஸ் பதிவு எண்ணைத் தட்டச்சு செய்க</string>
     <string name="search_no_results">முடிவுகள் எதுவும் கிடைக்கவில்லை.</string>
     <string name="search_routes">பாதைகள்</string>
