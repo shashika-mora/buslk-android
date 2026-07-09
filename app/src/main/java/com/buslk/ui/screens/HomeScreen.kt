@@ -207,8 +207,8 @@ fun HomeScreen(
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         // Using a standard icon as placeholder for a QR scanner icon
-                        Icon(Icons.Default.Search, contentDescription = "Scan") 
-                        Text("SCAN", fontWeight = FontWeight.Bold, fontSize = 10.sp)
+                        Icon(Icons.Default.Search, contentDescription = stringResource(id = R.string.home_btn_scan)) 
+                        Text(stringResource(id = R.string.home_btn_scan), fontWeight = FontWeight.Bold, fontSize = 10.sp)
                     }
                 }
                 
@@ -236,7 +236,7 @@ fun HomeScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Outlined.LocationOn, contentDescription = null, tint = BusLKBlue)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Nearby Buses", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                            Text(stringResource(id = R.string.home_nearby_buses), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                         }
                         
                         Spacer(modifier = Modifier.height(16.dp))
@@ -251,14 +251,14 @@ fun HomeScreen(
                                 modifier = Modifier.fillMaxWidth().padding(16.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Text("Failed to fetch live locations.", color = Color.Gray)
+                                Text(stringResource(id = R.string.home_failed_locations), color = Color.Gray)
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Button(onClick = { mapViewModel.refreshBusLocations() }) {
-                                    Text("Retry")
+                                    Text(stringResource(id = R.string.home_retry))
                                 }
                             }
                         } else if (filteredBuses.isEmpty()) {
-                            Text("No buses found nearby.", color = Color.Gray, modifier = Modifier.padding(16.dp))
+                            Text(stringResource(id = R.string.home_no_buses), color = Color.Gray, modifier = Modifier.padding(16.dp))
                         } else {
                             LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                                 items(filteredBuses) { bus ->
@@ -289,7 +289,7 @@ fun HomeScreen(
                                                 }
                                                 Spacer(modifier = Modifier.height(6.dp))
                                                 Surface(border = BorderStroke(1.dp, Color.LightGray), shape = RoundedCornerShape(50)) {
-                                                    Text("Live", fontSize = 10.sp, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp), color = Color.DarkGray)
+                                                    Text(stringResource(id = R.string.home_live_badge), fontSize = 10.sp, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp), color = Color.DarkGray)
                                                 }
                                             }
                                             Spacer(modifier = Modifier.width(16.dp))
@@ -301,7 +301,7 @@ fun HomeScreen(
                                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                                     Icon(Icons.Outlined.LocationOn, contentDescription = null, modifier = Modifier.size(16.dp), tint = CrowdGreen)
                                                     Spacer(modifier = Modifier.width(4.dp))
-                                                    Text("${bus.speed.toInt()} km/h", fontWeight = FontWeight.Medium, fontSize = 16.sp)
+                                                    Text(stringResource(id = R.string.home_speed_fmt, bus.speed.toInt()), fontWeight = FontWeight.Medium, fontSize = 16.sp)
                                                 }
                                             }
                                             
@@ -364,8 +364,8 @@ fun HomeScreen(
                             position = GeoPoint(bus.lat, bus.lng)
                             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
                             rotation = bus.heading
-                            title = "Reg: ${bus.busId} | Crowd: ${bus.crowdLevel}"
-                            subDescription = "Speed: ${bus.speed} km/h | Route: ${bus.routeId}"
+                            title = context.getString(R.string.home_marker_title_fmt, bus.busId, bus.crowdLevel)
+                            subDescription = context.getString(R.string.home_marker_sub_fmt, bus.speed, bus.routeId)
                             icon = redBusIcon  // Apply the custom red Material Vector Graphic
                         }
                         view.overlays.add(marker)
@@ -424,7 +424,7 @@ fun HomeScreen(
                     }
                     is com.buslk.ui.search.SearchUiState.Error -> {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text("Error: ${state.message}", color = MaterialTheme.colorScheme.error)
+                            Text(stringResource(id = R.string.home_error_fmt, state.message), color = MaterialTheme.colorScheme.error)
                         }
                     }
                     is com.buslk.ui.search.SearchUiState.Success -> {
@@ -432,7 +432,7 @@ fun HomeScreen(
                             items(state.routes) { route ->
                                 androidx.compose.material3.ListItem(
                                     headlineContent = { Text(route.routeId) },
-                                    supportingContent = { Text("${route.startLocation} to ${route.endLocation}") },
+                                    supportingContent = { Text(stringResource(id = R.string.home_route_span_fmt, route.startLocation, route.endLocation)) },
                                     modifier = Modifier.clickable {
                                         active = false
                                         searchQuery = route.routeId

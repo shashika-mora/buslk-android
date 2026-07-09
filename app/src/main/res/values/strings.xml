@@ -220,4 +220,17 @@
     <string name="search_no_ratings">No Ratings</string>
     <string name="search_recent_feedback">Recent Feedback</string>
     <string name="search_no_comment">No comment provided.</string>
+
+    <!-- Home Screen -->
+    <string name="home_btn_scan">SCAN</string>
+    <string name="home_nearby_buses">Nearby Buses</string>
+    <string name="home_failed_locations">Failed to fetch live locations.</string>
+    <string name="home_retry">Retry</string>
+    <string name="home_no_buses">No buses found nearby.</string>
+    <string name="home_live_badge">Live</string>
+    <string name="home_speed_fmt">%1$d km/h</string>
+    <string name="home_marker_title_fmt">Reg: %1$s | Crowd: %2$s</string>
+    <string name="home_marker_sub_fmt">Speed: %1$.1f km/h | Route: %2$s</string>
+    <string name="home_error_fmt">Error: %1$s</string>
+    <string name="home_route_span_fmt">%1$s to %2$s</string>
 </resources>

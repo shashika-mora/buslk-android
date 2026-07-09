@@ -215,4 +215,17 @@
     <string name="search_no_ratings">ශ්‍රේණිගත කිරීම් නොමැත</string>
     <string name="search_recent_feedback">මෑතකාලීන ප්‍රතිපෝෂණ</string>
     <string name="search_no_comment">අදහස් දක්වා නොමැත.</string>
+
+    <!-- Home Screen -->
+    <string name="home_btn_scan">ස්කෑන්</string>
+    <string name="home_nearby_buses">අසල ඇති බස් රථ</string>
+    <string name="home_failed_locations">සජීවී ස්ථාන ලබා ගැනීමට නොහැකි විය.</string>
+    <string name="home_retry">නැවත උත්සාහ කරන්න</string>
+    <string name="home_no_buses">අසල බස් රථ කිසිවක් හමු නොවීය.</string>
+    <string name="home_live_badge">සජීවී</string>
+    <string name="home_speed_fmt">පැයට කි.මී. %1$d</string>
+    <string name="home_marker_title_fmt">ලියාපදිංචි අංකය: %1$s | සෙනඟ: %2$s</string>
+    <string name="home_marker_sub_fmt">වේගය: පැයට කි.මී. %1$.1f | මාර්ගය: %2$s</string>
+    <string name="home_error_fmt">දෝෂයකි: %1$s</string>
+    <string name="home_route_span_fmt">%1$s සිට %2$s දක්වා</string>
 </resources>

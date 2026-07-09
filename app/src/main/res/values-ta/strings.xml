@@ -215,4 +215,17 @@
     <string name="search_no_ratings">மதிப்பீடுகள் இல்லை</string>
     <string name="search_recent_feedback">சமீபத்திய கருத்துகள்</string>
     <string name="search_no_comment">கருத்துகள் எதுவும் வழங்கப்படவில்லை.</string>
+
+    <!-- Home Screen -->
+    <string name="home_btn_scan">ஸ்கேன்</string>
+    <string name="home_nearby_buses">அருகிலுள்ள பேருந்துகள்</string>
+    <string name="home_failed_locations">நேரடி இடங்களைப் பெற முடியவில்லை.</string>
+    <string name="home_retry">மீண்டும் முயற்சி செய்க</string>
+    <string name="home_no_buses">அருகில் பேருந்துகள் எதுவும் கிடைக்கவில்லை.</string>
+    <string name="home_live_badge">சஜீவி</string>
+    <string name="home_speed_fmt">%1$d கிமீ/மணி</string>
+    <string name="home_marker_title_fmt">பதிவு எண்: %1$s | கூட்டம்: %2$s</string>
+    <string name="home_marker_sub_fmt">வேகம்: %1$.1f கிமீ/மணி | பாதை: %2$s</string>
+    <string name="home_error_fmt">பிழை: %1$s</string>
+    <string name="home_route_span_fmt">%1$s முதல் %2$s வரை</string>
 </resources>
