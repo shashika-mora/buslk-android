@@ -104,4 +104,21 @@
     <string name="ach_eco_warrior_desc">50 பேருந்துப் பயணங்கள்</string>
     <string name="ach_helping_hand_title">உதவும் கரம்</string>
     <string name="ach_helping_hand_desc">10 lost items found</string>
+
+    <!-- Friends Screen -->
+    <string name="friends_title">நண்பர்கள்</string>
+    <string name="friends_anonymous_user">அறியப்படாத பயனர்</string>
+    <string name="friends_tab_on_bus">பேருந்தில்</string>
+    <string name="friends_tab_online_fmt">ஆன்லைன் (%1$d)</string>
+    <string name="friends_tab_all_fmt">அனைத்தும் (%1$d)</string>
+    <string name="friends_btn_add_friend">நண்பரைச் சேர்</string>
+    <string name="friends_icon_desc">நண்பர்கள் ஐகான்</string>
+    <string name="friends_search_placeholder">நண்பர்களைத் தேடுங்கள்…</string>
+    <string name="friends_header_online">ஆன்லைன்</string>
+    <string name="friends_no_friends">நண்பர்கள் யாரும் இதுவரை இல்லை.</string>
+    <string name="friends_header_on_other_buses">வேறு பேருந்துகளில்</string>
+    <string name="friends_not_on_bus">இன்னும் பேருந்தில் இல்லை</string>
+    <string name="friends_scan_qr_prompt">ஒரே பேருந்தில் உள்ள நண்பர்களைப் பார்க்க QR குறியீட்டை ஸ்கேன் செய்யவும்</string>
+    <string name="friends_btn_chat">அரட்டை</string>
+    <string name="friends_status_fmt">புள்ளிகள்: %1$d | %2$s</string>
 </resources>

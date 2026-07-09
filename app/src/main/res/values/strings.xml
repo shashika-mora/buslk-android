@@ -109,4 +109,21 @@
     <string name="ach_eco_warrior_desc">50 bus trips</string>
     <string name="ach_helping_hand_title">Helping Hand</string>
     <string name="ach_helping_hand_desc">10 lost items found</string>
+
+    <!-- Friends Screen -->
+    <string name="friends_title">Friends</string>
+    <string name="friends_anonymous_user">Anonymous User</string>
+    <string name="friends_tab_on_bus">On Bus</string>
+    <string name="friends_tab_online_fmt">Online (%1$d)</string>
+    <string name="friends_tab_all_fmt">All (%1$d)</string>
+    <string name="friends_btn_add_friend">Add Friend</string>
+    <string name="friends_icon_desc">Friends Icon</string>
+    <string name="friends_search_placeholder">Search friends…</string>
+    <string name="friends_header_online">Online</string>
+    <string name="friends_no_friends">No friends available yet.</string>
+    <string name="friends_header_on_other_buses">On Other Buses</string>
+    <string name="friends_not_on_bus">Not on a bus yet</string>
+    <string name="friends_scan_qr_prompt">Scan a QR code to see friends on the same bus</string>
+    <string name="friends_btn_chat">Chat</string>
+    <string name="friends_status_fmt">Points: %1$d | %2$s</string>
 </resources>

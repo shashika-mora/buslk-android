@@ -27,6 +27,9 @@ import com.buslk.ui.theme.DarkButtonBg
 import com.buslk.ui.theme.FriendsPurple
 import com.buslk.ui.theme.UnreadRed
 import com.buslk.ui.theme.BusLKBlue
+import androidx.compose.ui.res.stringResource
+import com.buslk.R
+import java.util.Locale
 
 import com.buslk.data.UserRepository
 import com.buslk.data.UserDoc
@@ -61,13 +64,14 @@ fun FriendsScreen(
     }
 
     // Map fetched DB users to UI States
+    val fallbackName = stringResource(id = R.string.friends_anonymous_user)
     val friendStates = users.map { user ->
         val nameParts = user.displayName.split(" ")
         val initials = nameParts.take(2).joinToString("") { it.take(1).uppercase() }
         FriendState(
-            name = user.displayName.ifEmpty { "Anonymous User" },
+            name = user.displayName.ifEmpty { fallbackName },
             initials = initials.ifEmpty { "?" },
-            statusText = "Points: ${user.points} | ${user.role}",
+            statusText = stringResource(id = R.string.friends_status_fmt, user.points, user.role),
             isOnline = true, 
             unreadCount = 0,
             isOnBus = false
@@ -78,7 +82,11 @@ fun FriendsScreen(
     val otherBusesFriends = emptyList<FriendState>()
 
     var selectedTabIndex by remember { mutableIntStateOf(1) } // Default to "Online (2)"
-    val tabs = listOf("On Bus", "Online (${onlineFriends.size})", "All (${onlineFriends.size})")
+    val tabs = listOf(
+        stringResource(id = R.string.friends_tab_on_bus),
+        stringResource(id = R.string.friends_tab_online_fmt, onlineFriends.size),
+        stringResource(id = R.string.friends_tab_all_fmt, onlineFriends.size)
+    )
 
     Scaffold(
         floatingActionButtonPosition = FabPosition.End,
@@ -89,7 +97,7 @@ fun FriendsScreen(
                 containerColor = Color(0xFF00C853), // Green from UI
                 contentColor = Color.White
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Friend")
+                Icon(Icons.Default.Add, contentDescription = stringResource(id = R.string.friends_btn_add_friend))
             }
         }
     ) { paddingValues ->
@@ -112,13 +120,13 @@ fun FriendsScreen(
                         // We use a local compose icon as placeholder for the group icon
                         Icon(
                             imageVector = Icons.Default.ChatBubbleOutline,
-                            contentDescription = "Friends Icon",
+                            contentDescription = stringResource(id = R.string.friends_icon_desc),
                             tint = Color.White,
                             modifier = Modifier.size(24.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Friends",
+                            text = stringResource(id = R.string.friends_title),
                             style = MaterialTheme.typography.headlineMedium,
                             color = Color.White,
                             fontWeight = FontWeight.Bold
@@ -133,7 +141,7 @@ fun FriendsScreen(
                         value = text,
                         onValueChange = { text = it },
                         placeholder = { 
-                            Text("Search friends...", color = Color.White.copy(alpha = 0.7f)) 
+                            Text(stringResource(id = R.string.friends_search_placeholder), color = Color.White.copy(alpha = 0.7f)) 
                         },
                         leadingIcon = {
                             Icon(Icons.Outlined.Search, contentDescription = null, tint = Color.White.copy(alpha = 0.7f))
@@ -201,7 +209,7 @@ fun FriendsScreen(
                         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 8.dp)) {
                             Box(modifier = Modifier.size(8.dp).background(BusLKBlue, CircleShape))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Online", style = MaterialTheme.typography.titleMedium, color = Color.DarkGray)
+                            Text(stringResource(id = R.string.friends_header_online), style = MaterialTheme.typography.titleMedium, color = Color.DarkGray)
                         }
                     }
 
@@ -213,7 +221,7 @@ fun FriendsScreen(
                         }
                     } else if (onlineFriends.isEmpty()) {
                         item {
-                            Text("No friends available yet.", modifier = Modifier.padding(16.dp), color = Color.Gray)
+                            Text(stringResource(id = R.string.friends_no_friends), modifier = Modifier.padding(16.dp), color = Color.Gray)
                         }
                     }
 
@@ -227,7 +235,7 @@ fun FriendsScreen(
                         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 8.dp)) {
                             Icon(Icons.Outlined.LocationOn, contentDescription = null, tint = Color.DarkGray, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("On Other Buses", style = MaterialTheme.typography.titleMedium, color = Color.DarkGray)
+                            Text(stringResource(id = R.string.friends_header_on_other_buses), style = MaterialTheme.typography.titleMedium, color = Color.DarkGray)
                         }
                     }
 
@@ -243,9 +251,9 @@ fun FriendsScreen(
                         ) {
                             Icon(Icons.Default.ChatBubbleOutline, contentDescription = null, modifier = Modifier.size(64.dp), tint = Color.LightGray)
                             Spacer(modifier = Modifier.height(16.dp))
-                            Text("Not on a bus yet", color = Color.Gray)
+                            Text(stringResource(id = R.string.friends_not_on_bus), color = Color.Gray)
                             Spacer(modifier = Modifier.height(8.dp))
-                            Text("Scan a QR code to see friends on the same bus", color = Color.LightGray, fontSize = 12.sp)
+                            Text(stringResource(id = R.string.friends_scan_qr_prompt), color = Color.LightGray, fontSize = 12.sp)
                         }
                     }
                 }
@@ -338,7 +346,7 @@ fun FriendCard(friend: FriendState, onChatClick: () -> Unit) {
             ) {
                 Icon(Icons.Default.ChatBubbleOutline, contentDescription = null, modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Chat", fontSize = 14.sp)
+                Text(stringResource(id = R.string.friends_btn_chat), fontSize = 14.sp)
             }
         }
     }

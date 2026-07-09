@@ -104,4 +104,21 @@
     <string name="ach_eco_warrior_desc">බස් ගමන් 50 ක්</string>
     <string name="ach_helping_hand_title">සහන හස්තය</string>
     <string name="ach_helping_hand_desc">නැතිවූ බඩු 10 ක් සොයාදීම</string>
+
+    <!-- Friends Screen -->
+    <string name="friends_title">මිතුරන්</string>
+    <string name="friends_anonymous_user">නොදන්නා පරිශීලකයා</string>
+    <string name="friends_tab_on_bus">බස් රථයේ</string>
+    <string name="friends_tab_online_fmt">සක්‍රීයයි (%1$d)</string>
+    <string name="friends_tab_all_fmt">සියල්ල (%1$d)</string>
+    <string name="friends_btn_add_friend">මිතුරෙකු එක් කරන්න</string>
+    <string name="friends_icon_desc">මිතුරන්ගේ නිරූපකය</string>
+    <string name="friends_search_placeholder">මිතුරන් සොයන්න…</string>
+    <string name="friends_header_online">සක්‍රීයයි</string>
+    <string name="friends_no_friends">තවමත් මිතුරන් කිසිවෙක් නැත.</string>
+    <string name="friends_header_on_other_buses">වෙනත් බස් රථවල</string>
+    <string name="friends_not_on_bus">තවමත් බස් රථයක නැත</string>
+    <string name="friends_scan_qr_prompt">එකම බස් රථයේ සිටින මිතුරන් දැකීමට QR කේතය ස්කෑන් කරන්න</string>
+    <string name="friends_btn_chat">කතාබස්</string>
+    <string name="friends_status_fmt">ලකුණු: %1$d | %2$s</string>
 </resources>
