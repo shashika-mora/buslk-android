@@ -65,4 +65,43 @@
     <string name="settings_route_138">මාර්ගය 138</string>
     <string name="settings_language">භාෂාව</string>
     <string name="settings_push_notifications">දැනුම්දීම්</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_unknown">නොදන්නා</string>
+    <string name="profile_unknown_user">නොදන්නා පරිශීලකයා</string>
+    <string name="profile_level_beginner">ආරම්භකයා</string>
+    <string name="profile_total_points">මුළු ලකුණු</string>
+    <string name="profile_trips">ගමන් වාර</string>
+    <string name="profile_feedbacks">ප්‍රතිපෝෂණ</string>
+    <string name="profile_badges">ලාංඡන</string>
+    <string name="profile_tab_trip_history">ගමන් ඉතිහාසය</string>
+    <string name="profile_tab_feedbacks">ප්‍රතිපෝෂණ</string>
+    <string name="profile_tab_achievements">ජයග්‍රහණ</string>
+    <string name="profile_no_trips">ගමන් වාර හමු නොවීය.</string>
+    <string name="profile_no_feedbacks">ප්‍රතිපෝෂණ හමු නොවීය.</string>
+    <string name="profile_bus_id_prefix">බස් රථ අංකය: %1$s</string>
+    <string name="profile_distance_fmt">දුර: %1$.1f km</string>
+    <string name="profile_fare_fmt">ගාස්තුව: රු. %1$.2f</string>
+    <string name="profile_unlocked">🏆 විවෘතයි</string>
+    <string name="profile_locked_prefix">අගුලු දමා ඇත %1$s</string>
+    <string name="profile_unknown_bus">නොදන්නා බස් රථයකි</string>
+    <string name="profile_general">පොදු</string>
+    <string name="profile_no_comment">අදහස් දක්වා නොමැත.</string>
+    <string name="profile_cleanliness">පිරිසිදුකම</string>
+    <string name="profile_comfort">පහසුව</string>
+    <string name="profile_driver">රියදුරු</string>
+
+    <!-- Achievements -->
+    <string name="ach_early_bird_title">කඩිසර කුරුල්ලා</string>
+    <string name="ach_early_bird_desc">උදෑසන ගමන් 10 ක්</string>
+    <string name="ach_reporter_title">වාර්තාකරු</string>
+    <string name="ach_reporter_desc">ජනගහන වාර්තා 20 ක්</string>
+    <string name="ach_safety_first_title">ආරක්ෂාව පළමුව</string>
+    <string name="ach_safety_first_desc">ආරක්ෂක වාර්තා 5 ක්</string>
+    <string name="ach_explorer_title">ගවේෂකයා</string>
+    <string name="ach_explorer_desc">විවිධ මාර්ග 25 ක්</string>
+    <string name="ach_eco_warrior_title">පරිසර රණශූරයා</string>
+    <string name="ach_eco_warrior_desc">බස් ගමන් 50 ක්</string>
+    <string name="ach_helping_hand_title">සහන හස්තය</string>
+    <string name="ach_helping_hand_desc">නැතිවූ බඩු 10 ක් සොයාදීම</string>
 </resources>

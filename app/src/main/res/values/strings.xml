@@ -70,4 +70,43 @@
     <string name="nav_feedback">Feedback</string>
     <string name="nav_settings">Settings</string>
     <string name="nav_chat">Chat</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_unknown">Unknown</string>
+    <string name="profile_unknown_user">Unknown User</string>
+    <string name="profile_level_beginner">Beginner</string>
+    <string name="profile_total_points">Total Points</string>
+    <string name="profile_trips">Trips</string>
+    <string name="profile_feedbacks">Feedbacks</string>
+    <string name="profile_badges">Badges</string>
+    <string name="profile_tab_trip_history">Trip History</string>
+    <string name="profile_tab_feedbacks">Feedbacks</string>
+    <string name="profile_tab_achievements">Achievements</string>
+    <string name="profile_no_trips">No trips found.</string>
+    <string name="profile_no_feedbacks">No feedback found.</string>
+    <string name="profile_bus_id_prefix">Bus ID: %1$s</string>
+    <string name="profile_distance_fmt">Distance: %1$.1f km</string>
+    <string name="profile_fare_fmt">Fare: Rs. %1$.2f</string>
+    <string name="profile_unlocked">🏆 Unlocked</string>
+    <string name="profile_locked_prefix">Locked %1$s</string>
+    <string name="profile_unknown_bus">Unknown Bus</string>
+    <string name="profile_general">General</string>
+    <string name="profile_no_comment">No comment provided.</string>
+    <string name="profile_cleanliness">CLEANLINESS</string>
+    <string name="profile_comfort">COMFORT</string>
+    <string name="profile_driver">DRIVER</string>
+
+    <!-- Achievements -->
+    <string name="ach_early_bird_title">Early Bird</string>
+    <string name="ach_early_bird_desc">10 morning trips</string>
+    <string name="ach_reporter_title">Reporter</string>
+    <string name="ach_reporter_desc">20 crowd reports</string>
+    <string name="ach_safety_first_title">Safety First</string>
+    <string name="ach_safety_first_desc">5 safety reports</string>
+    <string name="ach_explorer_title">Explorer</string>
+    <string name="ach_explorer_desc">25 different routes</string>
+    <string name="ach_eco_warrior_title">Eco Warrior</string>
+    <string name="ach_eco_warrior_desc">50 bus trips</string>
+    <string name="ach_helping_hand_title">Helping Hand</string>
+    <string name="ach_helping_hand_desc">10 lost items found</string>
 </resources>

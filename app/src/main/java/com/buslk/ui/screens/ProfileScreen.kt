@@ -20,6 +20,8 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
+import androidx.compose.ui.res.stringResource
+import com.buslk.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,7 +54,11 @@ fun ProfileScreen(
     val authUiState by authViewModel.uiState.collectAsState()
     val currentUser = (authUiState as? com.buslk.ui.auth.AuthUiState.Success)?.user
     var selectedTabIndex by remember { mutableIntStateOf(0) }
-    val tabs = listOf("Trip History", "Feedbacks", "Achievements")
+    val tabs = listOf(
+        stringResource(id = R.string.profile_tab_trip_history),
+        stringResource(id = R.string.profile_tab_feedbacks),
+        stringResource(id = R.string.profile_tab_achievements)
+    )
 
     // Trigger data load when the screen becomes active
     val uid = currentUser?.uid ?: ""
@@ -125,40 +131,48 @@ fun ProfileScreen(
                                 modifier = Modifier.size(48.dp)
                             ) {
                                 Box(contentAlignment = Alignment.Center) {
-                                    val displayName = userData.displayName.ifBlank { currentUser?.displayName ?: "Unknown User" }
+                                    val fallbackName = stringResource(id = R.string.profile_unknown_user)
+                                    val displayName = userData.displayName.ifBlank { currentUser?.displayName ?: fallbackName }
                                     val initials = displayName.split(" ").mapNotNull { it.firstOrNull()?.uppercase() }.take(2).joinToString("")
                                     Text(initials.ifBlank { "?" }, color = BusLKBlue, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                                 }
-                            }
+                             }
 
-                            Spacer(modifier = Modifier.width(12.dp))
+                             Spacer(modifier = Modifier.width(12.dp))
 
-                            Column {
-                                Text(userData.displayName.ifBlank { currentUser?.displayName ?: "Unknown User" }, fontSize = 16.sp, color = Color.White, fontWeight = FontWeight.Bold)
-                                Text(userData.email.ifBlank { currentUser?.email ?: "" }, color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
-                                
-                                Spacer(modifier = Modifier.height(6.dp))
-                                
-                                Surface(
-                                    shape = RoundedCornerShape(8.dp),
-                                    color = GoldBadge
-                                ) {
-                                    Row(
-                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Icon(Icons.Outlined.StarRate, contentDescription = null, tint = Color.White, modifier = Modifier.size(10.dp))
-                                        Spacer(modifier = Modifier.width(2.dp))
-                                        Text(userData.level.ifBlank { "Beginner" }, color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                                    }
-                                }
-                            }
-                        }
+                             Column {
+                                 val fallbackName = stringResource(id = R.string.profile_unknown_user)
+                                 Text(userData.displayName.ifBlank { currentUser?.displayName ?: fallbackName }, fontSize = 16.sp, color = Color.White, fontWeight = FontWeight.Bold)
+                                 Text(userData.email.ifBlank { currentUser?.email ?: "" }, color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
+                                 
+                                 Spacer(modifier = Modifier.height(6.dp))
+                                 
+                                 Surface(
+                                     shape = RoundedCornerShape(8.dp),
+                                     color = GoldBadge
+                                 ) {
+                                     Row(
+                                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                         verticalAlignment = Alignment.CenterVertically
+                                     ) {
+                                         Icon(Icons.Outlined.StarRate, contentDescription = null, tint = Color.White, modifier = Modifier.size(10.dp))
+                                         Spacer(modifier = Modifier.width(2.dp))
+                                         val fallbackLevel = stringResource(id = R.string.profile_level_beginner)
+                                         val displayLevel = if (userData.level.lowercase(Locale.getDefault()) == "beginner") {
+                                             fallbackLevel
+                                         } else {
+                                             userData.level.ifBlank { fallbackLevel }
+                                         }
+                                         Text(displayLevel, color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                     }
+                                 }
+                             }
+                         }
 
-                        // Settings Button
-                        IconButton(onClick = onSettingsClick) {
-                            Icon(Icons.Outlined.Settings, contentDescription = "Settings", tint = Color.White)
-                        }
+                         // Settings Button
+                         IconButton(onClick = onSettingsClick) {
+                             Icon(Icons.Outlined.Settings, contentDescription = stringResource(id = R.string.settings_title), tint = Color.White)
+                         }
                     }
                 }
             }
@@ -193,7 +207,7 @@ fun ProfileScreen(
                                 verticalAlignment = Alignment.Top
                             ) {
                                 Column {
-                                    Text("Total Points", color = Color.White.copy(alpha = 0.9f), fontSize = 14.sp)
+                                    Text(stringResource(id = R.string.profile_total_points), color = Color.White.copy(alpha = 0.9f), fontSize = 14.sp)
                                     Text("${userData.points}", color = Color.White, fontSize = 48.sp, fontWeight = FontWeight.Light)
                                 }
                                 
@@ -216,18 +230,18 @@ fun ProfileScreen(
 
                                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = statModifier) {
                                     Text("${userData.stats.totalTrips}", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                                    Text("Trips", color = Color.White.copy(alpha = 0.9f), fontSize = 12.sp)
+                                    Text(stringResource(id = R.string.profile_trips), color = Color.White.copy(alpha = 0.9f), fontSize = 12.sp)
                                 }
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = statModifier) {
                                     Text("${feedbacks.size}", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                                    Text("Feedbacks", color = Color.White.copy(alpha = 0.9f), fontSize = 12.sp)
+                                    Text(stringResource(id = R.string.profile_feedbacks), color = Color.White.copy(alpha = 0.9f), fontSize = 12.sp)
                                 }
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = statModifier) {
                                     val unlockedBadges = achievementsMap.values.count { it.unlocked }
                                     Text("$unlockedBadges", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                                    Text("Badges", color = Color.White.copy(alpha = 0.9f), fontSize = 12.sp)
+                                    Text(stringResource(id = R.string.profile_badges), color = Color.White.copy(alpha = 0.9f), fontSize = 12.sp)
                                 }
                             }
                         }
@@ -293,7 +307,7 @@ fun ProfileScreen(
 fun TripHistoryList(trips: List<TripDoc>) {
     if (trips.isEmpty()) {
         Box(modifier = Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
-            Text("No trips found.", color = Color.Gray)
+            Text(stringResource(id = R.string.profile_no_trips), color = Color.Gray)
         }
         return
     }
@@ -339,7 +353,7 @@ fun TripHistoryList(trips: List<TripDoc>) {
                             // Locations & Status
                             Column {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Text("Bus ID: ${trip.busId}", color = Color.Gray, fontSize = 12.sp)
+                                    Text(stringResource(id = R.string.profile_bus_id_prefix, trip.busId), color = Color.Gray, fontSize = 12.sp)
                                     Spacer(modifier = Modifier.width(8.dp))
                                     // Status Pill
                                     val statusColor = when (trip.status.uppercase()) {
@@ -365,8 +379,9 @@ fun TripHistoryList(trips: List<TripDoc>) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(Icons.Outlined.LocationOn, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(12.dp))
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    val startLoc = trip.startLocationName.ifBlank { "Unknown" }
-                                    val endLoc = trip.endLocationName.ifBlank { "Unknown" }
+                                    val fallbackLoc = stringResource(id = R.string.profile_unknown)
+                                    val startLoc = trip.startLocationName.ifBlank { fallbackLoc }
+                                    val endLoc = trip.endLocationName.ifBlank { fallbackLoc }
                                     Text("$startLoc ➔ $endLoc", fontSize = 14.sp)
                                 }
                             }
@@ -396,8 +411,8 @@ fun TripHistoryList(trips: List<TripDoc>) {
                         modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("Distance: ${String.format(Locale.getDefault(), "%.1f", trip.distanceKm)} km", color = Color.DarkGray, fontSize = 12.sp)
-                        Text("Fare: Rs. ${String.format(Locale.getDefault(), "%.2f", trip.totalFare)}", color = Color.DarkGray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(id = R.string.profile_distance_fmt, trip.distanceKm), color = Color.DarkGray, fontSize = 12.sp)
+                        Text(stringResource(id = R.string.profile_fare_fmt, trip.totalFare), color = Color.DarkGray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     }
 
                     // Bottom Metadata (Date & Time)
@@ -428,12 +443,12 @@ fun TripHistoryList(trips: List<TripDoc>) {
 
 // --- Master list of definitions for rendering ---
 val achievementDefinitions = mapOf(
-    "early_bird" to Triple("🌅", "Early Bird", "10 morning trips"),
-    "reporter" to Triple("📊", "Reporter", "20 crowd reports"),
-    "safety_first" to Triple("🛡️", "Safety First", "5 safety reports"),
-    "explorer" to Triple("🗺️", "Explorer", "25 different routes"),
-    "eco_warrior" to Triple("🌱", "Eco Warrior", "50 bus trips"),
-    "helping_hand" to Triple("🤝", "Helping Hand", "10 lost items found")
+    "early_bird" to Triple("🌅", R.string.ach_early_bird_title, R.string.ach_early_bird_desc),
+    "reporter" to Triple("📊", R.string.ach_reporter_title, R.string.ach_reporter_desc),
+    "safety_first" to Triple("🛡️", R.string.ach_safety_first_title, R.string.ach_safety_first_desc),
+    "explorer" to Triple("🗺️", R.string.ach_explorer_title, R.string.ach_explorer_desc),
+    "eco_warrior" to Triple("🌱", R.string.ach_eco_warrior_title, R.string.ach_eco_warrior_desc),
+    "helping_hand" to Triple("🤝", R.string.ach_helping_hand_title, R.string.ach_helping_hand_desc)
 )
 
 @Composable
@@ -450,7 +465,7 @@ fun AchievementsGrid(userAchievements: Map<String, AchievementDoc>) {
         val itemsList = achievementDefinitions.entries.toList()
         
         items(itemsList) { (key, definition) ->
-            val (emoji, title, desc) = definition
+            val (emoji, titleRes, descRes) = definition
             val progressDoc = userAchievements[key]
             val isUnlocked = progressDoc?.unlocked == true
 
@@ -469,9 +484,9 @@ fun AchievementsGrid(userAchievements: Map<String, AchievementDoc>) {
                     Spacer(modifier = Modifier.height(16.dp))
                     
                     // Texts
-                    Text(title, fontWeight = FontWeight.Bold, fontSize = 16.sp, textAlign = TextAlign.Center)
+                    Text(stringResource(id = titleRes), fontWeight = FontWeight.Bold, fontSize = 16.sp, textAlign = TextAlign.Center)
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(desc, color = Color.Gray, fontSize = 12.sp, textAlign = TextAlign.Center)
+                    Text(stringResource(id = descRes), color = Color.Gray, fontSize = 12.sp, textAlign = TextAlign.Center)
                     
                     Spacer(modifier = Modifier.weight(1f))
                     
@@ -481,7 +496,7 @@ fun AchievementsGrid(userAchievements: Map<String, AchievementDoc>) {
                             shape = RoundedCornerShape(8.dp),
                             color = PositiveGreen
                         ) {
-                            Text("🏆 Unlocked", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp))
+                            Text(stringResource(id = R.string.profile_unlocked), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp))
                         }
                     } else {
                         val progressDetails = if (progressDoc != null) "${progressDoc.progress}/${progressDoc.target}" else ""
@@ -490,7 +505,7 @@ fun AchievementsGrid(userAchievements: Map<String, AchievementDoc>) {
                             color = Color.White,
                             border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray)
                         ) {
-                            Text("Locked $progressDetails", color = Color.Gray, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp))
+                            Text(stringResource(id = R.string.profile_locked_prefix, progressDetails), color = Color.Gray, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp))
                         }
                     }
                 }
@@ -506,7 +521,7 @@ fun AchievementsGrid(userAchievements: Map<String, AchievementDoc>) {
 fun FeedbackList(feedbacks: List<FeedbackDoc>) {
     if (feedbacks.isEmpty()) {
         Box(modifier = Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
-            Text("No feedback found.", color = Color.Gray)
+            Text(stringResource(id = R.string.profile_no_feedbacks), color = Color.Gray)
         }
         return
     }
@@ -577,13 +592,13 @@ fun FeedbackList(feedbacks: List<FeedbackDoc>) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Outlined.LocationOn, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(12.dp))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text(feedback.busId.ifBlank { "Unknown Bus" }, color = Color.Gray, fontSize = 12.sp)
+                            Text(feedback.busId.ifBlank { stringResource(id = R.string.profile_unknown_bus) }, color = Color.Gray, fontSize = 12.sp)
                             
                             Spacer(modifier = Modifier.width(8.dp))
                             Text("•", color = Color.LightGray, fontSize = 12.sp)
                             Spacer(modifier = Modifier.width(8.dp))
                             
-                            Text(feedback.routeId.ifBlank { "General" }, color = Color.Gray, fontSize = 12.sp, maxLines = 1)
+                            Text(feedback.routeId.ifBlank { stringResource(id = R.string.profile_general) }, color = Color.Gray, fontSize = 12.sp, maxLines = 1)
                         }
                         
                         Spacer(modifier = Modifier.height(4.dp))
@@ -605,7 +620,7 @@ fun FeedbackList(feedbacks: List<FeedbackDoc>) {
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(
-                                text = "\"${feedback.comment.ifBlank { "No comment provided." }}\"",
+                                text = "\"${feedback.comment.ifBlank { stringResource(id = R.string.profile_no_comment) }}\"",
                                 fontSize = 14.sp,
                                 fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
                                 modifier = Modifier.padding(12.dp)
@@ -621,7 +636,11 @@ fun FeedbackList(feedbacks: List<FeedbackDoc>) {
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            val attributes = listOf("cleanliness" to "CLEANLINESS", "comfort" to "COMFORT", "driver" to "DRIVER")
+                            val attributes = listOf(
+                                "cleanliness" to stringResource(id = R.string.profile_cleanliness),
+                                "comfort" to stringResource(id = R.string.profile_comfort),
+                                "driver" to stringResource(id = R.string.profile_driver)
+                            )
                             attributes.forEach { (key, label) ->
                                 Column {
                                     Text(label, fontSize = 9.sp, color = Color.Gray, fontWeight = FontWeight.Bold)

@@ -65,4 +65,43 @@
     <string name="settings_route_138">பாதை 138</string>
     <string name="settings_language">மொழி</string>
     <string name="settings_push_notifications">புஷ் அறிவிப்புகள்</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_unknown">அறியப்படாதது</string>
+    <string name="profile_unknown_user">அறியப்படாத பயனர்</string>
+    <string name="profile_level_beginner">தொடக்கநிலை</string>
+    <string name="profile_total_points">மொத்த புள்ளிகள்</string>
+    <string name="profile_trips">பயணங்கள்</string>
+    <string name="profile_feedbacks">கருத்துகள்</string>
+    <string name="profile_badges">சின்னங்கள்</string>
+    <string name="profile_tab_trip_history">பயண வரலாறு</string>
+    <string name="profile_tab_feedbacks">கருத்துகள்</string>
+    <string name="profile_tab_achievements">சாதனைகள்</string>
+    <string name="profile_no_trips">பயணங்கள் எதுவும் இல்லை.</string>
+    <string name="profile_no_feedbacks">கருத்துகள் எதுவும் இல்லை.</string>
+    <string name="profile_bus_id_prefix">பேருந்து எண்: %1$s</string>
+    <string name="profile_distance_fmt">தூரம்: %1$.1f கி.மீ</string>
+    <string name="profile_fare_fmt">கட்டணம்: ரூ. %1$.2f</string>
+    <string name="profile_unlocked">🏆 திறக்கப்பட்டது</string>
+    <string name="profile_locked_prefix">பூட்டப்பட்டது %1$s</string>
+    <string name="profile_unknown_bus">அறியப்படாத பேருந்து</string>
+    <string name="profile_general">பொதுவானது</string>
+    <string name="profile_no_comment">கருத்து எதுவும் தெரிவிக்கப்படவில்லை.</string>
+    <string name="profile_cleanliness">சுத்தம்</string>
+    <string name="profile_comfort">வசதி</string>
+    <string name="profile_driver">ஓட்டுனர்</string>
+
+    <!-- Achievements -->
+    <string name="ach_early_bird_title">முன்கூட்டியே வருபவர்</string>
+    <string name="ach_early_bird_desc">10 காலை நேரப் பயணங்கள்</string>
+    <string name="ach_reporter_title">செய்தியாளர்</string>
+    <string name="ach_reporter_desc">20 கூட்ட நெரிசல் அறிக்கைகள்</string>
+    <string name="ach_safety_first_title">பாதுகாப்பே முதன்மை</string>
+    <string name="ach_safety_first_desc">5 பாதுகாப்பு அறிக்கைகள்</string>
+    <string name="ach_explorer_title">ஆராய்ச்சியாளர்</string>
+    <string name="ach_explorer_desc">25 வெவ்வேறு பாதைகள்</string>
+    <string name="ach_eco_warrior_title">சுற்றுச்சூழல் காவலர்</string>
+    <string name="ach_eco_warrior_desc">50 பேருந்துப் பயணங்கள்</string>
+    <string name="ach_helping_hand_title">உதவும் கரம்</string>
+    <string name="ach_helping_hand_desc">10 lost items found</string>
 </resources>
