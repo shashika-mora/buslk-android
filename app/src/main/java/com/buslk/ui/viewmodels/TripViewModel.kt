@@ -124,8 +124,12 @@ class TripViewModel(
             if (result.isSuccess) {
                 if (busId != null) {
                     try {
-                        FirebaseDatabase.getInstance("https://buslk-app-default-rtdb.asia-southeast1.firebasedatabase.app")
-                            .reference.child("bus_locations").child(busId).removeValue().await()
+                        val hasOthersResult = tripRepository.hasOtherActivePassengers(busId)
+                        val hasOthers = hasOthersResult.getOrDefault(false)
+                        if (!hasOthers) {
+                            FirebaseDatabase.getInstance("https://buslk-app-default-rtdb.asia-southeast1.firebasedatabase.app")
+                                .reference.child("bus_locations").child(busId).removeValue().await()
+                        }
                     } catch (e: Exception) {
                         android.util.Log.e("TripViewModel", "Error deleting live location for bus $busId", e)
                     }

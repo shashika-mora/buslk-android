@@ -2,6 +2,9 @@ package com.buslk.ui.map
 
 import android.util.Log
 import android.view.ViewGroup
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
@@ -45,16 +48,30 @@ import java.util.concurrent.Executors
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun QRScanner(onQrScanned: (String) -> Unit, onClose: () -> Unit) {
+    val context = LocalContext.current
     val cameraPermissionState = rememberPermissionState(android.Manifest.permission.CAMERA)
 
     if (!cameraPermissionState.status.isGranted) {
         AlertDialog(
             onDismissRequest = onClose,
             title = { Text("Camera Permission Required") },
-            text = { Text("This app requires camera access to scan QR codes. Please grant permission manually to continue.") },
+            text = { Text("This app requires camera access to scan QR codes. If the system prompt does not appear, click \"Open Settings\" to enable it in your system settings.") },
             confirmButton = {
-                Button(onClick = { cameraPermissionState.launchPermissionRequest() }) {
-                    Text("Grant Permission")
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextButton(onClick = {
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.fromParts("package", context.packageName, null)
+                        }
+                        context.startActivity(intent)
+                    }) {
+                        Text("Open Settings")
+                    }
+                    Button(onClick = { cameraPermissionState.launchPermissionRequest() }) {
+                        Text("Grant Permission")
+                    }
                 }
             },
             dismissButton = {

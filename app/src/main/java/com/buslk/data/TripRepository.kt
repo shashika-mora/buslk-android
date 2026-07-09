@@ -14,6 +14,7 @@ interface ITripRepository {
     suspend fun startTrip(userId: String, busId: String): Result<String>
     suspend fun endTrip(tripId: String): Result<Unit>
     suspend fun reportCrowdLevel(userId: String, level: String): Result<Unit>
+    suspend fun hasOtherActivePassengers(busId: String): Result<Boolean>
 }
 
 class TripRepository : ITripRepository {
@@ -88,6 +89,20 @@ class TripRepository : ITripRepository {
             Result.success(Unit)
         } catch (e: Exception) {
             Log.e("TripRepository", "Error updating crowd level points for user $userId", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun hasOtherActivePassengers(busId: String): Result<Boolean> {
+        return try {
+            val snapshot = firestore.collection("trips")
+                .whereEqualTo("busId", busId)
+                .whereEqualTo("status", "ACTIVE")
+                .get()
+                .await()
+            Result.success(!snapshot.isEmpty)
+        } catch (e: Exception) {
+            Log.e("TripRepository", "Error checking active passengers for bus $busId", e)
             Result.failure(e)
         }
     }
