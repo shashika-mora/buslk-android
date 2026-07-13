@@ -75,3 +75,5 @@ obj/
 
 *.txt
 *.log
+
+app/google-services.json
